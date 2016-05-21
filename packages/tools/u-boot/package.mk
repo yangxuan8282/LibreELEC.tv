@@ -71,6 +71,11 @@ make_target() {
       make CROSS_COMPILE=aarch64-none-elf- ARCH=arm mrproper
       make CROSS_COMPILE=aarch64-none-elf- ARCH=arm $UBOOT_TARGET
       make CROSS_COMPILE=aarch64-none-elf- ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true"
+    elif [ "$PROJECT" = "SPOT_i7" ]; then
+      export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-none-elf/bin/:$PATH
+      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm mrproper
+      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm $UBOOT_TARGET
+      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true"
     else
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm mrproper
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm $UBOOT_TARGET

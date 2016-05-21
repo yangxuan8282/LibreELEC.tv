@@ -269,8 +269,8 @@ fi # bootloader
   dd if="$OE_TMP/part2.ext4" of="$DISK" bs=512 seek="$STORAGE_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
 
 # gzip
-  echo "image: compressing..."
-  gzip $DISK
+#  echo "image: compressing..."
+#  gzip $DISK
 
 # set owner
   if [ -n "$SUDO_USER" ] ; then
