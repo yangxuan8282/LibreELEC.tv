@@ -37,7 +37,7 @@
     KERNEL_TARGET="Image"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="amlogic/gxbb_p200.dtb"
+    KERNEL_UBOOT_EXTRA_TARGET="amlogic/gxbb_p200_2G.dtb"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD="dtbs"
@@ -147,4 +147,4 @@
     BUILD_ANDROID_BOOTIMG="yes"
 
   # Path to a file that will be passed as the --second parameter to Android mkbootimg
-    ANDROID_BOOTIMG_SECOND="arch/arm64/boot/dts/amlogic/gxbb_p200.dtb"
+    ANDROID_BOOTIMG_SECOND="arch/arm64/boot/dts/amlogic/gxbb_p200_2G.dtb"

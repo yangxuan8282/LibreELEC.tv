@@ -34,6 +34,10 @@ case $PROJECT in
     PKG_VERSION="210755d"
     PKG_URL="http://amlinux.ru/source/$PKG_NAME-$PKG_VERSION.tar.gz"
     ;;
+  *)
+    PKG_VERSION="210755d"
+    PKG_URL="http://amlinux.ru/source/$PKG_NAME-$PKG_VERSION.tar.gz"
+    ;;
 esac
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"

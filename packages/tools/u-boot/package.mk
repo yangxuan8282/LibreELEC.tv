@@ -66,12 +66,7 @@ make_target() {
   done
 
   for UBOOT_TARGET in $UBOOT_CONFIG; do
-    if [ "$PROJECT" = "Odroid_C2" ]; then
-      export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-none-elf/bin/:$PATH
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm mrproper
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm $UBOOT_TARGET
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true"
-    elif [ "$PROJECT" = "SPOT_i7" ]; then
+    if [ "$PROJECT" = "Odroid_C2" -o "SPOT_i7" -o  "Vega_S95" ]; then
       export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-none-elf/bin/:$PATH
       make CROSS_COMPILE=aarch64-none-elf- ARCH=arm mrproper
       make CROSS_COMPILE=aarch64-none-elf- ARCH=arm $UBOOT_TARGET
