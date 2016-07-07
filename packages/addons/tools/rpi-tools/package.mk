@@ -18,7 +18,7 @@
 
 PKG_NAME="rpi-tools"
 PKG_VERSION=""
-PKG_REV="100"
+PKG_REV="102"
 PKG_ARCH="arm"
 PKG_LICENSE="GPL"
 PKG_SITE=""
@@ -27,7 +27,7 @@ PKG_DEPENDS_TARGET="toolchain RPi.GPIO picamera gpiozero"
 PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="A bundle of tools and programs for use on the Raspberry Pi"
-PKG_LONGDESC="This bundle currently includes RPi.GPIO, picamera, and gpiozero python modules"
+PKG_LONGDESC="This bundle currently includes RPi.GPIO, picamera, gpiozero python modules"
 PKG_DISCAIMER="Raspberry Pi is a trademark of the Raspberry Pi Foundation http://www.raspberrypi.org"
 
 PKG_IS_ADDON="yes"

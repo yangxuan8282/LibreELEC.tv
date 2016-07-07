@@ -18,7 +18,7 @@
 
 PKG_NAME="sundtek-mediatv"
 PKG_VERSION="7.0"
-PKG_REV="100"
+PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://support.sundtek.com/"
@@ -45,6 +45,9 @@ make_target() {
       ;;
     arm)
       INSTALLER_URL="http://sundtek.de/media/netinst/armsysvhf/installer.tar.gz"
+      ;;
+    aarch64)
+      INSTALLER_URL="http://sundtek.de/media/netinst/arm64/installer.tar.gz"
       ;;
   esac
   
