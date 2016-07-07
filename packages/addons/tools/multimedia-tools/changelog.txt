@@ -1,2 +1,8 @@
+8.0.102
+- Remove IR support from squeezelite
+
+8.0.101
+- Add mpg123 and squeezelite
+
 8.0.100
 - Initial Release

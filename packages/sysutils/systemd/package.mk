@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="systemd"
-PKG_VERSION="229"
+PKG_VERSION="230"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -41,7 +41,6 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --disable-nls \
                            --disable-dbus \
                            --disable-utmp \
-                           --disable-compat-libs \
                            --disable-coverage \
                            --enable-kmod \
                            --disable-xkbcommon \
@@ -69,7 +68,6 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --disable-libiptc \
                            --disable-binfmt \
                            --disable-vconsole \
-                           --disable-bootchart \
                            --disable-quotacheck \
                            --enable-tmpfiles \
                            --disable-sysusers \
@@ -105,7 +103,6 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --with-dbuspolicydir=/etc/dbus-1/system.d \
                            --with-dbussessionservicedir=/usr/share/dbus-1/services \
                            --with-dbussystemservicedir=/usr/share/dbus-1/system-services \
-                           --with-dbusinterfacedir=/usr/share/dbus-1/interfaces \
                            --with-rootprefix=/usr \
                            --with-rootlibdir=/lib"
 
@@ -175,8 +172,9 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd/system-generators
   rm -rf $INSTALL/usr/lib/systemd/catalog
 
-  # meh presets
-  rm -rf $INSTALL/usr/lib/systemd/system-preset
+  # distro preset policy
+  rm -f $INSTALL/usr/lib/systemd/system-preset/*
+  echo "disable *" > $INSTALL/usr/lib/systemd/system-preset/99-default.preset
 
   # remove networkd
   rm -rf $INSTALL/usr/lib/systemd/network
@@ -184,7 +182,6 @@ post_makeinstall_target() {
   # tune journald.conf
   sed -e "s,^.*Compress=.*$,Compress=no,g" -i $INSTALL/etc/systemd/journald.conf
   sed -e "s,^.*SplitMode=.*$,SplitMode=none,g" -i $INSTALL/etc/systemd/journald.conf
-  sed -e "s,^.*MaxRetentionSec=.*$,MaxRetentionSec=1day,g" -i $INSTALL/etc/systemd/journald.conf
   sed -e "s,^.*RuntimeMaxUse=.*$,RuntimeMaxUse=2M,g" -i $INSTALL/etc/systemd/journald.conf
   sed -e "s,^.*RuntimeMaxFileSize=.*$,RuntimeMaxFileSize=128K,g" -i $INSTALL/etc/systemd/journald.conf
   sed -e "s,^.*SystemMaxUse=.*$,SystemMaxUse=10M,g" -i $INSTALL/etc/systemd/journald.conf

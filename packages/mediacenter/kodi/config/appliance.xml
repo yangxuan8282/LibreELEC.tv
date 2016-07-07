@@ -18,6 +18,11 @@
           <visible>false</visible>
         </setting>
       </group>
+      <group id="3">
+        <setting id="videoscreen.noofbuffers">
+          <default>2</default>
+        </setting>
+      </group>
     </category>
     <category id="audio">
       <group id="1">
@@ -83,7 +88,7 @@
     </category>
 
     <category id="pvrpowermanagement">
-      <group id="2">
+      <group id="1">
         <setting id="pvrpowermanagement.setwakeupcmd">
           <default>/usr/bin/setwakeup.sh</default>
         </setting>
