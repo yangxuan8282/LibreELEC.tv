@@ -1,2 +1,6 @@
-if fatload usb 0 1080000 kernel.img; then if fatload usb 0 0x1000000 dtb.img; then bootm 1080000;fi;fi;
-if fatload mmc 0 1080000 kernel.img; then if fatload mmc 0 0x1000000 dtb.img; then bootm 1080000;fi;fi;
+setenv video_output "1080p60hz"
+setenv video_bpp    "32"
+setenv libreelec "quiet"
+setenv bootargs "boot=LABEL=BOOT disk=LABEL=STORAGE console=ttyS0,115200n8 console=tty0 no_console_suspend hdmimode=${video_output} m_bpp=${video_bpp} consoleblank=0 hdmitx=cecf ${libreelec}"
+if fatload usb 0:1 11000000 kernel.img; then if fatload usb 0:1 0x1000000 dtb.img; then booti 0x11000000 - 0x1000000;fi;fi;
+if fatload mmc 0:1 11000000 kernel.img; then if fatload mmc 0:1 0x1000000 dtb.img; then booti 0x11000000 - 0x1000000;fi;fi;
