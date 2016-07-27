@@ -1,5 +1,0 @@
-8.0.100
-- Update for LibreELEC 8.0
-
-7.0.100
-- initial LibreELEC version
