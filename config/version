@@ -1,0 +1,19 @@
+# VERSION: set full version, use "devel" for development version
+  case $PROJECT in
+    S805)
+      LIBREELEC_VERSION="7.0.2.4"
+      ;;
+    S905)
+      LIBREELEC_VERSION="7.0.2.004"
+      ;;
+    *)
+      LIBREELEC_VERSION="devel"
+      ;;
+  esac
+
+# OS_VERSION: OS Version
+  OS_VERSION="7.0"
+
+# ADDON_VERSION: Addon version
+  ADDON_VERSION="7.0"
+
