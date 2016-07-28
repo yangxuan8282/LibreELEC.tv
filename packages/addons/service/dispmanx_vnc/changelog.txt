@@ -1,5 +1,0 @@
-7.0.101
-- Move settings to Kodi
-
-7.0.100
-- Initial addon
