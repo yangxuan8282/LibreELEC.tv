@@ -5,6 +5,26 @@ package_extract_file("backuptool.sh", "/tmp/backuptool.sh");
 set_metadata("/tmp/backuptool.sh", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0);
 run_program("/tmp/backuptool.sh", "backup");
 
+# Format data partition if previous installation is Android
+mount("ext4", "EMMC", "/dev/block/system", "/system");
+if
+  sha1_check(read_file("/system/build.prop"))
+then
+  ui_print("Wiping data");
+  format("ext4", "EMMC", "/dev/block/data", "0", "/data");
+endif;
+unmount("/system");
+
+if
+  sha1_check(read_file("/sdcard/ledtb.img"))
+then
+  ui_print("Writing device tree from ledtb.img");
+  write_dtb_image("/sdcard/ledtb.img");
+else
+  ui_print("Writing device tree from install ZIP");
+  write_dtb_image(package_extract_file("dtb.img"));
+endif;
+
 ui_print("Writing kernel image");
 write_raw_image(package_extract_file("KERNEL"), "boot");
 
@@ -20,6 +40,5 @@ run_program("/tmp/backuptool.sh", "restore");
 
 set_bootloader_env("upgrade_step", "2");
 set_bootloader_env("force_auto_update", "false");
-set_bootloader_env("libreonnand", "1");
 
 ui_print("LibreELEC Installed Successfully");

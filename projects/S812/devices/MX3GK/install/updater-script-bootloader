@@ -1,0 +1,7 @@
+ui_print("Writing uenv variables");
+
+set_bootloader_env("upgrade_step", "3");
+set_bootloader_env("bootcmd", "if mmcinfo; then if fatload mmc 0 ${loadaddr} kernel.img; then setenv bootargs ${bootargs} bootfromsd; bootm; fi; fi; run storeboot");
+set_bootloader_env("upgrade_step", "2");
+
+ui_print("Bootloader updated successfully");

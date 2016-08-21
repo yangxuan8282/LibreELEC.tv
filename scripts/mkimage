@@ -61,8 +61,8 @@ trap cleanup SIGINT
   UUID_2=$(date '+%M%S')
   FAT_VOL_ID="${UUID_1}${UUID_2}"
   UUID_SYSTEM="${UUID_1}-${UUID_2}"
-  LABEL_part1="BOOT"
-  LABEL_part2="STORAGE"
+  FAT_VOL_LABEL="BOOT"
+  EXT_VOL_LABEL="DISK"
 
 # create an image
   echo
@@ -88,7 +88,6 @@ trap cleanup SIGINT
     parted -s "$DISK" set 1 boot on
   fi
   sync
-
 # create part2
   echo "image: creating part2..."
   STORAGE_PART_START=$(( $SYSTEM_PART_END + 2048 ))
@@ -120,7 +119,7 @@ fi
   if [ "$BOOTLOADER" = "syslinux" ]; then
     mformat -v "$FAT_VOL_ID" -N "$FAT_VOL_ID" ::
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
-    mformat -v $LABEL_part1 ::
+    mformat -v "$FAT_VOL_LABEL" ::
   fi
   sync
 
@@ -227,6 +226,11 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
     mcopy $RELEASE_DIR/target/KERNEL.md5 "::/$KERNEL_NAME.md5"
     mcopy $RELEASE_DIR/target/SYSTEM.md5 ::/SYSTEM.md5
 
+    if [ -f $TARGET_IMG/$IMAGE_NAME.dtb ]; then
+      echo "image: copying dtb to part1..."
+      mcopy $TARGET_IMG/$IMAGE_NAME.dtb ::/dtb.img
+    fi
+
     if [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.img" ]; then
       mcopy "$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.img" ::/u-boot.img
     elif [ -f $RELEASE_DIR/3rdparty/bootloader/u-boot.img ]; then
@@ -245,12 +249,15 @@ if [ -f "$INSTALL_SRC_DIR/aml_autoscript.src" ]; then
   mcopy "$OE_TMP/aml_autoscript" "::/aml_autoscript"
 fi
 
+if [ -f "$INSTALL_SRC_DIR/s805_autoscript.src" ]; then
+  $MKIMAGE_TOOL_CMD "$INSTALL_SRC_DIR/s805_autoscript.src" "$OE_TMP/s805_autoscript"
+  mcopy "$OE_TMP/s805_autoscript" "::/s805_autoscript"
+fi
 
 if [ -f "$INSTALL_SRC_DIR/s905_autoscript.src" ]; then
   $MKIMAGE_TOOL_CMD "$INSTALL_SRC_DIR/s905_autoscript.src" "$OE_TMP/s905_autoscript"
   mcopy "$OE_TMP/s905_autoscript" "::/s905_autoscript"
 fi
-
 
 # extract part2 from image to format and copy files
   echo "image: extracting part2 from image..."
@@ -261,7 +268,7 @@ fi
 # create filesystem on part2
   echo "image: creating filesystem on part2..."
   mke2fs -F -q -t ext4 -m 0 "$OE_TMP/part2.ext4"
-  tune2fs -L $LABEL_part2 "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
+  tune2fs -L "$EXT_VOL_LABEL" -U $UUID_STORAGE "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   e2fsck -n "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   sync
 
@@ -280,8 +287,8 @@ fi
   dd if="$OE_TMP/part2.ext4" of="$DISK" bs=512 seek="$STORAGE_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
 
 # gzip
-  echo "image: compressing..."
-  gzip $DISK
+#  echo "image: compressing..."
+#  gzip $DISK
 
 # set owner
   if [ -n "$SUDO_USER" ] ; then

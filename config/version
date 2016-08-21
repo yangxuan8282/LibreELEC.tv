@@ -1,10 +1,16 @@
 # VERSION: set full version, use "devel" for development version
   case $PROJECT in
+    S802)
+      LIBREELEC_VERSION="7.0.2.4"
+      ;;
     S805)
+      LIBREELEC_VERSION="7.0.2.5"
+      ;;
+    S812)
       LIBREELEC_VERSION="7.0.2.4"
       ;;
     S905)
-      LIBREELEC_VERSION="7.0.2.004"
+      LIBREELEC_VERSION="7.0.2.006"
       ;;
     *)
       LIBREELEC_VERSION="devel"

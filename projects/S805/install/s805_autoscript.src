@@ -1,0 +1,7 @@
+setenv bootrootfs "boot=LABEL=BOOT disk=LABEL=STORAGE BOOT_IMAGE=kernel.img ssh hdmitx=cecf"
+setenv libre4k 'fdt set /reserved-memory/linux,meson-fb size <0x0 0x4480000>; fdt set /meson-fb mem_size <0x04380000 0x00100000>; fdt set /meson-fb vmode <3>; fdt set /meson-fb display_size_default <1920 1080 1920 2160 32>; fdt set /meson-fb 4k2k_fb <1>'
+setenv libreaocec 'if fdt print /aocec; then echo AOCEC present; else fdt resize; fdt set /amhdmitx/vend_data reg <0x0 0xc810023c 0x0 0x4 0x0 0xc8100000 0x0 0x200 0x0 0xda83e000 0x0 0x10>; fdt set /amhdmitx/vend_data interrupt-names hdmi_aocec; fdt set /amhdmitx/vend_data device_name aocec; fdt set /amhdmitx/vend_data compatible "amlogic, amlogic-aocec"; fi'
+setenv libredtb 'store dtb read $dtb_mem_addr; fdt addr $dtb_mem_addr; run libre4k; run libreaocec'
+setenv bootargs "${bootrootfs} ${bootargs}"
+if fatload usb 0:1 ${loadaddr} kernel.img; then if run libredtb; then bootm;fi;fi;
+if fatload mmc 0:1 ${loadaddr} kernel.img; then if run libredtb; then bootm;fi;fi;
