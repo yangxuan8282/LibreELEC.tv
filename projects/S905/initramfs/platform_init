@@ -10,6 +10,9 @@ for arg in $(cat /proc/cmdline); do
     bootfromsd)
       bootfromsd=1
       ;;
+    bootfromusb)
+      bootfromusb=1
+      ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE=${arg#*=}
       ;;
@@ -26,6 +29,8 @@ done
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
   if [ -n "$bootfromsd" ]; then
+    cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=BOOT disk=LABEL=DISK"
+  elif [ -n "$bootfromusb" ]; then
     cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=BOOT disk=LABEL=DISK"
   else
     cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
