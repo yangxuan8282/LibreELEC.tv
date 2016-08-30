@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,24 +16,22 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="oem"
-PKG_VERSION=""
+PKG_NAME="rng-tools"
+PKG_VERSION="5"
 PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="various"
-PKG_SITE="http://www.openelec.tv"
-PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain rng-tools u-boot-tools"
+PKG_LICENSE="GPL"
+PKG_SITE="http://sourceforge.net/projects/gkernel/files/rng-tools/"
+PKG_URL="$SOURCEFORGE_SRC/gkernel/$PKG_NAME/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
-PKG_SECTION="virtual"
-PKG_SHORTDESC="OEM: Metapackage for various OEM packages"
-PKG_LONGDESC="OEM: Metapackage for various OEM packages"
+PKG_SECTION="kszaq"
+PKG_SHORTDESC="rng-tools: Daemon to use a Hardware TRNG"
+PKG_LONGDESC="The rngd daemon acts as a bridge between a Hardware TRNG (true random number generator) such as the ones in some Intel/AMD/VIA chipsets, and the kernel's PRNG (pseudo-random number generator)."
 
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_AUTORECONF="yes"
 
 post_install() {
-  if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem" ]; then
-    cp -LR $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/* $ROOT/$BUILD/image/system
-  fi
+  enable_service rng-tools.service
 }

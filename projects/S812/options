@@ -32,8 +32,8 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="cff7c42"
-    KERNEL_URL="https://github.com/drieschel/linux/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_VERSION="b09c854"
+    KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
 # setup build defaults
@@ -52,7 +52,7 @@
     GOLD_SUPPORT="yes"
 
   # SquashFS compression method (gzip / lzo / xz / lz4)
-    SQUASHFS_COMPRESSION="lz4"
+    SQUASHFS_COMPRESSION="lzo"
 
   # SquashFS block size (default: 131072)
     SQUASHFS_BLOCK_SIZE="16384"
@@ -100,18 +100,21 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7610u media_build"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8723bs_bt"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
 
   # build and install IRServer IR/LCD support (yes / no)
     IRSERVER_SUPPORT="no"
+
+  # build and install iSCSI support - iscsistart (yes / no)
+    ISCSI_SUPPORT="no"
 
   # Amlogic IR remote support (yes / no)
     AMREMOTE_SUPPORT="yes"
@@ -141,6 +144,3 @@
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"
-
-  # Don't switch framebuffer
-    SWITCH_FRAMEBUFFER="no"

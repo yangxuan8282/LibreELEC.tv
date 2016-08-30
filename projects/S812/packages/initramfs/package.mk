@@ -16,24 +16,43 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="oem"
+PKG_NAME="initramfs"
 PKG_VERSION=""
 PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="various"
+PKG_LICENSE="GPL"
 PKG_SITE="http://www.openelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain rng-tools u-boot-tools"
+PKG_DEPENDS_TARGET="toolchain libc:init busybox:init linux:init plymouth-lite:init util-linux:init e2fsprogs:init dosfstools:init"
 PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
-PKG_SHORTDESC="OEM: Metapackage for various OEM packages"
-PKG_LONGDESC="OEM: Metapackage for various OEM packages"
+PKG_SHORTDESC="initramfs: Metapackage for installing initramfs"
+PKG_LONGDESC="debug is a Metapackage for installing initramfs"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
+if [ "$ISCSI_SUPPORT" = yes ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET open-iscsi:init"
+fi
+
+if [ "$INITRAMFS_PARTED_SUPPORT" = yes ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET util-linux:init"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET e2fsprogs:init"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET parted:init"
+fi
+
 post_install() {
-  if [ -n "$DEVICE" -a -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem" ]; then
-    cp -LR $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/* $ROOT/$BUILD/image/system
-  fi
+  cd $ROOT/$BUILD/initramfs
+    if [ "$TARGET_ARCH" = "x86_64" -o "$TARGET_ARCH" = "powerpc64" ]; then
+      ln -s /lib $ROOT/$BUILD/initramfs/lib64
+    fi
+
+    for MOD in `find ./lib/modules/ -type f -name *.ko`; do
+      $STRIP --strip-debug $MOD
+    done
+
+    mkdir -p $ROOT/$BUILD/image/
+    find . | cpio -H newc -ov -R 0:0 | gzip > $ROOT/$BUILD/image/initramfs.cpio
+  cd -
 }
