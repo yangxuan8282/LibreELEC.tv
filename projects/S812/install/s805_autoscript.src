@@ -1,3 +1,5 @@
+setenv bootrootfs "boot=LABEL=BOOT disk=LABEL=DISK BOOT_IMAGE=kernel.img hdmitx=cecf"
+setenv bootargs "${bootrootfs} ${bootargs}"
 setenv cecconfig cecf
-if fatload usb 0 ${loadaddr} kernel.img; then bootm ${loadaddr}; fi;
-if fatload mmc 0 ${loadaddr} kernel.img; then bootm ${loadaddr}; fi;
+if fatload usb 0 ${loadaddr} kernel.img; then bootm; fi;
+if fatload mmc 0 ${loadaddr} kernel.img; then bootm; fi;
