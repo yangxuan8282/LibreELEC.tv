@@ -247,6 +247,7 @@ fi # bootloader
 if [ -f "$INSTALL_SRC_DIR/aml_autoscript.src" ]; then
   $MKIMAGE_TOOL_CMD "$INSTALL_SRC_DIR/aml_autoscript.src" "$OE_TMP/aml_autoscript"
   mcopy "$OE_TMP/aml_autoscript" "::/aml_autoscript"
+  mcopy "$INSTALL_SRC_DIR/aml_autoscript.zip" "::/aml_autoscript.zip"
 fi
 
 if [ -f "$INSTALL_SRC_DIR/s805_autoscript.src" ]; then
