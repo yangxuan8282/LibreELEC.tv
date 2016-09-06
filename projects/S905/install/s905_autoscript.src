@@ -1,7 +1,7 @@
 setenv bootrootfs " boot=LABEL=BOOT disk=LABEL=DISK BOOT_IMAGE=kernel.img hdmitx=cecf "
-setenv bootargs "${bootrootfs} ${bootargs}"
 setenv usbdtb "if fatload usb 0 ${dtb_mem_addr} dtb.img; then echo usb dtb.img loaded; else store dtb read $dtb_mem_addr; fi"
 setenv sddtb "if fatload mmc 0 ${dtb_mem_addr} dtb.img; then echo sd dtb.img loaded; else store dtb read $dtb_mem_addr; fi"
-setenv le_usb "if fatload usb 0 ${loadaddr} kernel.img; then run usbdtb; wipeisb; bootm; fi"
-setenv le_sd "if fatload mmc 0 ${loadaddr} kernel.img; then run sddtb; wipeisb; bootm; fi"
-if test ${bootfromnand} = 1; then setenv bootfromnand 0; saveenv; else run le_usb; run le_sd; fi; run storeboot
+setenv le_usb "if fatload usb 0 ${loadaddr} kernel.img; then run usbdtb; setenv bootargs ${bootrootfs} ${bootargs}; wipeisb; bootm; fi"
+setenv le_sd "if fatload mmc 0 ${loadaddr} kernel.img; then run sddtb; setenv bootargs ${bootrootfs} ${bootargs}; wipeisb; bootm; fi"
+if test ${bootfromrecovery} = 1; then setenv bootfromrecovery 0; saveenv; run update;
+if test ${bootfromnand} = 1; then setenv bootfromnand 0; saveenv; else run le_usb; run le_sd; fi; run storeboot;

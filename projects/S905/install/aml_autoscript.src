@@ -1,3 +1,4 @@
+defenv
 setenv bootfromnand 0
 setenv bootcmd "run start_autoscript;run storeboot;"
 setenv start_autoscript "if usb start ; then run start_usb_autoscript;fi;if mmcinfo; then run start_mmc_autoscript;fi;"
