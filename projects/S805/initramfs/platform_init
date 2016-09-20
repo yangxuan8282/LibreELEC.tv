@@ -22,18 +22,31 @@ hdmimode=720p
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
-  case $arg in
+  case ${arg} in
     hdmitx=*)
-      hdmitx="${arg#*=}"
+      hdmitx=${arg#*=}
       ;;
     hdmimode=*)
-      hdmimode="${arg#*=}"
+      hdmimode=${arg#*=}
       ;;
-    bootfromsd*)
-      bootfromsd=1
+    BOOT_IMAGE=*)
+      BOOT_IMAGE=${arg#*=}
+      ;;
+    boot=*)
+      boot=${arg#*=}
+      ;;
+    disk=*)
+      disk=${arg#*=}
       ;;
   esac
 done
+
+# Add information where to run LibreELEC from
+if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
+  cmdline=$(cat /proc/cmdline)
+  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
+  echo "$cmdline" > /proc/cmdline
+fi
 
 echo "$hdmimode" > /sys/class/display/mode
 
@@ -65,17 +78,6 @@ esac
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
 echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
-
-cmdline=$(cat /proc/cmdline)
-
-# Add information where to run OpenELEC from
-if [ -n "$bootfromsd" ]; then
-  cmdline="$cmdline BOOT_IMAGE=kernel.img boot=/dev/mmcblk0p1 disk=/dev/mmcblk0p2"
-else
-  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
-fi
-
-echo "$cmdline" > /proc/cmdline
 
 for part in /sys/block/*/queue/add_random; do
   echo 0 > "$part"
