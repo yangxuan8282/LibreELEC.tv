@@ -31,6 +31,7 @@ case $hdmimode in
   480*)            X=720  Y=480  ;;
   576*)            X=720  Y=576  ;;
   720p*)           X=1280 Y=720  ;;
+  *smpte*)         X=1280 Y=675  ;;
   *)               X=1920 Y=1080 ;;
 esac
 
@@ -43,7 +44,14 @@ echo 1 > /sys/class/video/disable_video
 
 # Enable scaling for 4K output
 case $hdmimode in
-  4k*|smpte*|2160*)
+  *smpte*)
+    echo 0 0 1279 674  > /sys/class/graphics/fb0/free_scale_axis
+    echo 0 0 4095 2159 > /sys/class/graphics/fb0/window_axis
+    echo 1280 > /sys/class/graphics/fb0/scale_width
+    echo 675  > /sys/class/graphics/fb0/scale_height
+    echo 0x10001 > /sys/class/graphics/fb0/free_scale
+  ;;
+  4k*|2160*)
     echo 0 0 1919 1079 > /sys/class/graphics/fb0/free_scale_axis
     echo 0 0 3839 2159 > /sys/class/graphics/fb0/window_axis
     echo 1920 > /sys/class/graphics/fb0/scale_width
@@ -67,3 +75,10 @@ for part in /sys/block/*/queue/add_random; do
 done
 
 echo 1536000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+
+# Attempt to fix MPEG-TS stream lost packet (HDMI-CEC irq issue)
+# http://forum.odroid.com/viewtopic.php?p=155840#p155840
+echo 2 > /proc/irq/231/smp_affinity
+
+# Keep at least 64M RAM free
+echo 65535 > /proc/sys/vm/extra_free_kbytes

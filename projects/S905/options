@@ -33,13 +33,14 @@
     MKBOOTIMG_OPTIONS="--base 0x0 --kernel_offset 0x1080000"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
-    KERNEL_MAKE_EXTRACMD="gxbb_p200.dtb"
+    KERNEL_MAKE_EXTRACMD=""
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="bca261f"
-    KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_VERSION="48d3a2f"
+    KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
 
 ################################################################################
 # setup build defaults
@@ -59,9 +60,6 @@
 
   # SquashFS compression method (gzip / lzo / xz)
     SQUASHFS_COMPRESSION="lzo"
-
-  # SquashFS block size (default: 131072)
-    SQUASHFS_BLOCK_SIZE="16384"
 
 ################################################################################
 # setup project defaults
@@ -145,9 +143,6 @@
     ADDON_SERVER_URL="https://raw.github.com/wrxtasy/LibreELEC.tv.7.0/LE-7.0.Addons"
     ADDON_PATH="addons/$ADDON_VERSION/Odroid_C2/$TARGET_ARCH"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
-
-  # Hardware random number generator daemon
-    HW_RNG="yes"
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"
