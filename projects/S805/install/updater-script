@@ -1,8 +1,10 @@
+show_progress(0.800000, 30);
+
 set_bootloader_env("upgrade_step", "3");
 
-ui_print("Backing up device tree and remote.conf");
+ui_print("Backing up remote.conf");
 package_extract_file("backuptool.sh", "/tmp/backuptool.sh");
-set_metadata("/tmp/backuptool.sh", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0);
+set_perm(0, 0, 0755, "/tmp/backuptool.sh");
 run_program("/tmp/backuptool.sh", "backup");
 
 # Format data partition
@@ -19,9 +21,12 @@ ui_print("Writing system files");
 package_extract_dir("system", "/system");
 unmount("/system");
 
+show_progress(0.100000, 0);
+
 ui_print("Restoring remote.conf and copying device tree backup");
 run_program("/tmp/backuptool.sh", "restore");
 
 set_bootloader_env("upgrade_step", "2");
+show_progress(0.100000, 0);
 
 ui_print("LibreELEC Installed Successfully");

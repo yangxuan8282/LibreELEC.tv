@@ -4,13 +4,13 @@
       LIBREELEC_VERSION="7.0.2.4"
       ;;
     S805)
-      LIBREELEC_VERSION="7.0.2.6"
+      LIBREELEC_VERSION="7.0.2.7"
       ;;
     S812)
       LIBREELEC_VERSION="7.0.2.5"
       ;;
     S905)
-      LIBREELEC_VERSION="7.0.2.008"
+      LIBREELEC_VERSION="7.0.2.009"
       ;;
     *)
       LIBREELEC_VERSION="devel"
