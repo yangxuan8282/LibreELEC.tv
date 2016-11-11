@@ -1,3 +1,4 @@
+if test ${bootfromrecovery} = 1; then setenv bootfromrecovery 0; saveenv; run update; fi;
 if test ${bootfromnand} = 1; then setenv bootfromnand 0; saveenv; run storeboot; fi;
 setenv bootrootfs " boot=LABEL=BOOT disk=LABEL=DISK BOOT_IMAGE=kernel.img "
 setenv cecconfig cecf

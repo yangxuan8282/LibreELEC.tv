@@ -6,7 +6,7 @@
     TARGET_ARCH=arm
     TARGET_CPU="cortex-a9"
     TARGET_FLOAT="hard"
-    TARGET_FPU="neon-fp16"
+    TARGET_FPU="neon-vfpv4"
 
   # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
     BOOTLOADER="u-boot"
@@ -32,7 +32,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="b09c854"
+    KERNEL_VERSION="263a24f"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
@@ -52,10 +52,7 @@
     GOLD_SUPPORT="yes"
 
   # SquashFS compression method (gzip / lzo / xz / lz4)
-    SQUASHFS_COMPRESSION="lzo"
-
-  # SquashFS block size (default: 131072)
-    SQUASHFS_BLOCK_SIZE="16384"
+    SQUASHFS_COMPRESSION="lz4"
 
 ################################################################################
 # setup project defaults
@@ -138,9 +135,6 @@
   # set the addon dirs
     ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
-
-  # Hardware random number generator daemon
-    HW_RNG="yes"
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"

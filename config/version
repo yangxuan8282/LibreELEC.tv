@@ -7,7 +7,7 @@
       LIBREELEC_VERSION="7.0.2.7"
       ;;
     S812)
-      LIBREELEC_VERSION="7.0.2.5"
+      LIBREELEC_VERSION="7.0.2.6"
       ;;
     S905)
       LIBREELEC_VERSION="7.0.2.009"

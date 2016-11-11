@@ -6,5 +6,4 @@ setenv start_autoscript 'if mmcinfo; then run start_mmc_autoscript; fi; if usb s
 setenv bootcmd 'run start_autoscript; run storeboot'
 setenv reboot_mode normal
 saveenv
-run storeargs
-run bootcmd
+reset
