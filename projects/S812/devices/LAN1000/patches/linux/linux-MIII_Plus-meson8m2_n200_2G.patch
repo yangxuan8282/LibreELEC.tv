@@ -1,69 +1,6 @@
 diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd
 --- /dev/null
 +++ b/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd
-@@ -19,27 +19,27 @@
-         #size-cells = <0>;
- //$$ DEVICE="cpu0"
-         cpu@0 {
--		device_type = "cpu";
--		compatible = "arm,cortex-a9";
--		reg = <0x200>;
-+        	device_type = "cpu";
-+        	compatible = "arm,cortex-a9";
-+        	reg = <0x200>;
-         };
- //$$ DEVICE="cpu1"
-         cpu@1 {
--		device_type = "cpu";
--		compatible = "arm,cortex-a9";
--		reg = <0x1>;
-+        	device_type = "cpu";
-+        	compatible = "arm,cortex-a9";
-+        	reg = <0x1>;
-         };
- //$$ DEVICE="cpu2"
-         cpu@2 {
--		device_type = "cpu";
--		compatible = "arm,cortex-a9";
--		reg = <0x2>;
-+        	device_type = "cpu";
-+        	compatible = "arm,cortex-a9";
-+        	reg = <0x2>;
-         };
- //$$ DEVICE="cpu3"
-         cpu@3 {
--		device_type = "cpu";
--		compatible = "arm,cortex-a9";
--		reg = <0x3>;
-+        	device_type = "cpu";
-+        	compatible = "arm,cortex-a9";
-+        	reg = <0x3>;
-         };
-     };
- 
-@@ -133,18 +133,18 @@
- 		compatible = "amlogic,mesonfb";
- 		dev_name = "mesonfb";
- 		status = "okay";
--		reserve-memory = <0x01800000  0x00100000>;
--		reserve-iomap = "true";
-+	   	reserve-memory = <0x01800000  0x00100000>;
-+	   	reserve-iomap = "true";
-                 vmode = <3>; /**0:VMODE_720P 1:VMODE_LCD  2:VMODE_LVDS_1080P 3:VMODE_1080P*/
- 		scale_mode = <1>; /*0:default 1:new*/
- 		4k2k_fb = <0>;
--		display_size_default = <1920 1080 1920 3240 32>; //1920*1080*4*3 = 0x17BB000
-+ 		display_size_default = <1920 1080 1920 3240 32>; //1920*1080*4*3 = 0x17BB000
- 	};
- 
- //$$ DEVICE="deinterlace"
- //$$ L2 PROP_STR = "status"
- //$$ L2 PROP_U32 2 = "reg"
--	deinterlace{
-+    	deinterlace{
- 		compatible = "amlogic,deinterlace";
- 		dev_name = "deinterlace";
- 		status = "ok";
 @@ -175,8 +175,8 @@
                  compatible = "amlogic,vdec";
                  dev_name = "vdec.0";
@@ -71,21 +8,10 @@ diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/
 -								reserve-memory = <0x04000000>; // 64M
 -//		reserve-iomap = "true";
 +                reserve-memory = <0x10000000>;
-+		reserve-iomap = "true";
++				reserve-iomap = "true";
          };
  ///	-	picture decoder
  //$$ MODULE="picture decoder"
-@@ -355,8 +355,8 @@
- 		port_name = "uart_a";
- 		status = "okay";
- 		dev_name = "uart_0";
--	pinctrl-names = "default";
--	pinctrl-0 = <&a_uart_pins>;
-+    	pinctrl-names = "default";
-+    	pinctrl-0 = <&a_uart_pins>;
- 	};
- 
- //$$ DEVICE="uart_1"
 @@ -490,7 +490,7 @@
              gpio_dat3 = "CARD_4";
              jtag_pin = "CARD_0";
@@ -189,15 +115,6 @@ diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/
  
  //$$ DEVICE="I2C_D"
  //$$ L2 PROP_STR = "status"
-@@ -880,7 +880,7 @@
- //$$ L2 PROP_U32 = "port-dma"
- //$$ L2 PROP_U32 = "port-id-mode"
- //$$ L2 PROP_STR = "status"
--		usb_b{
-+        	usb_b{
- 			lm-compatible = "amlogic,usb";
- 			lm-periph-id = <1>; /** lm name */
- 			clock-src = "usb1"; /** clock src */
 @@ -917,7 +917,7 @@
  			port-config = <0>; /** 0: default */
  			port-dma = <0>; /** 0: default, 1: single, 2: incr, 3: incr4, 4: incr8, 5: incr16, 6: disable*/
@@ -207,22 +124,10 @@ diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/
  			gpio-work-mask	= <1>; /**0: work on pulldown,1:work on pullup*/
  			status = "okay";
  		};
-@@ -1035,7 +1035,7 @@
- 		compatible = "amlogic-thermal";
- 		#thermal-cells=<7>;
- 		dev_name = "aml_thermal";
--        trip_point=<70 1608001 1608001 511 511 3 5
-+        trip_point=<70 1608001 1608001 511 511 3 5 
-                     80 1200001 1200001 435 435 2 4
-                     90  800001 800001  328 328 2 3
-                     260 0xffffffff 0xffffffff 0xffffffff 0xffffffff 0xffffffff 0xffffffff>;
-@@ -1059,6 +1059,25 @@
-             426      55  65  70  75
-             511      60  70  75  80
-         >;
-+	};
-+
-+/// ***************************************************************************************
+@@ -1062,6 +1062,25 @@
+ 	};
+ 
+ /// ***************************************************************************************
 +///    -       Led
 +//$$ MODULE="Led"
 +//$$ DEVICE="led"
@@ -239,18 +144,12 @@ diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/
 +		blue_led_gpio = "GPIO_TEST_N";/**  */
 +		red_led_mode = <1>; /** 1:H on L off , 0:H off L on */
 +		blue_led_mode= <1>; /** 1:H on L off , 0:H off L on */
- 	};
- 
- /// ***************************************************************************************
-@@ -1272,7 +1291,7 @@
- //$$ L2 PROP_CHOICE "Unifykey_0_match" = "unifykey-index-0"
- //$$ L2 PROP_CHOICE "Unifykey_1_match" = "unifykey-index-1"
- //$$ L2 PROP_CHOICE "Unifykey_2_match" = "unifykey-index-2"
--	unifykey{
-+    	unifykey{
- 		compatible = "amlogic,unifykey";
- 		status = "ok";
- 
++	};
++
++/// ***************************************************************************************
+ /// -   Audio
+ //$$ MODULE="Audio"
+ //$$ DEVICE="audio_i2s"
 @@ -1798,10 +1817,10 @@
  //$$ MATCH "I2C_B_pin_match" = "&b_i2c_master"
  //$$ L2 PROP_U32 2 = "amlogic,setmask"
@@ -266,21 +165,12 @@ diff --git a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd b/arch/arm/boot/dts/
  
  // MATCH "I2C_C_pin_match" = "&c_i2c_master"
  // L2 PROP_U32 2 = "amlogic,setmask"
-@@ -1828,7 +1847,7 @@
- //$$ MATCH "remote_pin_0_match" = "&remote_pins"
- //$$ L2 PROP_U32 2 = "amlogic,setmask"
- //$$ L2 PROP_STR = "amlogic,pins"
--		remote_pins:remote_pin{
-+        	remote_pins:remote_pin{
- 			amlogic,setmask=<10 0x1>;
- 			amlogic,pins="GPIOAO_7";
- 		};
 @@ -1906,7 +1925,7 @@
  /// ***************************************************************************************
  ///	-	Ethernet
          ethmac: ethernet@0xc9410000{
 -                compatible = "amlogic,meson8m2-rmii-dwmac", "snps,dwmac";
-+		compatible = "amlogic,meson8m2-rgmii-dwmac", "snps,dwmac";
++		 compatible = "amlogic,meson8m2-rgmii-dwmac", "snps,dwmac";
                  reg = <0xc9410000 0x10000
                         0xc1108108 0x4>;
                  interrupts = <0 8 1>;
