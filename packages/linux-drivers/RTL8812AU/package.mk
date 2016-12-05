@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="928e27f"
+# Branch: 4.3.22_beta
+PKG_VERSION="73b88d5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -26,7 +27,6 @@ PKG_URL="https://github.com/Grawp/rtl8812au_rtl8821au/archive/$PKG_VERSION.tar.g
 PKG_SOURCE_DIR="rtl8812au_rtl8821au-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
-PKG_PRIORITY="optional"
 PKG_SECTION="driver"
 PKG_SHORTDESC="Realtek RTL8812AU Linux 3.x driver"
 PKG_LONGDESC="Realtek RTL8812AU Linux 3.x driver"

@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="vboxguest"
-PKG_VERSION="5.0.22"
+PKG_VERSION="5.1.8"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
@@ -26,7 +26,6 @@ PKG_URL="http://download.virtualbox.org/virtualbox/$PKG_VERSION/VirtualBox-$PKG_
 PKG_SOURCE_DIR="VirtualBox-$PKG_VERSION"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
-PKG_PRIORITY="optional"
 PKG_SECTION="driver"
 PKG_SHORTDESC="vboxguest"
 PKG_LONGDESC="vboxguest"

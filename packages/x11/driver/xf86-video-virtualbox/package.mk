@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="xf86-video-virtualbox"
-PKG_VERSION="5.0.22"
+PKG_VERSION="5.1.8"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="OSS"
@@ -25,7 +25,6 @@ PKG_SITE="http://www.virtualbox.org"
 PKG_URL="http://download.virtualbox.org/virtualbox/$PKG_VERSION/VirtualBox-$PKG_VERSION.tar.bz2"
 PKG_SOURCE_DIR="VirtualBox-$PKG_VERSION"
 PKG_DEPENDS_TARGET="toolchain libXcomposite libXdamage libXfixes libXext libX11 libxcb libXau libXmu"
-PKG_PRIORITY="optional"
 PKG_SECTION="x11/driver"
 PKG_SHORTDESC="xf86-video-virtualbox: The Xorg driver for virtualbox video"
 PKG_LONGDESC="xf86-video-virtualbox: The Xorg driver for virtualbox video"

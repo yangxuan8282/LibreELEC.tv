@@ -23,18 +23,18 @@ if [ "$UBOOT_VERSION" = "imx6-cuboxi" ]; then
   PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
   # https://github.com/SolidRun/u-boot-imx6.git
   PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+  [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
 elif [ "$UBOOT_VERSION" = "hardkernel" ]; then
-  PKG_VERSION="83bf8f0"
+  PKG_VERSION="6e4e886"
   PKG_SITE="https://github.com/hardkernel/u-boot"
   PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-none-elf:host"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
 else
   exit 0
 fi
 PKG_REV="1"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="u-boot: Universal Bootloader project"
 PKG_LONGDESC="Das U-Boot is a cross-platform bootloader for embedded systems, used as the default boot loader by several board vendors. It is intended to be easy to port and to debug, and runs on many supported architectures, including PPC, ARM, MIPS, x86, m68k, NIOS, and Microblaze."
@@ -66,11 +66,11 @@ make_target() {
   done
 
   for UBOOT_TARGET in $UBOOT_CONFIG; do
-    if [ "$PROJECT" = "Odroid_C2" -o "SPOT_i7" -o  "Vega_S95" ]; then
-      export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-none-elf/bin/:$PATH
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm mrproper
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm $UBOOT_TARGET
-      make CROSS_COMPILE=aarch64-none-elf- ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true"
+    if [ "$PROJECT" = "Odroid_C2" ]; then
+      export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$ROOT/$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
+      CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make mrproper
+      CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make $UBOOT_TARGET
+      CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make HOSTCC="$HOST_CC" HOSTSTRIP="true"
     else
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm mrproper
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm $UBOOT_TARGET
@@ -129,8 +129,12 @@ makeinstall_target() {
   case $PROJECT in
     Odroid_C2)
       cp -PRv $PKG_DIR/scripts/update-c2.sh $INSTALL/usr/share/bootloader/update.sh
-      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/bl1.bin.hardkernel $INSTALL/usr/share/bootloader/bl1
-      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      cp -PRv $ROOT/$PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
+        cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+      elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
+        cp -PRv $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+      fi
       ;;
     imx6)
       cp -PRv $PKG_DIR/scripts/update.sh $INSTALL/usr/share/bootloader

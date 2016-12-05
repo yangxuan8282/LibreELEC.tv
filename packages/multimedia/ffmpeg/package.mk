@@ -18,7 +18,7 @@
 
 PKG_NAME="ffmpeg"
 # Current branch is: release/3.1-xbmc
-PKG_VERSION="67171c3"
+PKG_VERSION="0cf9269"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"
@@ -26,7 +26,6 @@ PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/xbmc/FFmpeg/archive/${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="FFmpeg-${PKG_VERSION}*"
 PKG_DEPENDS_TARGET="toolchain yasm:host zlib bzip2 libressl speex"
-PKG_PRIORITY="optional"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
 PKG_LONGDESC="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video."
@@ -62,7 +61,7 @@ if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
 fi
 
 case "$TARGET_ARCH" in
-  arm)
+  arm|aarch64)
     FFMPEG_TABLES="--enable-hardcoded-tables"
     ;;
   *)
@@ -78,6 +77,10 @@ case "$TARGET_FPU" in
     FFMPEG_FPU="--disable-neon"
     ;;
 esac
+
+if [ "$DISPLAYSERVER" = "x11" ]; then
+  FFMPEG_X11GRAB="--enable-indev=x11grab_xcb"
+fi
 
 pre_configure_target() {
   cd $ROOT/$PKG_BUILD
@@ -142,7 +145,6 @@ configure_target() {
               --disable-devices \
               --enable-pthreads \
               --disable-w32threads \
-              --disable-x11grab \
               --enable-network \
               --disable-gnutls --enable-openssl \
               --disable-gray \
@@ -208,7 +210,8 @@ configure_target() {
               --disable-altivec \
               $FFMPEG_FPU \
               --enable-yasm \
-              --disable-symver
+              --disable-symver \
+              $FFMPEG_X11GRAB
 }
 
 post_makeinstall_target() {

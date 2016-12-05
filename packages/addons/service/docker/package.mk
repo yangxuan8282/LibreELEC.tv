@@ -17,15 +17,14 @@
 ################################################################################
 
 PKG_NAME="docker"
-PKG_VERSION="1.11.2"
-PKG_REV="104"
+PKG_VERSION="1.12.2"
+PKG_REV="108"
 PKG_ARCH="any"
-PKG_ADDON_PROJECTS="Generic RPi RPi2"
+PKG_ADDON_PROJECTS="Generic RPi RPi2 imx6"
 PKG_LICENSE="ASL"
 PKG_SITE="http://www.docker.com/"
 PKG_URL="https://github.com/docker/docker/archive/v${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain sqlite go:host containerd runc"
-PKG_PRIORITY="optional"
 PKG_SECTION="service/system"
 PKG_SHORTDESC="Docker is an open-source engine that automates the deployment of any application as a lightweight, portable, self-sufficient container that will run virtually anywhere."
 PKG_LONGDESC="Docker containers can encapsulate any payload, and will run consistently on and between virtually any server. The same container that a developer builds and tests on a laptop will run at scale, in production*, on VMs, bare-metal servers, OpenStack clusters, public instances, or combinations of the above."
@@ -34,7 +33,6 @@ PKG_AUTORECONF="no"
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Docker"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_ADDON_REPOVERSION="8.0"
 
 configure_target() {
   export DOCKER_BUILDTAGS="daemon \
@@ -54,7 +52,7 @@ configure_target() {
         arm1176jzf-s)
           export GOARM=6
           ;;
-        cortex-a7)
+        cortex-a7|cortex-a9)
          export GOARM=7
          ;;
       esac
@@ -65,7 +63,7 @@ configure_target() {
   export CGO_ENABLED=1
   export CGO_NO_EMULATION=1
   export CGO_CFLAGS=$CFLAGS
-  export LDFLAGS="-w -linkmode external -extldflags -Wl,--unresolved-symbols=ignore-in-shared-libs -extld $TARGET_CC"
+  export LDFLAGS="-w -linkmode external -extldflags -Wl,--unresolved-symbols=ignore-in-shared-libs -extld $CC"
   export GOLANG=$ROOT/$TOOLCHAIN/lib/golang/bin/go
   export GOPATH=$ROOT/$PKG_BUILD/.gopath:$ROOT/$PKG_BUILD/vendor
   export GOROOT=$ROOT/$TOOLCHAIN/lib/golang
@@ -82,7 +80,9 @@ configure_target() {
 
 make_target() {
   mkdir -p bin
-  $GOLANG build -v -o bin/docker -a -tags "$DOCKER_BUILDTAGS" -ldflags "$LDFLAGS" ./docker
+  $GOLANG build -v -o bin/docker -a -tags "$DOCKER_BUILDTAGS" -ldflags "$LDFLAGS" ./cmd/docker
+  $GOLANG build -v -o bin/dockerd -a -tags "$DOCKER_BUILDTAGS" -ldflags "$LDFLAGS" ./cmd/dockerd
+  $GOLANG build -v -o bin/docker-proxy -a -ldflags "$LDFLAGS" ./vendor/src/github.com/docker/libnetwork/cmd/proxy
 }
 
 makeinstall_target() {
@@ -92,11 +92,12 @@ makeinstall_target() {
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
     cp -P $ROOT/$PKG_BUILD/bin/docker $ADDON_BUILD/$PKG_ADDON_ID/bin
+    cp -P $ROOT/$PKG_BUILD/bin/dockerd $ADDON_BUILD/$PKG_ADDON_ID/bin
+    cp -P $ROOT/$PKG_BUILD/bin/docker-proxy $ADDON_BUILD/$PKG_ADDON_ID/bin
 
     # containerd
     cp -P $(get_build_dir containerd)/bin/containerd $ADDON_BUILD/$PKG_ADDON_ID/bin/docker-containerd
     cp -P $(get_build_dir containerd)/bin/containerd-shim $ADDON_BUILD/$PKG_ADDON_ID/bin/docker-containerd-shim
-    cp -P $(get_build_dir containerd)/bin/ctr $ADDON_BUILD/$PKG_ADDON_ID/bin/docker-containerd-ctr
 
     # runc
     cp -P $(get_build_dir runc)/bin/runc $ADDON_BUILD/$PKG_ADDON_ID/bin/docker-runc

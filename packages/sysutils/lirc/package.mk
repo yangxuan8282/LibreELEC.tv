@@ -24,7 +24,6 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://www.lirc.org"
 PKG_URL="$SOURCEFORGE_SRC/lirc/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libftdi1 libusb-compat libxslt"
-PKG_PRIORITY="optional"
 PKG_SECTION="sysutils/remote"
 PKG_SHORTDESC="lirc: Linux Infrared Remote Control"
 PKG_LONGDESC="LIRC is a package that allows you to decode and send infra-red signals of many (but not all) commonly used remote controls."
@@ -58,4 +57,7 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/udev
     cp $PKG_DIR/scripts/lircd_wakeup_enable $INSTALL/usr/lib/udev
+
+  mkdir -p $INSTALL/usr/share/services
+    cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
 }

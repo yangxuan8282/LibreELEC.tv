@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="busybox"
-PKG_VERSION="1.24.2"
+PKG_VERSION="1.25.0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -26,7 +26,6 @@ PKG_URL="http://busybox.net/downloads/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_HOST=""
 PKG_DEPENDS_TARGET="toolchain busybox:host hdparm dosfstools e2fsprogs zip unzip pciutils usbutils parted procps-ng"
 PKG_DEPENDS_INIT="toolchain"
-PKG_PRIORITY="required"
 PKG_SECTION="system"
 PKG_SHORTDESC="BusyBox: The Swiss Army Knife of Embedded Linux"
 PKG_LONGDESC="BusyBox combines tiny versions of many common UNIX utilities into a single small executable. It provides replacements for most of the utilities you usually find in GNU fileutils, shellutils, etc. The utilities in BusyBox generally have fewer options than their full-featured GNU cousins; however, the options that are included provide the expected functionality and behave very much like their GNU counterparts. BusyBox provides a fairly complete environment for any small or embedded system."
@@ -245,8 +244,12 @@ makeinstall_init() {
     touch $INSTALL/etc/fstab
     ln -sf /proc/self/mounts $INSTALL/etc/mtab
 
-  if [ -f $PROJECT_DIR/$PROJECT/initramfs/platform_init ]; then
+  if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/platform_init ]; then
+    cp $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/platform_init $INSTALL
+  elif [ -f $PROJECT_DIR/$PROJECT/initramfs/platform_init ]; then
     cp $PROJECT_DIR/$PROJECT/initramfs/platform_init $INSTALL
+  fi
+  if [ -f $INSTALL/platform_init ]; then
     chmod 755 $INSTALL/platform_init
   fi
 
