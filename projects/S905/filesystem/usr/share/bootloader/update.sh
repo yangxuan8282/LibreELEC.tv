@@ -37,14 +37,15 @@ for arg in $(cat /proc/cmdline); do
           ;;
       esac
 
-      if [ -f $UPDATE_DTB_IMG ] ; then
+      if [ -f "$UPDATE_DTB_IMG" ] ; then
         UPDATE_DTB_SOURCE="$UPDATE_DTB_IMG"
-      elif [ -f $UPDATE_DTB ] ; then
+      elif [ -f "$UPDATE_DTB" ] ; then
         UPDATE_DTB_SOURCE="$UPDATE_DTB"
       fi
 
-      if [ -f $UPDATE_DTB_SOURCE ] ; then
+      if [ -f "$UPDATE_DTB_SOURCE" ] ; then
         echo "Updating device tree from $UPDATE_DTB_SOURCE..."
+        $SYSTEM_ROOT/usr/sbin/fw_setenv upgrade_step 2
         case $boot in
           /dev/system)
             dd if=$UPDATE_DTB_SOURCE of="/dev/dtb" bs=256k

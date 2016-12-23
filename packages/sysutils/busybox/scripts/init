@@ -811,6 +811,44 @@
     [ -f "/sysroot/usr/lib/systemd/systemd" ] || error "final_check" "Could not find systemd!"
   }
 
+  install_internal() {
+    progress "Install Libreelec to internal "
+
+    if [ -f /flash/install.aml ] ; then
+      echo ""
+      echo ""
+      echo "WARNING !!!!"
+      echo ""
+      echo "To prevent an automatic repair attempt continuing,"
+      echo "press any key or power off your system within the next 20 seconds"
+      echo ""
+      read -t20 -n1
+
+      if [ "$?" -ne "0" -o "$?" -gt "28" ] ; then
+        echo ""
+        echo "Install to internal IN PROGRESS"
+        echo ""
+        echo "Please do not reboot or turn off your @DISTRONAME@ device!"
+        echo ""
+        mount -o remount,rw /flash
+        mv /flash/install.aml /flash/install.sh
+        /flash/install.sh
+        echo "****************************"
+        echo "Sucesful install to internal"
+        sync
+        sleep 3
+        echo "Poweroff system. "
+	sleep 5
+	poweroff
+      else
+        echo "Stop install to internal"
+        echo "Next start @DISTRONAME@ "
+        sleep 5
+      fi
+    fi
+ }
+
+
   if [ "${boot%%=*}" = "FILE" ]; then
     error "check arguments" "boot argument can't be FILE type..."
   fi
@@ -823,10 +861,13 @@
       load_splash \
       mount_storage \
       check_update \
+      install_internal \
       prepare_sysroot; do
     $BOOT_STEP
     [ -n "$DEBUG" ] && break_after $BOOT_STEP
   done
+
+
 
   BOOT_STEP=final
 
@@ -868,9 +909,11 @@
     INIT_UNIT="--unit=backup-restore.target"
   fi
 
+
   if [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_xbmc ] ; then
     INIT_UNIT="--unit=factory-reset.target"
   fi
+
 
   # switch to new sysroot and start real init
   exec /bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS $INIT_UNIT

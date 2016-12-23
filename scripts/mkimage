@@ -251,6 +251,10 @@ for src in $INSTALL_SRC_DIR/*autoscript.src ; do
   fi
 done
 
+if [ -f "$INSTALL_SRC_DIR/install.sh" ]; then
+  mcopy "$INSTALL_SRC_DIR/install.sh" "::/install.sh"
+fi
+
 if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
   mcopy "$INSTALL_SRC_DIR/aml_autoscript.zip" "::/aml_autoscript.zip"
 fi
