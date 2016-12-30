@@ -30,6 +30,7 @@ $SCRIPTS/build fakeroot:host
 $SCRIPTS/build kmod:host
 $SCRIPTS/build mtools:host
 $SCRIPTS/build populatefs:host
+$SCRIPTS/build dtbTool:host
 
 BUILD_DATE=`date +%Y%m%d%H%M%S`
 
@@ -277,7 +278,7 @@ fi
     DTB_BLOB_OUTPUT="arch/$TARGET_KERNEL_ARCH/boot/dtb.img"
     MKBOOTIMG_SECOND="--second $DTB_BLOB_OUTPUT"
     if [ "$DTB_BLOBS_COUNT" -gt 1 ]; then
-      $ROOT/tools/dtbTool/dtbTool -o $DTB_BLOB_OUTPUT -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
+      "$ROOT/$TOOLCHAIN/bin/dtbTool" -o $DTB_BLOB_OUTPUT -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
     elif [ "$DTB_BLOBS_COUNT" -eq 1 ]; then
       cp -f arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $DTB_BLOB_OUTPUT
     else
