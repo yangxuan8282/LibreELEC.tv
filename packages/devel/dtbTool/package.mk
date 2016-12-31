@@ -12,6 +12,6 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 makeinstall_host() {
-    mkdir -p "$ROOT/TOOLCHAIN/bin"
+    mkdir -p "$ROOT/$TOOLCHAIN/bin"
     cp -a "$ROOT/$PKG_BUILD/dtbTool" "$ROOT/$TOOLCHAIN/bin/"
 }
