@@ -21,8 +21,8 @@ PKG_VERSION="3.6.25"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.samba.org"
-PKG_URL="http://samba.org/samba/ftp/stable/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_SITE="https://www.samba.org"
+PKG_URL="https://samba.org/samba/ftp/stable/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain zlib connman"
 PKG_PRIORITY="optional"
 PKG_SECTION="network"
@@ -189,7 +189,6 @@ makeinstall_target() {
 
 post_install() {
   if [ "$SAMBA_SERVER" = "yes" ]; then
-    enable_service samba-defaults.service
     enable_service nmbd.service
     enable_service smbd.service
   fi

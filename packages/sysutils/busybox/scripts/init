@@ -867,8 +867,6 @@
     [ -n "$DEBUG" ] && break_after $BOOT_STEP
   done
 
-
-
   BOOT_STEP=final
 
   # log if booting from usb / removable storage
@@ -909,11 +907,9 @@
     INIT_UNIT="--unit=backup-restore.target"
   fi
 
-
   if [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_xbmc ] ; then
     INIT_UNIT="--unit=factory-reset.target"
   fi
-
 
   # switch to new sysroot and start real init
   exec /bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS $INIT_UNIT

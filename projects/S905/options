@@ -47,7 +47,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="fb23764"
+    KERNEL_VERSION="92ab78c"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
 
@@ -107,7 +107,7 @@
     DCADEC_SUPPORT="yes"
 
   # Modules to install in initramfs for early boot
-    INITRAMFS_MODULES="font softcursor bitblit fbcon aml_nftl_dev"
+    INITRAMFS_MODULES="dwc_otg dwc3 font softcursor bitblit fbcon aml_nftl_dev"
 
     INITRAMFS_PARTED_SUPPORT="yes"
 
@@ -115,12 +115,12 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU media_build gpu-aml qca9377-aml"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU gpu-aml qca9377-aml media_build mt7601u-aml mt7603u-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8723bs_bt"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8723bs_bt qca9377-firmware-aml"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -151,17 +151,8 @@
     KERNEL_NAME="kernel.img"
 
   # set the addon dirs
-    case $TARGET_ARCH in
-      arm)
-        ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
-        ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
-        ;;
-      aarch64)
-        ADDON_SERVER_URL="https://raw.github.com/codesnake/libreelec-addons"
-        ADDON_PATH="$ADDON_VERSION/WeTek_Play_2/$TARGET_ARCH"
-        ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
-        ;;
-    esac
+    ADDON_SERVER_URL="http://kszaq.libreelec.tv/addons"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"

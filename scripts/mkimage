@@ -178,7 +178,7 @@ EOF
     mcopy $RELEASE_DIR/3rdparty/bootloader/fixup.dat ::
     mcopy $RELEASE_DIR/3rdparty/bootloader/start.elf ::
     mcopy $RELEASE_DIR/3rdparty/bootloader/config.txt ::
-      
+
     if [ -f $RELEASE_DIR/3rdparty/bootloader/dt-blob.bin ]; then
       mcopy $RELEASE_DIR/3rdparty/bootloader/dt-blob.bin ::
     fi
@@ -257,6 +257,10 @@ fi
 
 if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
   mcopy "$INSTALL_SRC_DIR/aml_autoscript.zip" "::/aml_autoscript.zip"
+fi
+
+if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
+  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot.scr"
 fi
 
 # extract part2 from image to format and copy files
