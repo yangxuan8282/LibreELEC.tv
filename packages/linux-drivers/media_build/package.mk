@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - https://LibreELEC.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-2017 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,29 +17,17 @@
 ################################################################################
 
 PKG_NAME="media_build"
-PKG_VERSION="526f51c"
-
-# choose "LATEST" or a date like "2014-12-01-e8bd888" for the driver package
-# chose from here http://linuxtv.org/downloads/drivers/
-
-# working
-# 2016-03-29-d3f519301944
-# 2016-05-02-68af062b5f38
-# 2016-06-16-0db5c79989de
-# 2016-07-18-009a62084821
-MEDIA_BUILD_VERSION="2016-09-11-c3b809834db8"
-
-PKG_REV="1"
+PKG_VERSION="2017-01-22"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://git.linuxtv.org/media_build.git"
-PKG_URL="http://mycvh.de/openelec/$PKG_NAME/$PKG_NAME-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_TARGET=""
+PKG_SITE="https://github.com/crazycat69/linux_media"
+PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain linux"
-PKG_PRIORITY="optional"
+PKG_BUILD_DEPENDS_TARGET="toolchain linux"
+PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver"
-PKG_SHORTDESC="Build system to use the latest experimental drivers/patches from latest Kernel version"
-PKG_LONGDESC="Build system to use the latest experimental drivers/patches from latest Kernel version"
+PKG_SHORTDESC="DVB drivers that replace the version shipped with the kernel"
+PKG_LONGDESC="DVB drivers that replace the version shipped with the kernel"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
@@ -51,19 +39,28 @@ fi
 
 pre_make_target() {
   export KERNEL_VER=$(get_module_dir)
-  # dont use our LDFLAGS, use the KERNEL LDFLAGS
   export LDFLAGS=""
 }
 
 make_target() {
-  $SED -i  -e "/^LATEST_TAR/s/-LATEST/-$MEDIA_BUILD_VERSION/g" linux/Makefile
-  make VER=$KERNEL_VER SRCDIR=$(kernel_path) -C linux/ download
-  make VER=$KERNEL_VER SRCDIR=$(kernel_path) -C linux/ untar
-  make VER=$KERNEL_VER SRCDIR=$(kernel_path) stagingconfig
+  make untar
+
+  # copy config file
+  if [ "$PROJECT" = Generic ] || [ "$PROJECT" = Virtual ]; then
+    if [ -f $PKG_DIR/config/generic.config ]; then
+      cp $PKG_DIR/config/generic.config v4l/.config
+    fi
+  elif [ "$PROJECT" != "S805" ] && [ "$PROJECT" != "S905" ] && [ "$PROJECT" != "S812" ]; then
+    if [ -f $PKG_DIR/config/usb.config ]; then
+      cp $PKG_DIR/config/usb.config v4l/.config
+    fi
+  fi
+
+  # add menuconfig to edit .config
   make VER=$KERNEL_VER SRCDIR=$(kernel_path)
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/lib/modules/$KERNEL_VER/updates/media_build
-  find $ROOT/$PKG_BUILD/v4l/ -name \*.ko -exec cp {} $INSTALL/lib/modules/$KERNEL_VER/updates/media_build \;
+  mkdir -p $INSTALL/lib/modules/$KERNEL_VER/updates
+  find $ROOT/$PKG_BUILD/v4l/ -name \*.ko -exec cp {} $INSTALL/lib/modules/$KERNEL_VER/updates \;
 }

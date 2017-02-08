@@ -260,7 +260,7 @@ if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
 fi
 
 if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
-  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot.scr"
+  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot/boot.scr"
 fi
 
 # extract part2 from image to format and copy files
