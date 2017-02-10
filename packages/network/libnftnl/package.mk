@@ -17,13 +17,14 @@
 ################################################################################
 
 PKG_NAME="libnftnl"
-PKG_VERSION="1.0.6"
+PKG_VERSION="1.0.5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://netfilter.org/projects/libnftnl"
 PKG_URL="http://netfilter.org/projects/libnftnl/files/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libmnl"
+PKG_PRIORITY="optional"
 PKG_SECTION="network"
 PKG_SHORTDESC="libnftnl: a userspace library providing a low-level netlink programming interface (API) to the in-kernel nf_tables subsystem."
 PKG_LONGDESC="libnftnl is a userspace library providing a low-level netlink programming interface (API) to the in-kernel nf_tables subsystem. The library libnftnl has been previously known as libnftables. This library is currently used by nftables."

@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libdvbcsa"
-PKG_VERSION="f988715"
+PKG_VERSION="4ce8be8"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
@@ -25,6 +25,7 @@ PKG_SITE="http://www.videolan.org/developers/libdvbcsa.html"
 PKG_SITE="https://github.com/glenvt18/libdvbcsa/"
 PKG_URL="https://github.com/glenvt18/libdvbcsa/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
+PKG_PRIORITY="optional"
 PKG_SECTION="lib"
 PKG_SHORTDESC="libdvbcsa is a free implementation of the DVB Common Scrambling Algorithm - DVB/CSA - with encryption and decryption capabilities"
 PKG_LONGDESC="libdvbcsa is a free implementation of the DVB Common Scrambling Algorithm - DVB/CSA - with encryption and decryption capabilities"
@@ -36,6 +37,10 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static --with-sysroot=$SYSR
 
 if echo "$TARGET_FPU" | grep -q '^neon'; then
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-neon"
+elif [ "$TARGET_ARCH" = aarch64 ]; then
+  # change this to --enable-neon when AArch64 NEON performance is improved
+  # check performance with test/benchbitslice
+  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-uint64"
 elif [ "$TARGET_ARCH" = x86_64  ]; then
   if echo "$PROJECT_CFLAGS" | grep -q '\-mssse3'; then
     PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-ssse3"

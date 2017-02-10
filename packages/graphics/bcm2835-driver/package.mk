@@ -17,13 +17,14 @@
 ################################################################################
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="c53b9e5"
+PKG_VERSION="d760a4f"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.broadcom.com"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain dtc"
+PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
 PKG_LONGDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
@@ -70,5 +71,6 @@ makeinstall_target() {
 }
 
 post_install() {
+  enable_service fbset.service
   enable_service unbind-console.service
 }

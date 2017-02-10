@@ -58,17 +58,26 @@
 
   # Kernel to use. values can be:
   # default:  default mainline kernel
-    LINUX="amlogic-3.10"
+    LINUX="amlogic"
 
 
 ################################################################################
 # setup build defaults
 ################################################################################
 
+  # Build optimizations (size/normal)
+    OPTIMIZATIONS="size"
+
   # Project CFLAGS
     PROJECT_CFLAGS=""
 
-  # SquashFS compression method (gzip / lzo / xz)
+  # LTO (Link Time Optimization) support
+    LTO_SUPPORT="yes"
+
+  # GOLD (Google Linker) support
+    GOLD_SUPPORT="yes"
+
+  # SquashFS compression method (gzip / lzo / xz / lz4)
     SQUASHFS_COMPRESSION="lzo"
 
 ################################################################################
@@ -120,6 +129,9 @@
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
+
+  # build and install IRServer IR/LCD support (yes / no)
+    IRSERVER_SUPPORT="no"
 
   # Amlogic IR remote support (yes / no)
     AMREMOTE_SUPPORT="yes"

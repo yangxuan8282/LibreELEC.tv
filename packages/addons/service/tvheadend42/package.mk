@@ -17,23 +17,25 @@
 ################################################################################
 
 PKG_NAME="tvheadend42"
-PKG_VERSION="0736ebc"
-PKG_VERSION_NUMBER="4.1.2309"
-PKG_REV="107"
+PKG_VERSION="5374573"
+PKG_VERSION_NUMBER="4.1.1945"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL="https://github.com/tvheadend/tvheadend/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="tvheadend-${PKG_VERSION}*"
 PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl Python:host yasm"
+PKG_PRIORITY="optional"
 PKG_SECTION="service"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux"
-PKG_LONGDESC="Tvheadend ($PKG_VERSION_NUMBER): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T"
-PKG_AUTORECONF="no"
+PKG_LONGDESC="Tvheadend($PKG_VERSION_NUMBER): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Tvheadend 4.2"
 PKG_ADDON_TYPE="xbmc.service"
+PKG_AUTORECONF="no"
+PKG_ADDON_REPOVERSION="7.0"
 
 # transcoding only for generic
 if [ "$TARGET_ARCH" = x86_64 ]; then
@@ -46,7 +48,7 @@ fi
 PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --arch=$TARGET_ARCH \
                            --cpu=$TARGET_CPU \
-                           --cc=$CC \
+                           --cc=$TARGET_CC \
                            --disable-avahi \
                            --enable-bundle \
                            --disable-dbus_1 \
@@ -60,9 +62,7 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --disable-uriparser \
                            $TVH_TRANSCODING \
                            --enable-tvhcsa \
-                           --enable-trace \
                            --nowerror \
-                           --disable-bintray_cache \
                            --python=$ROOT/$TOOLCHAIN/bin/python"
 
 post_unpack() {
@@ -86,7 +86,7 @@ pre_configure_target() {
 # transcoding link tvheadend with g++
 if [ "$TARGET_ARCH" = x86_64 ]; then
   pre_make_target() {
-    export CXX=$CXX
+    export CXX=$TARGET_CXX
   }
 fi
 

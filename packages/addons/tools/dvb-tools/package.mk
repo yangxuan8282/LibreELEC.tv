@@ -18,28 +18,33 @@
 
 PKG_NAME="dvb-tools"
 PKG_VERSION=""
-PKG_REV="101"
+PKG_REV="100"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE=""
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
+PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
-PKG_SHORTDESC="DVB-Tools: is a bundle of dvb tools and programs"
-PKG_LONGDESC="This bundle currently includes dvb-apps, dvb-fe-tool, dvblast and w_scan."
-PKG_AUTORECONF="no"
+PKG_SHORTDESC="A bundle of dvb tools and programs"
+PKG_LONGDESC="This bundle currently includes dvb-apps, dvb-fe-tool and dvblast."
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="DVB Tools"
 PKG_ADDON_TYPE="xbmc.python.script"
+PKG_ADDON_PROVIDES=""
+PKG_ADDON_REPOVERSION="7.0"
+
+PKG_AUTORECONF="no"
 
 PKG_DEPENDS_TARGET="toolchain \
                     dvb-apps \
                     dvb-fe-tool \
-                    dvblast \
-                    w_scan"
+                    dvblast"
 
 addon() {
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib/
+
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin/
     # dvb-apps
     cp -P $(get_build_dir dvb-apps)/util/dvbdate/dvbdate $ADDON_BUILD/$PKG_ADDON_ID/bin
@@ -59,9 +64,6 @@ addon() {
 
     # dvblast
     cp -P $(get_build_dir dvblast)/dvblast $ADDON_BUILD/$PKG_ADDON_ID/bin
-
-    # w_scan
-    cp -P $(get_build_dir w_scan)/.$TARGET_NAME/w_scan $ADDON_BUILD/$PKG_ADDON_ID/bin
 
   debug_strip $ADDON_BUILD/$PKG_ADDON_ID/bin
 }

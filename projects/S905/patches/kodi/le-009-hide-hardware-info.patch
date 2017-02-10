@@ -1,5 +1,5 @@
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index a4450e3..ee32e03 100644
+index 8941b87..ccf55a1 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
 @@ -100,7 +100,6 @@ void CGUIWindowSystemInfo::FrameMove()
@@ -10,7 +10,16 @@ index a4450e3..ee32e03 100644
    }
  
    else if (m_section == CONTROL_BT_STORAGE)
-@@ -147,17 +146,15 @@ void CGUIWindowSystemInfo::FrameMove()
+@@ -139,7 +138,7 @@ void CGUIWindowSystemInfo::FrameMove()
+ #else
+     SetControlLabel(i++, "%s %s", 22024, SYSTEM_RENDER_VERSION);
+ #endif
+-#if !defined(__arm__) && !defined(HAS_DX)
++#if !(defined(__arm__) || defined(__aarch64__)) && !defined(HAS_DX)
+     SetControlLabel(i++, "%s %s", 22010, SYSTEM_GPU_TEMPERATURE);
+ #endif
+   }
+@@ -148,17 +147,15 @@ void CGUIWindowSystemInfo::FrameMove()
    {
      SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
@@ -22,7 +31,8 @@ index a4450e3..ee32e03 100644
 -    SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUSerial());
  #endif
      SetControlLabel(i++, "%s %s", 22011, SYSTEM_CPU_TEMPERATURE);
- #if (!defined(__arm__) && !defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
+-#if !defined(__arm__) || defined(TARGET_RASPBERRY_PI)
++#if !(defined(__arm__) || defined(__aarch64__)) || defined(TARGET_RASPBERRY_PI)
      SetControlLabel(i++, "%s %s", 13284, SYSTEM_CPUFREQUENCY);
  #endif
 -#if !(defined(__arm__) && defined(TARGET_LINUX))

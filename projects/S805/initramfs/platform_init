@@ -22,21 +22,21 @@ hdmimode=720p
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
-  case $arg in
+  case ${arg} in
     hdmitx=*)
-      hdmitx="${arg#*=}"
+      hdmitx=${arg#*=}
       ;;
     hdmimode=*)
-      hdmimode="${arg#*=}"
+      hdmimode=${arg#*=}
       ;;
     BOOT_IMAGE=*)
-      BOOT_IMAGE="${arg#*=}"
+      BOOT_IMAGE=${arg#*=}
       ;;
     boot=*)
-      boot="${arg#*=}"
+      boot=${arg#*=}
       ;;
     disk=*)
-      disk="${arg#*=}"
+      disk=${arg#*=}
       ;;
   esac
 done
@@ -82,3 +82,5 @@ echo add default decoder ppmgr deinterlace amvideo > /sys/class/vfm/map
 for part in /sys/block/*/queue/add_random; do
   echo 0 > "$part"
 done
+
+echo 1 > /sys/module/di/parameters/bypass_prog

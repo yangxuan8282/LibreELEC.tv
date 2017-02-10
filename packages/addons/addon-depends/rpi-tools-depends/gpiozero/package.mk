@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
+#      This file is part of LibreELEC - http://www.libreelec.tv
 #      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/RPi-Distro/python-gpiozero"
 PKG_URL="https://pypi.python.org/packages/source/g/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
+PKG_PRIORITY="optional"
 PKG_SECTION="python"
 PKG_SHORTDESC="A simple interface to everyday GPIO components used with Raspberry Pi"
 PKG_LONGDESC="A simple interface to everyday GPIO components used with Raspberry Pi"

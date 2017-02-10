@@ -1,3 +1,4 @@
+defenv
 setenv bootfromnand 0
 setenv bootfromrecovery 0
 setenv bootcmd "run start_autoscript;run storeboot;"

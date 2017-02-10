@@ -17,13 +17,15 @@
 ################################################################################
 
 PKG_NAME="libcec"
-PKG_VERSION="6d68d21"
+PKG_VERSION="3.0.1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://libcec.pulse-eight.com/"
-PKG_URL="https://github.com/Pulse-Eight/libcec/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain systemd lockdev p8-platform"
+PKG_URL="https://github.com/Pulse-Eight/libcec/archive/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="$PKG_NAME-$PKG_NAME-$PKG_VERSION"
+PKG_DEPENDS_TARGET="toolchain systemd lockdev platform"
+PKG_PRIORITY="optional"
 PKG_SECTION="system"
 PKG_SHORTDESC="libCEC is an open-source dual licensed library designed for communicating with the Pulse-Eight USB - CEC Adaptor"
 PKG_LONGDESC="libCEC is an open-source dual licensed library designed for communicating with the Pulse-Eight USB - CEC Adaptor."
@@ -31,34 +33,28 @@ PKG_LONGDESC="libCEC is an open-source dual licensed library designed for commun
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CMAKE_OPTS_TARGET="-DBUILD_SHARED_LIBS=1 \
-                       -DCMAKE_INSTALL_LIBDIR=/usr/lib \
-                       -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/lib \
-                       -DCMAKE_INSTALL_PREFIX_TOOLCHAIN=$SYSROOT_PREFIX/usr \
-                       -DCMAKE_PREFIX_PATH=$SYSROOT_PREFIX/usr"
-
-if [ "$KODIPLAYER_DRIVER" = "bcm2835-firmware" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-firmware"
+if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver"
 fi
 
 if [ "$KODIPLAYER_DRIVER" = "libfslvpuwrap" ]; then
-  PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_IMX_API=1"
+  EXTRA_CMAKE_OPTS="$EXTRA_CMAKE_OPTS -DHAVE_IMX_API=1"
 else
-  PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_IMX_API=0"
+  EXTRA_CMAKE_OPTS="$EXTRA_CMAKE_OPTS -DHAVE_IMX_API=0"
 fi
 
 if [ "$KODIPLAYER_DRIVER" = "libamcodec" ]; then
-  if [ "$TARGET_ARCH" = "aarch64" ]; then
-    PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AOCEC_API=1"
-  else
-    PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AMLOGIC_API=1"
+  if [ "$TARGET_KERNEL_ARCH" = "arm" ]; then
+    EXTRA_CMAKE_OPTS="$EXTRA_CMAKE_OPTS -DHAVE_AOCEC_API=0 -DHAVE_AMLOGIC_API=1"
+  elif [ "$TARGET_KERNEL_ARCH" = "arm64" ]; then
+    EXTRA_CMAKE_OPTS="$EXTRA_CMAKE_OPTS -DHAVE_AOCEC_API=1 -DHAVE_AMLOGIC_API=0"
   fi
 else
-  PKG_CMAKE_OPTS_TARGET="$PKG_CMAKE_OPTS_TARGET -DHAVE_AOCEC_API=0 -DHAVE_AMLOGIC_API=0"
+  EXTRA_CMAKE_OPTS="$EXTRA_CMAKE_OPTS -DHAVE_AOCEC_API=0 -DHAVE_AMLOGIC_API=0"
 fi
 
-pre_configure_target() {
-  if [ "$KODIPLAYER_DRIVER" = "bcm2835-firmware" ]; then
+configure_target() {
+  if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
     export CXXFLAGS="$CXXFLAGS \
       -I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads/ \
       -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
@@ -66,6 +62,16 @@ pre_configure_target() {
     # detecting RPi support fails without -lvchiq_arm
     export LDFLAGS="$LDFLAGS -lvchiq_arm"
   fi
+
+  cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
+        -DBUILD_SHARED_LIBS=1 \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+        -DCMAKE_INSTALL_LIBDIR_NOARCH=/usr/lib \
+        -DCMAKE_INSTALL_PREFIX_TOOLCHAIN=$SYSROOT_PREFIX/usr \
+        -DCMAKE_PREFIX_PATH=$SYSROOT_PREFIX/usr \
+        $EXTRA_CMAKE_OPTS \
+        ..
 }
 
 post_makeinstall_target() {

@@ -44,10 +44,6 @@
     UBOOT_CONFIG="mx6_cubox-i_config"
     UBOOT_CONFIG="$UBOOT_CONFIG matrix"
 
-    UBOOT_CONFIG_V2="udoo_config"
-    UBOOT_CONFIG_V2="$UBOOT_CONFIG_V2 tbs2910_config"
-    #UBOOT_CONFIG_V2="$UBOOT_CONFIG_V2 wandboard_config"
-
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE=""
 
@@ -70,7 +66,6 @@
   # default is 4.4 from xbian
     if [ -z "$LINUX_VERSION" -o "$LINUX_VERSION" != "sr-3.14" ]; then
       LINUX="imx6-4.4-xbian"
-      LIBCEC_TYPE="xbian"
     else
       LINUX="imx6"
     fi
@@ -79,11 +74,21 @@
 # setup build defaults
 ################################################################################
 
+  # Build optimizations (size/normal)
+    OPTIMIZATIONS="size"
+
   # Project CFLAGS
     PROJECT_CFLAGS=""
 
-  # SquashFS compression method (gzip / lzo / xz)
-    SQUASHFS_COMPRESSION="lzo"
+  # LTO (Link Time Optimization) support
+    LTO_SUPPORT="yes"
+
+  # GOLD (Google Linker) support
+    GOLD_SUPPORT="yes"
+
+  # SquashFS compression method (gzip / lzo / xz / lz4)
+    SQUASHFS_COMPRESSION="gzip"
+
 
 ################################################################################
 # setup project defaults
@@ -96,7 +101,7 @@
     OPENGL="no"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / imx-gpu-viv)
-    if [ "$LINUX" = "imx6" ]; then
+  	if [ "$LINUX" = "imx6" ]; then
       OPENGLES="imx-gpu-viv"
     else
       OPENGLES="gpu-viv-bin-mx6q"
@@ -126,7 +131,11 @@
   # for a list of additional drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS dvbhdhomerun"
+    if [ "$LINUX" = "imx6" ]; then
+      ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8188EU dvbhdhomerun"
+    else
+      ADDITIONAL_DRIVERS="$ADDITIONAL_DRIVERS"
+    fi
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -135,6 +144,9 @@
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
+
+  # build and install IRServer IR/LCD support (yes / no)
+    IRSERVER_SUPPORT="no"
 
   # build with swap support (yes / no)
     SWAP_SUPPORT="no"

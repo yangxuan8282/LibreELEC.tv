@@ -45,8 +45,9 @@ single_stacktrace()
 
 print_crash_report()
 {
-  mkdir -p $CRASHLOG_DIR
-
+  if [ ! -d $CRASHLOG_DIR ] ; then
+    mkdir -p $CRASHLOG_DIR
+  fi
   DATE=`date +%Y%m%d%H%M%S`
   FILE="$CRASHLOG_DIR/.kodi_crashlog.log"
   echo "############## kodi CRASH LOG ###############" > $FILE

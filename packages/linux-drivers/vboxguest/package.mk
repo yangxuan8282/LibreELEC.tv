@@ -17,15 +17,15 @@
 ################################################################################
 
 PKG_NAME="vboxguest"
-PKG_VERSION="5.1.8"
+PKG_VERSION="5.0.12"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.virtualbox.org"
-PKG_URL="http://download.virtualbox.org/virtualbox/$PKG_VERSION/VirtualBox-$PKG_VERSION.tar.bz2"
-PKG_SOURCE_DIR="VirtualBox-$PKG_VERSION"
+PKG_URL="${DISTRO_SRC}/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
+PKG_PRIORITY="optional"
 PKG_SECTION="driver"
 PKG_SHORTDESC="vboxguest"
 PKG_LONGDESC="vboxguest"
@@ -33,26 +33,15 @@ PKG_LONGDESC="vboxguest"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-pre_configure_target() {
-  # Create and unpack a tarball with the sources of the Linux guest
-  # kernel modules, to include all the needed files
-  mkdir -p $ROOT/$PKG_BUILD/vbox-kmod
-  $ROOT/$PKG_BUILD/src/VBox/Additions/linux/export_modules $ROOT/$PKG_BUILD/vbox-kmod/vbox-kmod.tar.gz
-  tar -xf $ROOT/$PKG_BUILD/vbox-kmod/vbox-kmod.tar.gz -C $ROOT/$PKG_BUILD/vbox-kmod
-}
-
-configure_target() {
-  :
+pre_make_target() {
+  unset LDFLAGS
 }
 
 make_target() {
-  cd $ROOT/$PKG_BUILD/vbox-kmod
   make KERN_DIR=$(kernel_path)
 }
 
 makeinstall_target() {
-  for module in vboxguest vboxsf vboxvideo; do
-    mkdir -p $INSTALL/lib/modules/$(get_module_dir)/$module
-      cp -P $ROOT/$PKG_BUILD/vbox-kmod/$module.ko $INSTALL/lib/modules/$(get_module_dir)/$module
-  done
+  mkdir -p $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
+    cp *.ko $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
 }

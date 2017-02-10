@@ -17,13 +17,14 @@
 ################################################################################
 
 PKG_NAME="systemd"
-PKG_VERSION="230"
+PKG_VERSION="229"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
 PKG_URL="https://github.com/systemd/systemd/archive/v$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libcap kmod util-linux entropy"
+PKG_PRIORITY="required"
 PKG_SECTION="system"
 PKG_SHORTDESC="systemd: a system and session manager"
 PKG_LONGDESC="systemd is a system and session manager for Linux, compatible with SysV and LSB init scripts. systemd provides aggressive parallelization capabilities, uses socket and D-Bus activation for starting services, offers on-demand starting of daemons, keeps track of processes using Linux cgroups, supports snapshotting and restoring of the system state, maintains mount and automount points and implements an elaborate transactional dependency-based service control logic. It can work as a drop-in replacement for sysvinit."
@@ -40,6 +41,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --disable-nls \
                            --disable-dbus \
                            --disable-utmp \
+                           --disable-compat-libs \
                            --disable-coverage \
                            --enable-kmod \
                            --disable-xkbcommon \
@@ -67,6 +69,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --disable-libiptc \
                            --disable-binfmt \
                            --disable-vconsole \
+                           --disable-bootchart \
                            --disable-quotacheck \
                            --enable-tmpfiles \
                            --disable-sysusers \
@@ -102,6 +105,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
                            --with-dbuspolicydir=/etc/dbus-1/system.d \
                            --with-dbussessionservicedir=/usr/share/dbus-1/services \
                            --with-dbussystemservicedir=/usr/share/dbus-1/system-services \
+                           --with-dbusinterfacedir=/usr/share/dbus-1/interfaces \
                            --with-rootprefix=/usr \
                            --with-rootlibdir=/lib"
 
@@ -171,9 +175,8 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd/system-generators
   rm -rf $INSTALL/usr/lib/systemd/catalog
 
-  # distro preset policy
-  rm -f $INSTALL/usr/lib/systemd/system-preset/*
-  echo "disable *" > $INSTALL/usr/lib/systemd/system-preset/99-default.preset
+  # meh presets
+  rm -rf $INSTALL/usr/lib/systemd/system-preset
 
   # remove networkd
   rm -rf $INSTALL/usr/lib/systemd/network

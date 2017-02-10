@@ -19,13 +19,14 @@
 PKG_NAME="moonlight"
 PKG_VERSION="391de3f"
 PKG_VERSION_NUMBER="2.2.2"
-PKG_REV="103"
+PKG_REV="104"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/dead/script.moonlight"
 PKG_URL="https://github.com/dead/script.moonlight/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="script.moonlight-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain moonlight-embedded"
+PKG_PRIORITY="optional"
 PKG_SECTION="script"
 PKG_SHORTDESC="Moonlight: implementation of NVIDIA's GameStream protocol"
 PKG_LONGDESC="Moonlight ($PKG_VERSION_NUMBER): allows you to stream your collection of games from your PC (with NVIDIA Gamestream) to your device and play them remotely"
@@ -35,6 +36,7 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Moonlight"
 PKG_ADDON_TYPE="xbmc.service.pluginsource"
 PKG_ADDON_PROVIDES="executable"
+PKG_ADDON_REPOVERSION="7.0"
 
 make_target() {
   :

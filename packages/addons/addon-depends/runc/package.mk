@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
+#      This file is part of LibreELEC - http://www.libreelec.tv
 #      Copyright (C) 2009-2016 Lukas Rusak (lrusak@libreelec.tv)
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ PKG_LICENSE="APL"
 PKG_SITE="https://github.com/opencontainers/runc"
 PKG_URL="https://github.com/opencontainers/runc/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain go"
+PKG_PRIORITY="optional"
 PKG_SECTION="system"
 PKG_SHORTDESC="runc is a CLI tool for spawning and running containers according to the OCI specification"
 PKG_LONGDESC="runc is a CLI tool for spawning and running containers according to the OCI specification"
@@ -48,13 +49,16 @@ pre_make_target() {
          ;;
       esac
       ;;
+    aarch64)
+      export GOARCH=arm64
+      ;;
   esac
 
   export GOOS=linux
   export CGO_ENABLED=1
   export CGO_NO_EMULATION=1
   export CGO_CFLAGS=$CFLAGS
-  export LDFLAGS="-w -extldflags -static -X main.gitCommit=${PKG_VERSION} -extld $CC"
+  export LDFLAGS="-w -extldflags -static -X main.gitCommit=${PKG_VERSION} -extld $TARGET_CC"
   export GOLANG=$ROOT/$TOOLCHAIN/lib/golang/bin/go
   export GOPATH=$ROOT/$PKG_BUILD.gopath:$ROOT/$PKG_BUILD/Godeps/_workspace/
   export GOROOT=$ROOT/$TOOLCHAIN/lib/golang

@@ -1,5 +1,2 @@
-101
-- added w_scan
-
-100
+7.0.100
 - Initial Release

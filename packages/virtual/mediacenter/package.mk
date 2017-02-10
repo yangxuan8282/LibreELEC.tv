@@ -21,9 +21,10 @@ PKG_VERSION=""
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://libreelec.tv"
+PKG_SITE="http://www.libreelec.tv"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain $MEDIACENTER"
+PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="Mediacenter: Metapackage"
 PKG_LONGDESC=""
@@ -39,11 +40,11 @@ if [ "$MEDIACENTER" = "kodi" ]; then
   done
   
 # some python stuff needed for various addons
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET Pillow \
-                                          simplejson \
-                                          pycrypto"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET Pillow"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET simplejson"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET pycrypto"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xmlstarlet"
+
 # other packages
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET LibreELEC-settings \
-                                          xmlstarlet \
-                                          peripheral.joystick"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET LibreELEC-settings"
 fi

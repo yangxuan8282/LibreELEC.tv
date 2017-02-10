@@ -33,6 +33,7 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Inadyn"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
+PKG_ADDON_REPOVERSION="7.0"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-openssl"
 

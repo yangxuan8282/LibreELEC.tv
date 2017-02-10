@@ -25,12 +25,15 @@ PKG_LICENSE="GPL"
 PKG_SITE="http://open-vm-tools.sourceforge.net"
 PKG_URL="https://github.com/vmware/open-vm-tools/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain glib:host glib libdnet"
+PKG_PRIORITY="optional"
 PKG_SECTION="virtualization"
 PKG_SHORTDESC="open-vm-tools: open source implementation of VMware Tools"
 PKG_LONGDESC="open-vm-tools: open source implementation of VMware Tools"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
+
+OPENVMTOOLS_KERNEL_VER=$(basename $(ls -d $ROOT/$BUILD/linux-[0-9]*)| sed 's|linux-||g')
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-docs \
                            --disable-tests \
@@ -51,18 +54,18 @@ post_unpack() {
 }
 
 pre_configure_target() {
-  export LIBS="-ldnet"
+   export LIBS="-ldnet"
 }
 
-post_makeinstall_target() {
-  rm -rf $INSTALL/sbin
-  rm -rf $INSTALL/usr/share
-  rm -rf $INSTALL/etc/vmware-tools/scripts/vmware/network
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/lib
+    cp -PR libvmtools/.libs/libvmtools.so* $INSTALL/usr/lib
 
-  find $INSTALL/etc/vmware-tools/ -type f | xargs sed -i '/.*expr.*/d'
+  mkdir -p $INSTALL/usr/bin
+    cp -PR services/vmtoolsd/.libs/vmtoolsd $INSTALL/usr/bin
+    cp -PR checkvm/.libs/vmware-checkvm $INSTALL/usr/bin
 }
 
 post_install() {
-  enable_service vmtoolsd.service
-  enable_service vmware-vmblock-fuse.service
+  enable_service open-vm-tools.service
 }
