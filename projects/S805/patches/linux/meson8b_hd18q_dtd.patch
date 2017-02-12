@@ -10,7 +10,7 @@ index 0000000..af28bb1
 +//$$ REMOVE 1
 +void root_func(){
 +//$$ ADD /{
-+	amlogic-dt-id = "m8b_m201_1G";
++	amlogic-dt-id = "m8b_m201_v1";
 +	compatible = "AMLOGIC,8726_M8B";
 +	model = "AMLOGIC";
 +	interrupt-parent = <&gic>;

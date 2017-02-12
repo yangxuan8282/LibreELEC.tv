@@ -18,13 +18,11 @@
 
 PKG_NAME="imx-gpu-viv"
 PKG_VERSION="5.0.11.p4.5-hfp"
-PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.freescale.com"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="imx-gpu-viv: OpenGL-ES and VIVANTE driver for imx6q"
 PKG_LONGDESC="imx-gpu-viv: OpenGL-ES and VIVANTE driver for imx6q"

@@ -18,13 +18,11 @@
 
 PKG_NAME="vdr-plugin-epgsearch"
 PKG_VERSION="0b09f90"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://winni.vdr-developer.org/epgsearch/"
 PKG_URL="https://projects.vdr-developer.org/git/vdr-plugin-epgsearch.git/snapshot/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain vdr"
-PKG_PRIORITY="optional"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="vdr-epgsearch"
 PKG_LONGDESC="vdr-epgsearch"

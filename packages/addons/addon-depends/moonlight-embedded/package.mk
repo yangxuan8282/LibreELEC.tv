@@ -17,14 +17,12 @@
 ################################################################################
 
 PKG_NAME="moonlight-embedded"
-PKG_VERSION="2.2.2"
-PKG_REV="1"
+PKG_VERSION="9301898"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/irtimmer/moonlight-embedded"
-PKG_URL="https://github.com/irtimmer/moonlight-embedded/archive/v$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/irtimmer/moonlight-embedded/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain curl libcec pulseaudio ffmpeg systemd alsa-lib moonlight-common-c libevdev enet opus"
-PKG_PRIORITY="optional"
 PKG_SECTION=""
 PKG_SHORTDESC="Gamestream client for embedded systems"
 PKG_LONGDESC="Moonlight Embedded is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux"
@@ -32,26 +30,26 @@ PKG_LONGDESC="Moonlight Embedded is an open source implementation of NVIDIA's Ga
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
+FREESCALE_V4L_INCLUDE=""
 if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver"
 elif [ "$KODIPLAYER_DRIVER" = "libfslvpuwrap" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET imx-gpu-viv"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libfslvpuwrap gpu-viv-bin-mx6q v4l-utils"
+  FREESCALE_V4L_INCLUDE="-DFREESCALE_INCLUDE_DIR=$(get_build_dir v4l-utils)/lib/include"
 elif [ "$KODIPLAYER_DRIVER" = "libamcodec" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libamcodec"
 elif [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libvdpau SDL2 ffmpeg libxcb"
 fi
 
+PKG_CMAKE_OPTS_TARGET="$FREESCALE_V4L_INCLUDE"
+
 pre_build_target() {
   cp -a $(get_build_dir moonlight-common-c)/* $ROOT/$PKG_BUILD/third_party/moonlight-common-c
 }
 
-configure_target() {
-  cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_CONF \
-        -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_INSTALL_LIBDIR=/usr/lib \
-        -DCMAKE_PREFIX_PATH=$SYSROOT_PREFIX/usr \
-        ..
+pre_configure_target() {
+  [ "$PROJECT" = "imx6" ] && strip_gold || true
 }
 
 makeinstall_target() {

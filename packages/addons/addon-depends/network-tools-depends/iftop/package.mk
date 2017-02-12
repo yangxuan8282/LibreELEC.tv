@@ -18,13 +18,11 @@
 
 PKG_NAME="iftop"
 PKG_VERSION="1.0pre4"
-PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://htop.sourceforge.net/"
 PKG_URL="http://www.ex-parrot.com/pdw/iftop/download/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain ncurses libpcap libnl"
-PKG_PRIORITY="optional"
+PKG_DEPENDS_TARGET="toolchain netbsd-curses libpcap libnl"
 PKG_SECTION="network/analyzer"
 PKG_SHORTDESC="iftop: display bandwidth usage on an interface"
 PKG_LONGDESC="iftop does for network usage what top(1) does for CPU usage. It listens to network traffic on a named interface and displays a table of current bandwidth usage by pairs of hosts. Handy for answering the question 'why is our ADSL link so slow?'."
@@ -36,8 +34,8 @@ pre_build_target() {
 }
 
 pre_configure_target() {
-  export CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/ncurses -I$SYSROOT_PREFIX/usr/include/pcap"
-  export LIBS="-lpcap -lnl-3 -lnl-genl-3"
+  export CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/pcap"
+  export LIBS="-lpcap -lnl-3 -lnl-genl-3 -lncurses -ltermcap"
 }
 
 makeinstall_target() {

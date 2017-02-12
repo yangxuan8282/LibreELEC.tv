@@ -45,10 +45,10 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
-  cp $ROOT/$PKG_BUILD/mtprealloc.ko $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
-  cp $ROOT/$PKG_BUILD/mt7601usta.ko $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
+  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+  cp $ROOT/$PKG_BUILD/mtprealloc.ko $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+  cp $ROOT/$PKG_BUILD/mt7601usta.ko $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
 
-  mkdir -p $INSTALL/lib/firmware
-  cp $ROOT/$PKG_BUILD/RT2870STA_7601.dat $INSTALL/lib/firmware
+  mkdir -p $INSTALL/usr/lib/firmware
+  cp $ROOT/$PKG_BUILD/RT2870STA_7601.dat $INSTALL/usr/lib/firmware
 }

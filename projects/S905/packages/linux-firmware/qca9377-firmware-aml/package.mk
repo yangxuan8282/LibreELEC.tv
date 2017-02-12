@@ -36,10 +36,10 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/lib/firmware
+  mkdir -p $INSTALL/usr/lib/firmware
 
-  cp -P LICENSE.TXT $INSTALL/lib/firmware/LICENSE.qca
-  cp -P *.bin $INSTALL/lib/firmware
-  cp -PR qca $INSTALL/lib/firmware
-  cp -PR wlan $INSTALL/lib/firmware
+  cp -P LICENSE.TXT $INSTALL/usr/lib/firmware/LICENSE.qca
+  cp -P *.bin $INSTALL/usr/lib/firmware
+  cp -PR qca $INSTALL/usr/lib/firmware
+  cp -PR wlan $INSTALL/usr/lib/firmware
 }

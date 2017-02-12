@@ -18,14 +18,12 @@
 
 PKG_NAME="dosfstools"
 PKG_VERSION="3.0.28"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/dosfstools/dosfstools"
 PKG_URL="https://github.com/dosfstools/dosfstools/releases/download/v$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain dosfstools"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="dosfstools: utilities for making and checking MS-DOS FAT filesystems."
 PKG_LONGDESC="dosfstools contains utilities for making and checking MS-DOS FAT filesystems."
@@ -51,10 +49,10 @@ make_host() {
 }
 
 makeinstall_init() {
-  mkdir -p $INSTALL/sbin
-    cp fsck.fat $INSTALL/sbin
-    ln -sf fsck.fat $INSTALL/sbin/fsck.msdos
-    ln -sf fsck.fat $INSTALL/sbin/fsck.vfat
+  mkdir -p $INSTALL/usr/sbin
+    cp fsck.fat $INSTALL/usr/sbin
+    ln -sf fsck.fat $INSTALL/usr/sbin/fsck.msdos
+    ln -sf fsck.fat $INSTALL/usr/sbin/fsck.vfat
 }
 
 makeinstall_host() {

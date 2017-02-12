@@ -17,15 +17,13 @@
 ################################################################################
 
 PKG_NAME="dtc"
-PKG_VERSION="beef80b"
-PKG_REV="1"
+PKG_VERSION="1.4.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://git.kernel.org/cgit/utils/dtc/dtc.git"
 PKG_URL="https://git.kernel.org/cgit/utils/dtc/dtc.git/snapshot/$PKG_VERSION.tar.xz"
 PKG_SOURCE_DIR="$PKG_VERSION"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="The Device Tree Compiler"
 PKG_LONGDESC="The Device Tree Compiler"

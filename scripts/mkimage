@@ -24,8 +24,8 @@
 ################################################################################
 
 # set variables
-  OE_TMP=$(mktemp -d)
-  SAVE_ERROR="$OE_TMP/save_error"
+  LE_TMP=$(mktemp -d)
+  SAVE_ERROR="$LE_TMP/save_error"
 
   if [ -z "$SYSTEM_SIZE" -o -z "$SYSTEM_PART_START" ]; then
     echo "mkimage: SYSTEM_SIZE and SYSTEM_PART_START must be configured!"
@@ -40,7 +40,7 @@
 # functions
   cleanup() {
     echo "image: cleanup..."
-    rm -rf "$OE_TMP"
+    rm -rf "$LE_TMP"
     echo
     exit
   }
@@ -59,10 +59,10 @@ trap cleanup SIGINT
 # generate volume id for fat partition
   UUID_1=$(date '+%d%m')
   UUID_2=$(date '+%M%S')
-  FAT_VOL_ID="${UUID_1}${UUID_2}"
+  FAT_SERIAL_NUMBER="${UUID_1}${UUID_2}"
   UUID_SYSTEM="${UUID_1}-${UUID_2}"
-  FAT_VOL_LABEL="BOOT"
-  EXT_VOL_LABEL="DISK"
+  FAT_VOLUME_LABEL="LIBREELEC"
+  EXT_VOLUME_LABEL="LIBREELEC_DISK"
 
 # create an image
   echo
@@ -110,24 +110,24 @@ fi
   HEADS=4
   TRACKS=32
   SECTORS=$(( $SYSTEM_SIZE * 1024 * 1024 / 512 / $HEADS / $TRACKS ))
-  
+
   shopt -s expand_aliases  # enables alias expansion in script
   alias mformat="mformat -i $DISK@@$OFFSET -h $HEADS -t $TRACKS -s $SECTORS"
   alias mcopy="mcopy -i $DISK@@$OFFSET"
   alias mmd="mmd -i $DISK@@$OFFSET"
 
   if [ "$BOOTLOADER" = "syslinux" ]; then
-    mformat -v "$FAT_VOL_ID" -N "$FAT_VOL_ID" ::
+    mformat -v "$FAT_VOLUME_LABEL" -N "$FAT_SERIAL_NUMBER" ::
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
-    mformat -v "$FAT_VOL_LABEL" ::
+    mformat -v "$FAT_VOLUME_LABEL" ::
   fi
   sync
 
 if [ "$BOOTLOADER" = "syslinux" ]; then
   # create bootloader configuration
     echo "image: creating bootloader configuration..."
-    cat << EOF > "$OE_TMP"/syslinux.cfg
-SAY Press <TAB> to edit options
+    cat << EOF > "$LE_TMP"/syslinux.cfg
+SAY Wait for installer to start or press <TAB> for more options (live, run)
 DEFAULT installer
 TIMEOUT 50
 PROMPT 1
@@ -139,9 +139,25 @@ LABEL installer
 LABEL live
   KERNEL /$KERNEL_NAME
   APPEND boot=UUID=$UUID_SYSTEM live quiet tty vga=current
+
+LABEL run
+  KERNEL /$KERNEL_NAME
+  APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE portable quiet
 EOF
 
-    mcopy "$OE_TMP/syslinux.cfg" ::
+  if [ "$PROJECT" = Virtual ]; then
+    cat << EOF > "$LE_TMP"/syslinux.cfg
+DEFAULT virtual
+TIMEOUT 50
+PROMPT 0
+
+LABEL virtual
+  KERNEL /$KERNEL_NAME
+  APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE quiet tty vga=current
+EOF
+  fi
+
+    mcopy "$LE_TMP/syslinux.cfg" ::
 
   # install extlinux
     echo "image: installing extlinux to part1..."
@@ -157,15 +173,15 @@ EOF
     mmd EFI EFI/BOOT
     mcopy $ROOT/$TOOLCHAIN/share/syslinux/bootx64.efi ::/EFI/BOOT
     mcopy $ROOT/$TOOLCHAIN/share/syslinux/ldlinux.e64 ::/EFI/BOOT
-    mcopy "$OE_TMP"/syslinux.cfg ::/EFI/BOOT
+    mcopy "$LE_TMP"/syslinux.cfg ::/EFI/BOOT
 elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
   # create bootloader configuration
     echo "image: creating bootloader configuration..."
-    cat << EOF > "$OE_TMP"/cmdline.txt
+    cat << EOF > "$LE_TMP"/cmdline.txt
 boot=/dev/mmcblk0p1 disk=/dev/mmcblk0p2 quiet $EXTRA_CMDLINE
 EOF
 
-    mcopy "$OE_TMP/cmdline.txt" ::
+    mcopy "$LE_TMP/cmdline.txt" ::
 
   # copy files
     echo "image: copying files to part1..."
@@ -178,7 +194,8 @@ EOF
     mcopy $RELEASE_DIR/3rdparty/bootloader/fixup.dat ::
     mcopy $RELEASE_DIR/3rdparty/bootloader/start.elf ::
     mcopy $RELEASE_DIR/3rdparty/bootloader/config.txt ::
-
+    mcopy $RELEASE_DIR/3rdparty/bootloader/distroconfig.txt ::
+ 
     if [ -f $RELEASE_DIR/3rdparty/bootloader/dt-blob.bin ]; then
       mcopy $RELEASE_DIR/3rdparty/bootloader/dt-blob.bin ::
     fi
@@ -218,6 +235,9 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
     elif [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot-fuse" ]; then
      # allow custom dd script for vendor specific fusing
       . $RELEASE_DIR/3rdparty/bootloader/u-boot-fuse
+    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
+      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
+      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
     fi
 
     echo "image: copying files to part1..."
@@ -237,17 +257,26 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
       mcopy $RELEASE_DIR/3rdparty/bootloader/u-boot.img ::
     fi
 
+    if [ -f $RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz ::
+    fi
+
     for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb ; do
       if [ -f $dtb ] ; then
         mcopy "$dtb" ::/$(basename "$dtb")
       fi
     done
+
+    # copy Amlogic device tree image
+    if [ -f "$RELEASE_DIR/3rdparty/bootloader/dtb.img" ]; then
+      mcopy $RELEASE_DIR/3rdparty/bootloader/dtb.img ::
+    fi
 fi # bootloader
 
 for src in $INSTALL_SRC_DIR/*autoscript.src ; do
   if [ -e "$src" ] ; then
-    $MKIMAGE_TOOL_CMD "$src" "$OE_TMP/$(basename $src .src)"
-    mcopy "$OE_TMP/$(basename $src .src)" ::
+    $MKIMAGE_TOOL_CMD "$src" "$LE_TMP/$(basename $src .src)"
+    mcopy "$LE_TMP/$(basename $src .src)" ::
   fi
 done
 
@@ -267,28 +296,46 @@ fi
   echo "image: extracting part2 from image..."
   STORAGE_PART_COUNT=$(( $STORAGE_PART_END - $STORAGE_PART_START + 1 ))
   sync
-  dd if="$DISK" of="$OE_TMP/part2.ext4" bs=512 skip="$STORAGE_PART_START" count="$STORAGE_PART_COUNT" conv=fsync >"$SAVE_ERROR" 2>&1 || show_error
+  dd if="$DISK" of="$LE_TMP/part2.ext4" bs=512 skip="$STORAGE_PART_START" count="$STORAGE_PART_COUNT" conv=fsync >"$SAVE_ERROR" 2>&1 || show_error
 
 # create filesystem on part2
   echo "image: creating filesystem on part2..."
-  mke2fs -F -q -t ext4 -m 0 "$OE_TMP/part2.ext4"
-  tune2fs -L "$EXT_VOL_LABEL" -U $UUID_STORAGE "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
-  e2fsck -n "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
+  mke2fs -F -q -t ext4 -m 0 "$LE_TMP/part2.ext4"
+  tune2fs -L "$EXT_VOLUME_LABEL" -U $UUID_STORAGE "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
+  e2fsck -n "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   sync
 
 # add resize mark
-  if [ "$BOOTLOADER" != "syslinux" ]; then
-    mkdir "$OE_TMP/part2.fs"
-    touch "$OE_TMP/part2.fs/.please_resize_me"
-    echo "image: populating filesystem on part2..."
-    populatefs -U -d "$OE_TMP/part2.fs" "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
-    sync
-    e2fsck -n "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
-  fi
+  mkdir "$LE_TMP/part2.fs"
+  touch "$LE_TMP/part2.fs/.please_resize_me"
+  echo "image: populating filesystem on part2..."
+  populatefs -U -d "$LE_TMP/part2.fs" "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
+  sync
+  e2fsck -n "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
 
 # merge part2 back to disk image
   echo "image: merging part2 back to image..."
-  dd if="$OE_TMP/part2.ext4" of="$DISK" bs=512 seek="$STORAGE_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
+  dd if="$LE_TMP/part2.ext4" of="$DISK" bs=512 seek="$STORAGE_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
+
+
+# extract part1 from image to run fsck
+  echo "image: extracting part1 from image..."
+  SYSTEM_PART_COUNT=$(( $SYSTEM_PART_END - $SYSTEM_PART_START + 1 ))
+  sync
+  dd if="$DISK" of="$LE_TMP/part1.fat" bs=512 skip="$SYSTEM_PART_START" count="$SYSTEM_PART_COUNT" conv=fsync >"$SAVE_ERROR" 2>&1 || show_error
+  echo "image: checking filesystem on part1..."
+  fsck -n $LE_TMP/part1.fat >"$SAVE_ERROR" 2>&1 || show_error
+
+# create virtual images
+  if [ "$PROJECT" = Virtual ]; then
+    echo "image: creating open virtual appliance..."
+    qemu-img convert -O vmdk -o subformat=streamOptimized "$DISK" "$DISK.vmdk"
+    sed -e "s,@DISTRO@,$DISTRO,g" -e "s,@DISK@,$(basename $DISK),g" -e "s,@DISK_SIZE@,$(ls -l $DISK.vmdk | awk '{print $5}'),g" $PROJECT_DIR/$PROJECT/config/ovf.template > $DISK.ovf
+    tar -C $TARGET_IMG -cf $DISK.ova $(basename $DISK).ovf $(basename $DISK).vmdk
+    echo "image: cleaning up..."
+    rm $DISK.vmdk $DISK.ovf
+    [ -n "$SUDO_USER" ] && chown $SUDO_USER: $DISK.ova
+  fi
 
 # gzip
 #  echo "image: compressing..."

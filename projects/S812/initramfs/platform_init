@@ -56,14 +56,20 @@ fi
 
 echo "$hdmimode" > /sys/class/display/mode
 
-# Enable first framebuffer
+# Force enable CEC if configuration parameter not present or empty
+if [ -z "$hdmitx" ]; then
+  echo 0xf > /sys/class/amhdmitx/amhdmitx0/cec_config
+fi
+
+# Enable framebuffer device
 echo 0 > /sys/class/graphics/fb0/blank
 
-# Disable second framebuffer
+# Blank fb1 to prevent static noise
 echo 1 > /sys/class/graphics/fb1/blank
 
 # Disable framebuffer scaling
 echo 0 > /sys/class/graphics/fb0/free_scale
+echo 0 > /sys/class/graphics/fb1/free_scale
 
 # set initial video state
 echo 1 > /sys/class/video/disable_video

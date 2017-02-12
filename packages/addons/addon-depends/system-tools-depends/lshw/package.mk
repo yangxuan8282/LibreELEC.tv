@@ -18,13 +18,11 @@
 
 PKG_NAME="lshw"
 PKG_VERSION="B.02.17"
-PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://ezix.org/project/wiki/HardwareLiSter"
 PKG_URL="http://ezix.org/software/files/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="lshw (Hardware Lister)"
 PKG_LONGDESC="lshw (Hardware Lister) is a small tool to provide detailed information on the hardware configuration of the machine."

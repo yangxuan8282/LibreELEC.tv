@@ -17,29 +17,27 @@
 ################################################################################
 
 PKG_NAME="tvheadend"
-PKG_VERSION="ac9e47d"
+PKG_VERSION="e5400e2"
 PKG_VERSION_NUMBER="4.0.9"
-PKG_REV="101"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL="https://github.com/tvheadend/tvheadend/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain curl libdvbcsa libiconv libressl Python:host"
-PKG_PRIORITY="optional"
 PKG_SECTION="service.multimedia"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux"
-PKG_LONGDESC="Tvheadend($PKG_VERSION_NUMBER): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP and ATSC"
+PKG_LONGDESC="Tvheadend ($PKG_VERSION_NUMBER): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP and ATSC"
+PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Tvheadend 4.0"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_AUTORECONF="no"
-PKG_ADDON_REPOVERSION="7.0"
 
 PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --arch=$TARGET_ARCH \
                            --cpu=$TARGET_CPU \
-                           --cc=$TARGET_CC \
+                           --cc=$CC \
                            --enable-hdhomerun_client \
                            --enable-hdhomerun_static \
                            --disable-avahi \

@@ -34,10 +34,10 @@ for arg in $(cat /proc/cmdline); do
       boot="${arg#*=}"
       case $boot in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "BOOT"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $boot "LIBREELEC"
           ;;
         LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/sbin/findfs $boot) "BOOT"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/fatlabel $($SYSTEM_ROOT/usr/sbin/findfs $boot) "LIBREELEC"
           ;;
       esac
 
@@ -66,10 +66,10 @@ for arg in $(cat /proc/cmdline); do
       disk="${arg#*=}"
       case $disk in
         /dev/mmc*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/sbin/e2label $disk "DISK"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $disk "LIBREELEC_DISK"
           ;;
         LABEL=*)
-          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/sbin/e2label $($SYSTEM_ROOT/sbin/findfs $disk) "DISK"
+          LD_LIBRARY_PATH="$SYSTEM_ROOT/lib" $SYSTEM_ROOT/usr/sbin/e2label $($SYSTEM_ROOT/usr/sbin/findfs $disk) "LIBREELEC_DISK"
           ;;
       esac
       ;;

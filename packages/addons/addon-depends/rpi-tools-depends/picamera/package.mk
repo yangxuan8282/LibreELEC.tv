@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -18,13 +18,11 @@
 
 PKG_NAME="picamera"
 PKG_VERSION="1.10"
-PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="BSD"
 PKG_SITE="https://github.com/waveform80/picamera"
 PKG_URL="https://pypi.python.org/packages/source/p/picamera/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain Python distutilscross:host bcm2835-driver"
-PKG_PRIORITY="optional"
 PKG_SECTION="python"
 PKG_SHORTDESC="A python and shell interface for the Raspberry Pi camera module"
 PKG_LONGDESC="A python and shell interface for the Raspberry Pi camera module"

@@ -18,13 +18,12 @@
 
 PKG_NAME="multimedia-tools"
 PKG_VERSION=""
-PKG_REV="104"
+PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE=""
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="A bundle of multimedia tools and programs"
 PKG_LONGDESC="This bundle currently includes alsamixer, mediainfo, mesa-demos, mpg123, opencaster, squeezelite, tsdecrypt and tstools."
@@ -33,7 +32,6 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Multimedia Tools"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_ADDON_PROVIDES=""
-PKG_ADDON_REPOVERSION="7.0"
 
 PKG_AUTORECONF="no"
 

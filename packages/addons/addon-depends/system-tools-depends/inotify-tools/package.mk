@@ -18,13 +18,11 @@
 
 PKG_NAME="inotify-tools"
 PKG_VERSION="1df9af4"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://wiki.github.com/rvoicilas/inotify-tools/"
 PKG_URL="https://github.com/rvoicilas/$PKG_NAME/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="inotify-tools"
 PKG_LONGDESC="a C library and a set of command-line programs for Linux providing a simple interface to inotify"
@@ -32,6 +30,10 @@ PKG_AUTORECONF="yes"
 
 PKG_IS_ADDON="no"
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-doxygen"
+
+pre_configure_target() {
+  CFLAGS="$CFLAGS -Wno-error=misleading-indentation"
+}
 
 makeinstall_target() {
   : nothing to do

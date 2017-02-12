@@ -1,3 +1,0 @@
-setenv cecconfig cecf
-if fatload usb 0 ${loadaddr} kernel.img; then bootm ${loadaddr}; fi;
-if fatload mmc 0 ${loadaddr} kernel.img; then bootm ${loadaddr}; fi;

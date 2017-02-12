@@ -18,13 +18,11 @@
 
 PKG_NAME="libdnet"
 PKG_VERSION="1.12"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="http://code.google.com/p/libdnet/"
 PKG_URL="http://libdnet.googlecode.com/files/$PKG_NAME-$PKG_VERSION.tgz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="network"
 PKG_SHORTDESC="A simplified, portable interface to several low-level networking routines"
 PKG_LONGDESC="A simplified, portable interface to several low-level networking routines"

@@ -18,13 +18,12 @@
 
 PKG_NAME="hdhomerun"
 PKG_VERSION="7.0"
-PKG_REV="101"
+PKG_REV="100"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.silicondust.com/products/hdhomerun/dvbt/"
 PKG_URL=""
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="driver/dvb"
 PKG_SHORTDESC="HDHomeRun: a Linux driver to add support for HDHomeRun from silicondust.com"
 PKG_LONGDESC="Install this to add support for HDHomeRun devices."
@@ -33,7 +32,6 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="HDHomeRun"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_AUTORECONF="no"
-PKG_ADDON_REPOVERSION="7.0"
 
 make_target() {
   : # nothing to do here

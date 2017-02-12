@@ -1,6 +1,12 @@
-7.0.101
-- Update OSCam to 11233
+103
+- update OSCam to 11350
+
+102
+- fix the delayed start workaround
+
+101
+- update OSCam to 11233
 - fix the WeTek_Play problems
 
-7.0.100
-- initial LibreELEC version
+100
+- Update for LibreELEC 8.0

@@ -18,13 +18,11 @@
 
 PKG_NAME="misc-firmware"
 PKG_VERSION="0.0.17"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="Free-to-use"
 PKG_SITE="https://github.com/OpenELEC/misc-firmware"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_PRIORITY="optional"
 PKG_SECTION="firmware"
 PKG_SHORTDESC="misc-firmware: firmwares for various drivers"
 PKG_LONGDESC="misc-firmware: firmwares for various drivers"
@@ -37,5 +35,5 @@ make_target() {
 }
 
 makeinstall_target() {
-  DESTDIR=$INSTALL ./install
+  DESTDIR=$INSTALL/usr ./install
 }

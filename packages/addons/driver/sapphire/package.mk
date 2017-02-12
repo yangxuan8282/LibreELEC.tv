@@ -18,13 +18,12 @@
 
 PKG_NAME="sapphire"
 PKG_VERSION="6.6"
-PKG_REV="100"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://libreelec.tv"
 PKG_URL="http://www.rtr.ca/sapphire_remote/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain linux bash"
-PKG_PRIORITY="optional"
 PKG_SECTION="driver.remote"
 PKG_SHORTDESC="A Linux driver to add support for sapphire remotes"
 PKG_LONGDESC="A Linux driver to add support for sapphire remotes"
@@ -33,12 +32,11 @@ PKG_AUTORECONF="no"
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Sapphire Remote Driver"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_ADDON_REPOVERSION="8.0"
 
 if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host"
-  export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$PATH
-  TARGET_PREFIX=aarch64-elf-
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
+  export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
+  TARGET_PREFIX=aarch64-linux-gnu-
 fi
 
 if [ -f $SYSROOT_PREFIX/usr/include/linux/input-event-codes.h ]; then
@@ -47,8 +45,15 @@ else
   INPUT_H="$SYSROOT_PREFIX/usr/include/linux/input.h"
 fi
 
+pre_make_target() {
+  unset LDFLAGS
+}
+
 make_target() {
-  KVER=$(kernel_version) KDIR=$(kernel_path) INPUT_H=$INPUT_H make
+  make V=1 \
+       KVER=$(kernel_version) \
+       KDIR=$(kernel_path) \
+       INPUT_H=$INPUT_H
 }
 
 post_make_target() {

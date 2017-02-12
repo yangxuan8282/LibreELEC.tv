@@ -1,5 +1,16 @@
-7.0.101
--Add inotify-tools, mc
+104
+- Bump file package
 
-7.0.100
+103
+- Add nmon
+
+102
+- Add inotify-tools, mc
+
+101
+- mrxvt can be started from KODI
+- correct mrxvt terminal type
+- make hddtemp work
+
+100
 - Initial Release

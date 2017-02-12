@@ -18,7 +18,6 @@
 
 PKG_NAME="tbs-linux-drivers"
 PKG_VERSION="160126"
-PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tbsdtv.com/english/Download.html"
@@ -26,7 +25,6 @@ PKG_URL="http://www.tbsdtv.com/download/document/common/tbs-linux-drivers_v${PKG
 PKG_SOURCE_DIR="$PKG_NAME"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
-PKG_PRIORITY="optional"
 PKG_SECTION="driver"
 PKG_SHORTDESC="Linux TBS tuner drivers"
 PKG_LONGDESC="Linux TBS tuner drivers"
@@ -46,8 +44,8 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/lib/modules/$(get_module_dir)/updates/tbs
-  find $ROOT/$PKG_BUILD/linux-tbs-drivers/ -name \*.ko -exec cp {} $INSTALL/lib/modules/$(get_module_dir)/updates/tbs \;
+  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/updates/tbs
+  find $ROOT/$PKG_BUILD/linux-tbs-drivers/ -name \*.ko -exec cp {} $INSTALL/usr/lib/modules/$(get_module_dir)/updates/tbs \;
   mkdir -p $INSTALL/lib/firmware/
   cp $ROOT/$PKG_BUILD/*.fw $INSTALL/lib/firmware/
 }

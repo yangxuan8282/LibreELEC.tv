@@ -18,17 +18,15 @@
 
 PKG_NAME="mtpfs"
 PKG_VERSION="1.1"
-PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.adebenham.com/mtpfs/"
 PKG_URL="http://www.adebenham.com/files/mtp/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain fuse libmtp glib"
-PKG_PRIORITY="optional"
 PKG_SECTION="tools"
 PKG_SHORTDESC="MTPfs is a FUSE filesystem that supports reading and writing from any MTP device"
 PKG_LONGDESC="MTPfs is a FUSE filesystem that supports reading and writing from any MTP device"
-PKG_AUTORECONF="yes"
+PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-mad"
 

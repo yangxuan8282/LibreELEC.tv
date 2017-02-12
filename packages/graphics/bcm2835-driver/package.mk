@@ -17,14 +17,12 @@
 ################################################################################
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="d760a4f"
-PKG_REV="1"
+PKG_VERSION="debe2d2"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.broadcom.com"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain dtc"
-PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
 PKG_LONGDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
@@ -46,6 +44,7 @@ make_target() {
     cp -PRv $FLOAT/opt/vc/lib/*.so $SYSROOT_PREFIX/usr/lib
     ln -sf $SYSROOT_PREFIX/usr/lib/libbrcmEGL.so $SYSROOT_PREFIX/usr/lib/libEGL.so
     ln -sf $SYSROOT_PREFIX/usr/lib/libbrcmGLESv2.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so
+    cp -PRv $FLOAT/opt/vc/lib/*.a $SYSROOT_PREFIX/usr/lib
 }
 
 makeinstall_target() {
@@ -71,6 +70,5 @@ makeinstall_target() {
 }
 
 post_install() {
-  enable_service fbset.service
   enable_service unbind-console.service
 }
