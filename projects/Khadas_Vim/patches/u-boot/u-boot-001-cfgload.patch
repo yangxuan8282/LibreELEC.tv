@@ -1,0 +1,223 @@
+diff -Naur u-boot-2a56c9f.orig/board/khadas/configs/kvim.h u-boot-2a56c9f/board/khadas/configs/kvim.h
+--- u-boot-2a56c9f.orig/board/khadas/configs/kvim.h	2016-07-20 17:19:45.419708211 +0800
++++ u-boot-2a56c9f/board/khadas/configs/kvim.h	2016-07-20 17:20:03.236014811 +0800
+@@ -70,6 +70,9 @@
+ /* args/envs */
+ #define CONFIG_SYS_MAXARGS  64
+ #define CONFIG_EXTRA_ENV_SETTINGS \
++        "boardname=kvim\0"\
++        "dtbaddr=0x1000000\0"\
++        "bootcmd=cfgload\0"\
+         "firstboot=1\0"\
+         "upgrade_step=0\0"\
+         "jtag=apee\0"\
+@@ -97,7 +100,7 @@
+         "recovery_part=recovery\0"\
+         "recovery_offset=0\0"\
+         "initargs="\
+-            "rootfstype=ramfs init=/init console=ttyS0,115200 no_console_suspend earlyprintk=aml-uart,0xc81004c0 ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 androidboot.selinux=enforcing"\
++            "init=/sbin/init console=ttyS0,115200 no_console_suspend earlyprintk=aml-uart,0xc81004c0 ramoops.pstore_en=1 ramoops.record_size=0x8000 ramoops.console_size=0x4000 androidboot.selinux=enforcing"\
+             "\0"\
+         "upgrade_check="\
+             "echo upgrade_step=${upgrade_step}; "\
+@@ -106,7 +109,17 @@
+             "else fi;"\
+             "\0"\
+     "storeargs="\
+-            "setenv bootargs ${initargs} logo=${display_layer},loaded,${fb_addr},${outputmode} maxcpus=${maxcpus} vout=${outputmode},enable hdmimode=${hdmimode} hdmitx=${cecconfig} androidboot.firstboot=${firstboot} jtag=${jtag}; "\
++            "setenv bootargs root=/dev/system rootfstype=ext4 ${initargs} logo=${display_layer},loaded,${fb_addr},${outputmode} vout=${outputmode},enable hdmimode=${hdmimode} hdmitx=${hdmimode} androidboot.firstboot=${firstboot} jtag=${jtag}; "\
++	"setenv bootargs ${bootargs} androidboot.hardware=amlogic;"\
++            "run cmdline_keys;"\
++            "\0"\
++        "sdcardargs="\
++            "setenv bootargs root=/dev/mmcblk0p1 rootfstype=ext2 ${initargs} logo=${display_layer},loaded,${fb_addr},${outputmode} vout=${outputmode},enable hdmimode=${hdmimode} hdmitx=${hdmimode} androidboot.firstboot=${firstboot} jtag=${jtag}; "\
++	"setenv bootargs ${bootargs} androidboot.hardware=amlogic;"\
++            "run cmdline_keys;"\
++            "\0"\
++        "bootupdateargs="\
++            "setenv bootargs root=/dev/mmcblk0p1 rootfstype=vfat ${initargs} logo=${display_layer},loaded,${fb_addr},${outputmode} vout=${outputmode},enable hdmimode=${hdmimode} hdmitx=${hdmimode} androidboot.firstboot=${firstboot} jtag=${jtag} firmware=rootfs.tar.gz;"\
+ 	"setenv bootargs ${bootargs} androidboot.hardware=amlogic;"\
+             "run cmdline_keys;"\
+             "\0"\
+@@ -124,6 +137,12 @@
+             "if imgread kernel boot ${loadaddr}; then bootm ${loadaddr}; fi;"\
+             "run update;"\
+             "\0"\
++        "bootsdcard="\
++            "run sdcardargs; mmcinfo; ext2load mmc 0 ${loadaddr} boot.img; bootm ${loadaddr};"\
++            "\0"\
++        "bootupdate="\
++            "run bootupdateargs; mmcinfo; fatload mmc 0 ${loadaddr} boot.img; bootm ${loadaddr};"\
++            "\0"\
+         "factory_reset_poweroff_protect="\
+             "echo wipe_data=${wipe_data}; echo wipe_cache=${wipe_cache};"\
+             "if test ${wipe_data} = failed; then "\
+@@ -248,6 +267,7 @@
+ #define	CONFIG_STORE_COMPATIBLE 1
+ #define CONFIG_AML_NAND	1
+ /* env */
++//KVIM.TODO
+ #define 	CONFIG_ENV_OVERWRITE
+ #define 	CONFIG_CMD_SAVEENV
+ /* fixme, need fix*/
+@@ -280,6 +300,7 @@
+ #define CONFIG_AML_OSD 1
+ #define CONFIG_OSD_SCALE_ENABLE 1
+ #define CONFIG_CMD_BMP 1
++#define CONFIG_CMD_CFGLOAD 1
+ 
+ #if defined(CONFIG_AML_VOUT)
+ #undef CONFIG_AML_CVBS
+@@ -352,6 +373,8 @@
+ #define CONFIG_FS_FAT 1
+ #define CONFIG_FS_EXT4 1
+ #define CONFIG_LZO 1
++#define CONFIG_CMD_EXT2 1
++#define CONFIG_CMD_EXT4 1
+ 
+ /* Cache Definitions */
+ //#define CONFIG_SYS_DCACHE_OFF
+diff -Naur u-boot-2a56c9f.orig/common/cmd_cfgload.c u-boot-2a56c9f/common/cmd_cfgload.c
+--- u-boot-2a56c9f.orig/common/cmd_cfgload.c	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2a56c9f/common/cmd_cfgload.c	2016-07-20 17:20:33.096526986 +0800
+@@ -0,0 +1,130 @@
++/*
++ * Copyright (C) 2015 Hardkernel Co,. Ltd
++ * Dongjin Kim <tobetter@gmail.com>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <common.h>
++#include <command.h>
++#include <asm/errno.h>
++#include <malloc.h>
++#include <linux/ctype.h>    /* isalpha, isdigit */
++#include <linux/sizes.h>
++
++#ifdef CONFIG_SYS_HUSH_PARSER
++#include <cli_hush.h>
++#endif
++
++#define BOOTINI_MAGIC	"KVIM-UBOOT-CONFIG"
++#define SZ_BOOTINI		SZ_64K
++
++/* Nothing to proceed with zero size string or comment.
++ *
++ * FIXME: Do we really need to strip the line start with '#' or ';',
++ *        since any U-boot command does not start with punctuation character.
++ */
++static int valid_command(const char* p)
++{
++	char *q;
++
++	for (q = (char*)p; *q; q++) {
++		if (isblank(*q)) continue;
++		if (isalnum(*q)) return 1;
++		if (ispunct(*q))
++			return (*q != '#') && (*q != ';');
++	}
++
++	return !(p == q);
++}
++
++/* Read boot.ini from FAT partition
++ */
++static char* read_cfgload(void)
++{
++	char cmd[128];
++	unsigned long filesize;
++	char *p;
++
++	p = (char *)simple_strtoul(getenv("loadaddr"), NULL, 16);
++	if (NULL == p)
++		p = (char *)CONFIG_SYS_LOAD_ADDR;
++
++	setenv("filesize", "0");
++
++	sprintf(cmd, "fatload mmc 0:1 0x%p boot.ini", (void *)p);
++	run_command(cmd, 0);
++
++	filesize = getenv_ulong("filesize", 16, 0);
++	if (0 == filesize) {
++		printf("cfgload: no boot.ini or empty file\n");
++		return NULL;
++	}
++
++	if (filesize > SZ_BOOTINI) {
++		printf("boot.ini: 'boot.ini' exceeds %d, size=%ld\n",
++				SZ_BOOTINI, filesize);
++		return NULL;
++    }
++
++	/* Terminate the read buffer with '\0' to be treated as string */
++	*(char *)(p + filesize) = '\0';
++
++	/* Scan MAGIC string, readed boot.ini must start with exact magic string.
++	 * Otherwise, we will not proceed at all.
++	 */
++	while (*p) {
++		char *s = strsep(&p, "\n");
++		if (!valid_command(s))
++			continue;
++
++		/* MAGIC string is discovered, return the buffer address of next to
++		 * proceed the commands.
++		 */
++		if (!strncmp(s, BOOTINI_MAGIC, sizeof(BOOTINI_MAGIC)))
++			return memcpy(malloc(filesize), p, filesize);
++	}
++
++	printf("cfgload: MAGIC NAME, %s, is not found!!\n", BOOTINI_MAGIC);
++
++	return NULL;
++}
++
++static int do_load_cfgload(cmd_tbl_t *cmdtp, int flag, int argc,
++		char *const argv[])
++{
++	char *p;
++	char *cmd;
++
++	p = read_cfgload();
++	if (NULL == p)
++		return 0;
++
++	printf("cfgload: applying boot.ini...\n");
++
++	while (p) {
++		cmd = strsep(&p, "\n");
++		if (!valid_command(cmd))
++			continue;
++
++		printf("cfgload: %s\n", cmd);
++
++#ifndef CONFIG_SYS_HUSH_PARSER
++		run_command(cmd, 0);
++#else
++		parse_string_outer(cmd, FLAG_PARSE_SEMICOLON
++				| FLAG_EXIT_FROM_LOOP);
++#endif
++	}
++
++	return 0;
++}
++
++U_BOOT_CMD(
++		cfgload,		1,		0,		do_load_cfgload,
++		"read 'boot.ini' from FAT partiton",
++		"\n"
++		"    - read boot.ini from the first partiton treated as FAT partiton"
++);
++
++/* vim: set ts=4 sw=4 tw=80: */
+diff -Naur u-boot-2a56c9f.orig/common/Makefile u-boot-2a56c9f/common/Makefile
+--- u-boot-2a56c9f.orig/common/Makefile	2016-07-20 17:19:45.491709451 +0800
++++ u-boot-2a56c9f/common/Makefile	2016-07-20 17:20:21.536328949 +0800
+@@ -309,5 +309,6 @@
+ obj-$(CONFIG_AML_VOUT) += cmd_vout.o
+ obj-$(CONFIG_AML_LCD) += cmd_lcd.o
+ obj-$(CONFIG_CMD_RSVMEM) += cmd_rsvmem.o
++obj-$(CONFIG_CMD_CFGLOAD) += cmd_cfgload.o
+ 
+ CFLAGS_env_embedded.o := -Wa,--no-warn -DENV_CRC=$(shell tools/envcrc 2>/dev/null)

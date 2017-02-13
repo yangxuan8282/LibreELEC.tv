@@ -59,6 +59,19 @@ if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver"
 fi
 
+case "$TARGET_ARCH" in
+  arm)
+      FFMPEG_CPU=""
+      FFMPEG_TABLES="--enable-hardcoded-tables"
+      FFMPEG_PIC="--enable-pic"
+  ;;
+  x86_64)
+      FFMPEG_CPU=""
+      FFMPEG_TABLES="--disable-hardcoded-tables"
+      FFMPEG_PIC="--enable-pic"
+  ;;
+esac
+
 case "$TARGET_FPU" in
   neon*)
       FFMPEG_FPU="--enable-neon"
@@ -85,12 +98,6 @@ pre_configure_target() {
     export CFLAGS="-I$SYSROOT_PREFIX/usr/include/interface/vcos/pthreads -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux -DRPI=1 $CFLAGS"
     export FFMPEG_LIBS="-lbcm_host -lvcos -lvchiq_arm -lmmal -lmmal_core -lmmal_util -lvcsm"
   fi
-
-  case "$TARGET_FPU" in
-    neon*)
-      export CFLAGS=`echo $CFLAGS | sed -e "s|-O[s012]|-O3 -ftree-vectorize -mvectorize-with-neon-quad|"`
-    ;;
-  esac
 }
 
 configure_target() {
@@ -125,7 +132,7 @@ configure_target() {
               --enable-logging \
               --disable-doc \
               $FFMPEG_DEBUG \
-              --enable-pic \
+              $FFMPEG_PIC \
               --pkg-config="$ROOT/$TOOLCHAIN/bin/pkg-config" \
               --enable-optimizations \
               --disable-extra-warnings \
@@ -157,7 +164,7 @@ configure_target() {
               $FFMPEG_VDPAU \
               --disable-dxva2 \
               --enable-runtime-cpudetect \
-              --disable-hardcoded-tables \
+              $FFMPEG_TABLES \
               --disable-memalign-hack \
               --disable-encoders \
               --enable-encoder=ac3 \
@@ -208,6 +215,7 @@ configure_target() {
               --enable-zlib \
               --enable-asm \
               --disable-altivec \
+              $FFMPEG_CPU \
               $FFMPEG_FPU \
               --enable-yasm \
               --disable-symver

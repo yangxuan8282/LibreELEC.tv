@@ -1,0 +1,23 @@
+diff -Naur u-boot-2a56c9f.orig/board/khadas/configs/kvim.h u-boot-2a56c9f/board/khadas/configs/kvim.h
+--- u-boot-2a56c9f.orig/board/khadas/configs/kvim.h	2016-09-18 12:02:40.626127301 +0800
++++ u-boot-2a56c9f/board/khadas/configs/kvim.h	2016-09-18 12:03:11.802127559 +0800
+@@ -74,9 +74,18 @@
+ 	"loadaddr=0x20000000\0"\
+ 	"dtbaddr=0x1000000\0"\
+ 	"fdt_high=0x20000000\0"\
++ 	"vim_check="\
++ 	"saradc open 1;"\
++ 	"if saradc get_in_range 0x1d0 0x220; then "\
++ 		"echo Product checking: pass!;"\
++ 	"else if saradc get_in_range 0x0 0x1cf; then "\
++ 		"echo Product checking: fail!; sleep 5; reboot;"\
++ 	"fi;fi;"\
++	"\0"\
+ 	"bootcmd=cfgload\0"
+ 
+-#define CONFIG_PREBOOT
++#define CONFIG_PREBOOT \
++			"run vim_check;"
+ #define CONFIG_BOOTCOMMAND
+ 
+ #define CONFIG_ENV_IS_NOWHERE  1

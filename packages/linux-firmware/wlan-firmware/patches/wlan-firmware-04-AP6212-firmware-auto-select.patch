@@ -1,0 +1,20 @@
+From 1387c556a06a55722fd0bf5a84bc48c86d38466e Mon Sep 17 00:00:00 2001
+From: Gouwa <gouwa@khadas.com>
+Date: Mon, 16 Jan 2017 15:16:00 +0800
+Subject: [PATCH] Support AP6212(not ap6212a) firmware auto select
+
+---
+ firmware/brcm/config_43438a0.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 firmware/brcm/config_43438a0.txt
+
+diff --git a/firmware/brcm/config_43438a0.txt b/firmware/brcm/config_43438a0.txt
+new file mode 100644
+index 0000000..b9418b6
+--- /dev/null
++++ b/firmware/brcm/config_43438a0.txt
+@@ -0,0 +1 @@
++nv_by_chip=2 43430 0 nvram_ap6212.txt 43430 1 nvram_ap6212a.txt
+-- 
+1.9.1
+

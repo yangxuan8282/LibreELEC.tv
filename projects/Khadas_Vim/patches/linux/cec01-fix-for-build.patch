@@ -1,0 +1,25 @@
+diff -Naur linux-7f42343.orig/include/linux/amlogic/hdmi_tx/hdmi_tx_cec_20.h linux-7f42343/include/linux/amlogic/hdmi_tx/hdmi_tx_cec_20.h
+--- linux-7f42343.orig/include/linux/amlogic/hdmi_tx/hdmi_tx_cec_20.h	2016-07-25 09:37:08.832584926 +0800
++++ linux-7f42343/include/linux/amlogic/hdmi_tx/hdmi_tx_cec_20.h	2016-07-25 09:37:39.456585514 +0800
+@@ -311,11 +311,11 @@
+ 	unsigned int power_status;
+ 	unsigned int menu_lang;
+ 	unsigned int cec_version;
+-	unsigned int log_addr;
+ 	unsigned int menu_status;
+ 	unsigned char osd_name[16];
+ 	struct input_dev *remote_cec_dev;	/* cec input device */
+ 	struct hdmitx_dev *hdmitx_device;
++	unsigned int log_addr[];
+ };
+ 
+ enum cec_device_menu_state_e {
+@@ -331,7 +331,7 @@
+ void cec_arbit_bit_time_set(unsigned , unsigned , unsigned);
+ void cec_clear_buf(unsigned int flag);
+ void cec_keep_reset(void);
+-void cec_logicaddr_set(int logicaddr);
++void cec_logicaddr_set(int logicaddr, int logreg);
+ void ao_cec_init(void);
+ void tx_irq_handle(void);
+ 

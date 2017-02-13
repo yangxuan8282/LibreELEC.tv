@@ -20,7 +20,8 @@ PKG_NAME="qt"
 PKG_VERSION="4.8.7"
 PKG_LICENSE="OSS"
 PKG_SITE="http://qt-project.org"
-PKG_URL="http://download.qt-project.org/official_releases/qt/4.8/${PKG_VERSION}/qt-everywhere-opensource-src-${PKG_VERSION}.tar.gz"
+PKG_URL="https://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/4.8/${PKG_VERSION}/qt-everywhere-opensource-src-${PKG_VERSION}.tar.gz"
+#PKG_URL="http://download.qt-project.org/official_releases/qt/4.8/${PKG_VERSION}/qt-everywhere-opensource-src-${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="qt-everywhere-opensource-src-${PKG_VERSION}"
 PKG_DEPENDS_TARGET="toolchain Python zlib:host zlib"
 PKG_SHORTDESC="Qt GUI toolkit"
@@ -88,8 +89,8 @@ configure_target() {
   echo "QMAKE_AR = $AR cqs" >> $QMAKE_CONF
   echo "QMAKE_OBJCOPY = $OBJCOPY" >> $QMAKE_CONF
   echo "QMAKE_STRIP = $STRIP" >> $QMAKE_CONF
-  echo "QMAKE_CFLAGS = $(echo $CFLAGS | sed -e 's|-march=armv8\S*|-march=armv7ve|g' -e 's|-mfpu=neon-fp-armv8|-mfpu=neon-vfpv4|g' -e 's|-mcpu=cortex-a53|-mcpu=cortex-a7|g')" >> $QMAKE_CONF
-  echo "QMAKE_CXXFLAGS = $(echo $CXXFLAGS | sed -e 's|-march=armv8\S*|-march=armv7ve|g' -e 's|-mfpu=neon-fp-armv8|-mfpu=neon-vfpv4|g' -e 's|-mcpu=cortex-a53|-mcpu=cortex-a7|g')" >> $QMAKE_CONF
+  echo "QMAKE_CFLAGS = $CFLAGS" >> $QMAKE_CONF
+  echo "QMAKE_CXXFLAGS = $CXXFLAGS" >> $QMAKE_CONF
   echo "QMAKE_LFLAGS = $LDFLAGS" >> $QMAKE_CONF
   echo "load(qt_config)" >> $QMAKE_CONF
   echo '#include "../../linux-g++/qplatformdefs.h"' >> $QMAKE_CONF_DIR/qplatformdefs.h

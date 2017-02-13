@@ -1,0 +1,32 @@
+diff -Naur linux-7f42343.orig/arch/arm64/boot/dts/amlogic/kvim.dts linux-7f42343/arch/arm64/boot/dts/amlogic/kvim.dts
+--- linux-7f42343.orig/arch/arm64/boot/dts/amlogic/kvim.dts	2016-07-26 16:46:45.074056326 +0800
++++ linux-7f42343/arch/arm64/boot/dts/amlogic/kvim.dts	2016-07-26 16:48:29.350055795 +0800
+@@ -160,6 +160,16 @@
+ 
+ 	};
+ 
++       meson-ir {
++       compatible = "amlogic, meson6-ir";
++       dev_name = "meson6-ir";
++       reg = <0x0 0xc8100580 0x0 0x20>;
++       interrupts = <0 196 1>;
++       pinctrl-names = "default";
++       pinctrl-0 = <&remote_pins>;
++       pulse-inverted;
++       status = "ok";
++     };
+ 	sysled {
+ 		compatible = "amlogic, sysled";
+ 		dev_name = "sysled";
+diff -Naur linux-7f42343.orig/arch/arm64/boot/dts/amlogic/mesongxl.dtsi linux-7f42343/arch/arm64/boot/dts/amlogic/mesongxl.dtsi
+--- linux-7f42343.orig/arch/arm64/boot/dts/amlogic/mesongxl.dtsi	2016-07-26 16:46:45.074056326 +0800
++++ linux-7f42343/arch/arm64/boot/dts/amlogic/mesongxl.dtsi	2016-07-26 16:50:22.750055218 +0800
+@@ -573,7 +573,7 @@
+ 	meson-remote {
+ 		compatible = "amlogic, aml_remote";
+ 		dev_name = "meson-remote";
+-		status = "okay";
++		status = "disabled";
+ 		remote_ao_offset = <0x580>; /* 0x400 + (0x20 + idx)<<2 -- old ; 0x400 + (0x60 +idx)<<2 --new   */
+ 		interrupts = <0 196 1>;
+ 		pinctrl-names = "default";

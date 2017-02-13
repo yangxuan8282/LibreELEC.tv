@@ -1,0 +1,12 @@
+diff -Naur linux-7f42343.orig/drivers/media/rc/ir-nec-decoder.c linux-7f42343/drivers/media/rc/ir-nec-decoder.c
+--- linux-7f42343.orig/drivers/media/rc/ir-nec-decoder.c	2016-07-28 19:59:02.030284464 +0800
++++ linux-7f42343/drivers/media/rc/ir-nec-decoder.c	2016-07-28 20:00:12.898281867 +0800
+@@ -158,6 +158,8 @@
+ 		if (!geq_margin(ev.duration, NEC_TRAILER_SPACE, NEC_UNIT / 2))
+ 			break;
+ 
++                if(ev.duration<39000000 || ev.duration>40000000)
++                        break;  
+ 		address     = bitrev8((data->bits >> 24) & 0xff);
+ 		not_address = bitrev8((data->bits >> 16) & 0xff);
+ 		command	    = bitrev8((data->bits >>  8) & 0xff);

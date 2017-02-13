@@ -73,8 +73,6 @@ makeinstall_target() {
                                 --with-system \
                                 --with-serialization \
                                 --with-filesystem \
-                                --with-program_options \
-                                --with-chrono \
                                 --with-regex -sICU_PATH="$SYSROOT_PREFIX/usr" \
                                 install
 }

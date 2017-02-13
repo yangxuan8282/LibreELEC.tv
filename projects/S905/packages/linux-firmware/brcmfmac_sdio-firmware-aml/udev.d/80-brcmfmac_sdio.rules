@@ -1,6 +1,0 @@
-################################################################################
-# udev rules file for loading brcmfmac_sdio-firmware-aml
-################################################################################
-
-SUBSYSTEMS=="sdio", ATTRS{vendor}=="0x02d0", ACTION=="add", \
-  TAG+="systemd", ENV{SYSTEMD_WANTS}+="brcmfmac_sdio-firmware-aml.service"

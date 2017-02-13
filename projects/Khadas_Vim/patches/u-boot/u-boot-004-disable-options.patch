@@ -1,0 +1,179 @@
+diff -Naur u-boot-2a56c9f.orig/board/khadas/configs/kvim.h u-boot-2a56c9f/board/khadas/configs/kvim.h
+--- u-boot-2a56c9f.orig/board/khadas/configs/kvim.h	2016-07-21 01:33:24.909687942 +0800
++++ u-boot-2a56c9f/board/khadas/configs/kvim.h	2016-07-21 00:43:54.137427668 +0800
+@@ -45,7 +45,7 @@
+ #define CONFIG_CEC_OSD_NAME		"KVim"
+ #define CONFIG_CEC_WAKEUP
+ 
+-#define CONFIG_INSTABOOT
++//#define CONFIG_INSTABOOT
+ 
+ /* SMP Definitinos */
+ #define CPU_RELEASE_ADDR		secondary_boot_func
+@@ -76,16 +76,10 @@
+ 	"fdt_high=0x20000000\0"\
+ 	"bootcmd=cfgload\0"
+ 
+-#define CONFIG_PREBOOT  \
+-            "run factory_reset_poweroff_protect;"\
+-            "run upgrade_check;"\
+-            "run init_display;"\
+-            "run storeargs;"\
+-            "run upgrade_key;" \
+-            "run switch_bootmode;"
+-#define CONFIG_BOOTCOMMAND "run storeboot"
++#define CONFIG_PREBOOT
++#define CONFIG_BOOTCOMMAND
+ 
+-//#define CONFIG_ENV_IS_NOWHERE  1
++#define CONFIG_ENV_IS_NOWHERE  1
+ #define CONFIG_ENV_SIZE   (64*1024)
+ #define CONFIG_FIT 1
+ #define CONFIG_OF_LIBFDT 1
+@@ -122,11 +116,12 @@
+ #define CONFIG_DDR_USE_EXT_VREF			0 //0:disable, 1:enable. ddr use external vref
+ 
+ /* storage: emmc/nand/sd */
+-#define	CONFIG_STORE_COMPATIBLE 1
+-#define CONFIG_AML_NAND	1
++//#define	CONFIG_STORE_COMPATIBLE 1
++//#define CONFIG_AML_NAND	1
+ /* env */
+ //KVIM.TODO
+-#define 	CONFIG_ENV_OVERWRITE
++//#define 	CONFIG_ENV_OVERWRITE
++#define CONFIG_ENV_IS_IN_MMC		0
+ #define 	CONFIG_CMD_SAVEENV
+ /* fixme, need fix*/
+ 
+@@ -142,6 +137,10 @@
+ 	#define CONFIG_EMMC_DDR52_CLK 35000000
+ #endif
+ 
++#define	CONFIG_DISABLE_EMMC_PARTITIONS 1
++#define	CONFIG_DISABLE_DTS_PARTITIONS 1
++#define	CONFIG_DISABLE_AML_MMC 1
++#define	CONFIG_DISABLE_RSVMEM_CHECK 1
+ #define	CONFIG_PARTITIONS 1
+ #define CONFIG_SYS_NO_FLASH  1
+ 
+@@ -180,13 +179,13 @@
+ #endif //#if defined(CONFIG_CMD_USB)
+ 
+ //UBOOT Facotry usb/sdcard burning config
+-#define CONFIG_AML_V2_FACTORY_BURN              1       //support facotry usb burning
++//#define CONFIG_AML_V2_FACTORY_BURN              1       //support facotry usb burning
+ #define CONFIG_AML_FACTORY_BURN_LOCAL_UPGRADE   1       //support factory sdcard burning
+ #define CONFIG_POWER_KEY_NOT_SUPPORTED_FOR_BURN 1       //There isn't power-key for factory sdcard burning
+ #define CONFIG_SD_BURNING_SUPPORT_UI            1       //Displaying upgrading progress bar when sdcard/udisk burning
+ 
+ #define CONFIG_AML_SECURITY_KEY                 1
+-#define CONFIG_UNIFY_KEY_MANAGE                 1
++//#define CONFIG_UNIFY_KEY_MANAGE                 1
+ 
+ /* net */
+ #define CONFIG_CMD_NET   1
+@@ -276,7 +275,7 @@
+ 
+ #endif //CONFIG_AML_SECURE_UBOOT
+ 
+-#define CONFIG_SECURE_STORAGE 1
++//#define CONFIG_SECURE_STORAGE 1
+ 
+ //build with uboot auto test
+ //#define CONFIG_AML_UBOOT_AUTO_TEST 1
+diff -Naur u-boot-2a56c9f.orig/board/khadas/kvim/kvim.c u-boot-2a56c9f/board/khadas/kvim/kvim.c
+--- u-boot-2a56c9f.orig/board/khadas/kvim/kvim.c	2016-07-21 01:33:24.909687942 +0800
++++ u-boot-2a56c9f/board/khadas/kvim/kvim.c	2016-07-21 00:35:32.355387252 +0800
+@@ -397,7 +397,9 @@
+ #endif
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void){
++#ifdef CONFIG_STORE_COMPATIBLE
+ 	int ret;
++#endif
+ 
+ 	//update env before anyone using it
+ 	run_command("get_rebootmode; echo reboot_mode=${reboot_mode}; "\
+@@ -416,6 +418,7 @@
+ 	run_command("vout output $outputmode", 0);
+ #endif
+ 	/*add board late init function here*/
++#ifdef CONFIG_STORE_COMPATIBLE
+ 	ret = run_command("store dtb read $dtb_mem_addr", 1);
+ 	if (ret) {
+ 		printf("%s(): [store dtb read $dtb_mem_addr] fail\n", __func__);
+@@ -429,6 +432,7 @@
+ 		}
+ 		#endif
+ 	}
++#endif
+ #ifdef CONFIG_AML_V2_FACTORY_BURN
+ 	aml_try_factory_sdcard_burning(0, gd->bd);
+ #endif// #ifdef CONFIG_AML_V2_FACTORY_BURN
+diff -Naur u-boot-2a56c9f.orig/common/bootm.c u-boot-2a56c9f/common/bootm.c
+--- u-boot-2a56c9f.orig/common/bootm.c	2016-07-21 01:33:24.989689024 +0800
++++ u-boot-2a56c9f/common/bootm.c	2016-07-21 00:43:02.504781388 +0800
+@@ -639,7 +639,7 @@
+ #endif
+ 
+ 	/* Check reserved memory region */
+-#ifdef CONFIG_CMD_RSVMEM
++#if defined(CONFIG_CMD_RSVMEM) && !defined(CONFIG_DISABLE_RSVMEM_CHECK)
+ 	ret = run_command("rsvmem check", 0);
+ 	if (ret) {
+ 		puts("rsvmem check failed\n");
+diff -Naur u-boot-2a56c9f.orig/common/Makefile u-boot-2a56c9f/common/Makefile
+--- u-boot-2a56c9f.orig/common/Makefile	2016-07-21 01:33:25.005689240 +0800
++++ u-boot-2a56c9f/common/Makefile	2016-07-20 23:44:46.078446709 +0800
+@@ -35,7 +35,9 @@
+ obj-y += cmd_version.o
+ 
+ #partitions
++ifndef CONFIG_DISABLE_DTS_PARTITIONS
+ obj-y += partitions.o
++endif
+ 
+ #remote support
+ obj-$(CONFIG_IR_REMOTE) += cmd_irkey.o
+@@ -148,7 +150,9 @@
+ endif
+ obj-$(CONFIG_CMD_MISC) += cmd_misc.o
+ obj-$(CONFIG_CMD_MMC) += cmd_mmc.o
++ifndef CONFIG_DISABLE_AML_MMC
+ obj-$(CONFIG_CMD_MMC) += cmd_aml_mmc.o
++endif
+ obj-$(CONFIG_STORE_COMPATIBLE) += store_interface.o cmd_burnup.o
+ obj-$(CONFIG_STORE_COMPATIBLE) += cmd_imgread.o
+ obj-$(CONFIG_CMD_MMC_SPI) += cmd_mmc_spi.o
+diff -Naur u-boot-2a56c9f.orig/drivers/mmc/Makefile u-boot-2a56c9f/drivers/mmc/Makefile
+--- u-boot-2a56c9f.orig/drivers/mmc/Makefile	2016-07-21 01:33:25.133690971 +0800
++++ u-boot-2a56c9f/drivers/mmc/Makefile	2016-07-20 23:24:49.522535288 +0800
+@@ -35,7 +35,9 @@
+ obj-$(CONFIG_TEGRA_MMC) += tegra_mmc.o
+ obj-$(CONFIG_ZYNQ_SDHCI) += zynq_sdhci.o
+ obj-$(CONFIG_AML_SD_EMMC) += aml_sd_emmc.o
++ifndef CONFIG_DISABLE_EMMC_PARTITIONS
+ obj-y += emmc_partitions.o
++endif
+ ifdef CONFIG_SPL_BUILD
+ obj-$(CONFIG_SPL_MMC_BOOT) += fsl_esdhc_spl.o
+ else
+diff -Naur u-boot-2a56c9f.orig/drivers/mmc/mmc.c u-boot-2a56c9f/drivers/mmc/mmc.c
+--- u-boot-2a56c9f.orig/drivers/mmc/mmc.c	2016-07-21 01:33:25.133690971 +0800
++++ u-boot-2a56c9f/drivers/mmc/mmc.c	2016-07-21 00:18:43.774995464 +0800
+@@ -1450,11 +1450,14 @@
+ 	if (err)
+ 		return err;
+ 	printf("[%s] mmc init success\n", __func__);
++#ifdef CONFIG_SECURE_STORAGE
++	//CONFIG_DISABLE_EMMC_PARTITIONS
+ 	if (mmc->block_dev.dev == CONFIG_SYS_MMC_ENV_DEV)  {
+ 		device_boot_flag = EMMC_BOOT_FLAG;
+ 		secure_storage_set_info(STORAGE_DEV_EMMC);
+ 
+ 	}
++#endif
+ #ifdef CONFIG_STORE_COMPATIBLE
+ 	info_disprotect |= DISPROTECT_KEY;
+ 	if (aml_is_emmc_tsd(mmc)) { // eMMC OR TSD

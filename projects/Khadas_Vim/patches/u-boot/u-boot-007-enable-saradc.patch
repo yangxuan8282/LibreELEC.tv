@@ -1,0 +1,11 @@
+diff -Naur u-boot-2a56c9f.orig/board/khadas/configs/kvim.h u-boot-2a56c9f/board/khadas/configs/kvim.h
+--- u-boot-2a56c9f.orig/board/khadas/configs/kvim.h	2016-09-18 12:35:01.370143361 +0800
++++ u-boot-2a56c9f/board/khadas/configs/kvim.h	2016-09-18 12:35:12.458143453 +0800
+@@ -232,6 +232,7 @@
+ #define CONFIG_CMD_JTAG	1
+ #define CONFIG_CMD_AUTOSCRIPT 1
+ #define CONFIG_CMD_MISC 1
++#define CONFIG_CMD_SARADC 1
+ 
+ /*file system*/
+ #define CONFIG_DOS_PARTITION 1

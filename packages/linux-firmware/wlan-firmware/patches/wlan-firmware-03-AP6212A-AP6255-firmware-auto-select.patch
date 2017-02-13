@@ -1,0 +1,39 @@
+From 917c87e27de22c61f81e37d138afc1c72f928af4 Mon Sep 17 00:00:00 2001
+From: Gouwa <gouwa@khadas.com>
+Date: Mon, 16 Jan 2017 06:04:57 +0800
+Subject: [PATCH] AP6212A & AP6255 firmware auto select
+
+---
+ firmware/brcm/config.txt         | 3 ---
+ firmware/brcm/config_43438a1.txt | 1 +
+ firmware/brcm/config_43455c0.txt | 1 +
+ 3 files changed, 2 insertions(+), 3 deletions(-)
+ create mode 100644 firmware/brcm/config_43438a1.txt
+ create mode 100644 firmware/brcm/config_43455c0.txt
+
+diff --git a/firmware/brcm/config.txt b/firmware/brcm/config.txt
+index e178f9f..b9418b6 100644
+--- a/firmware/brcm/config.txt
++++ b/firmware/brcm/config.txt
+@@ -1,4 +1 @@
+-kso_enable=0
+-ccode=CN
+-regrev=38
+ nv_by_chip=2 43430 0 nvram_ap6212.txt 43430 1 nvram_ap6212a.txt
+diff --git a/firmware/brcm/config_43438a1.txt b/firmware/brcm/config_43438a1.txt
+new file mode 100644
+index 0000000..b9418b6
+--- /dev/null
++++ b/firmware/brcm/config_43438a1.txt
+@@ -0,0 +1 @@
++nv_by_chip=2 43430 0 nvram_ap6212.txt 43430 1 nvram_ap6212a.txt
+diff --git a/firmware/brcm/config_43455c0.txt b/firmware/brcm/config_43455c0.txt
+new file mode 100644
+index 0000000..19e8376
+--- /dev/null
++++ b/firmware/brcm/config_43455c0.txt
+@@ -0,0 +1 @@
++nv_by_chip=1 43455 0 nvram_ap6225.txt
+-- 
+1.9.1
+

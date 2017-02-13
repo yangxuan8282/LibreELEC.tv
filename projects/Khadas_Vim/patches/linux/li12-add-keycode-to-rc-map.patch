@@ -1,0 +1,22 @@
+diff -Naur linux-7f42343.orig/drivers/media/rc/rc-main.c linux-7f42343/drivers/media/rc/rc-main.c
+--- linux-7f42343.orig/drivers/media/rc/rc-main.c	2016-07-28 10:17:20.228202936 +0800
++++ linux-7f42343/drivers/media/rc/rc-main.c	2016-07-28 10:19:28.572198232 +0800
+@@ -102,7 +102,17 @@
+ 
+ 
+ static struct rc_map_table empty[] = {
+-	{ 0x2a, KEY_COFFEE },
++      {0x000b , KEY_VOLUMEUP },
++      {0x0058, KEY_VOLUMEDOWN },
++      {0x000e, KEY_LEFT},
++      {0x001a, KEY_RIGHT},
++      {0x0003, KEY_UP},
++      {0x0002, KEY_DOWN},
++      {0x0048, KEY_HOME},
++      {0x0013, KEY_MENU},
++      {0x0007, KEY_OK },
++      {0x0014, KEY_POWER},
++      {0x0001, KEY_BACK },
+ };
+ 
+ static struct rc_map_list empty_map = {

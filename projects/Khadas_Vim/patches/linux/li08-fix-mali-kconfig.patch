@@ -1,0 +1,12 @@
+diff -Naur linux-7f42343.orig/drivers/video/Kconfig linux-7f42343/drivers/video/Kconfig
+--- linux-7f42343.orig/drivers/video/Kconfig	2016-07-22 20:04:38.304895345 +0800
++++ linux-7f42343/drivers/video/Kconfig	2016-07-22 20:07:32.852888948 +0800
+@@ -23,6 +23,8 @@
+ 
+ source "drivers/gpu/drm/Kconfig"
+ 
++source "drivers/gpu/arm/mali/Kconfig"
++
+ config VGASTATE
+        tristate
+        default n

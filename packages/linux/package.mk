@@ -30,6 +30,14 @@ PKG_SECTION="linux"
 PKG_SHORTDESC="linux26: The Linux kernel 2.6 precompiled kernel binary image and modules"
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 case "$LINUX" in
+  khadas)
+    PKG_VERSION="7f42343"
+    PKG_URL="https://github.com/khadas/linux/archive/$PKG_VERSION.tar.gz"
+    ;;
+  hardkernel)
+    PKG_VERSION="f0ddde5"
+    PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
+    ;;
   amlogic)
     PKG_VERSION="amlogic-3.10-c8d5b2f"
     PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
@@ -50,13 +58,8 @@ case "$LINUX" in
     PKG_URL="$DISTRO_SRC/$PKG_SOURCE_NAME"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET imx6-status-led imx6-soc-fan irqbalanced"
     ;;
-  custom)
-    PKG_VERSION="$KERNEL_VERSION"
-    PKG_URL="$KERNEL_URL"
-    PKG_SOURCE_DIR="$KERNEL_SOURCE_DIR"
-    ;;
   *)
-    PKG_VERSION="4.4.13"
+    PKG_VERSION="4.4.7"
     PKG_URL="http://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     ;;
 esac
@@ -64,14 +67,7 @@ esac
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
-  export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
-  TARGET_PREFIX=aarch64-linux-gnu-
-  PKG_MAKE_OPTS_HOST="ARCH=$TARGET_ARCH headers_check"
-else
-  PKG_MAKE_OPTS_HOST="ARCH=$TARGET_KERNEL_ARCH headers_check"
-fi
+PKG_MAKE_OPTS_HOST="ARCH=$TARGET_KERNEL_ARCH headers_check"
 
 if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mkbootimg:host"
@@ -133,11 +129,7 @@ post_patch() {
 }
 
 makeinstall_host() {
-  if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-    make ARCH=$TARGET_ARCH INSTALL_HDR_PATH=dest headers_install
-  else
-    make ARCH=$TARGET_KERNEL_ARCH INSTALL_HDR_PATH=dest headers_install
-  fi
+  make ARCH=$TARGET_KERNEL_ARCH INSTALL_HDR_PATH=dest headers_install
   mkdir -p $SYSROOT_PREFIX/usr/include
     cp -R dest/include/* $SYSROOT_PREFIX/usr/include
 }
@@ -164,19 +156,27 @@ make_target() {
     $SCRIPTS/install initramfs
   )
 
-  if [ "$BOOTLOADER" = "u-boot" -a -n "$KERNEL_UBOOT_EXTRA_TARGET" -a -z "$BUILD_ANDROID_BOOTIMG" ]; then
+  if [ "$BOOTLOADER" = "u-boot" -a -n "$KERNEL_UBOOT_EXTRA_TARGET" ]; then
     for extra_target in "$KERNEL_UBOOT_EXTRA_TARGET"; do
       LDFLAGS="" make $extra_target
     done
   fi
 
   LDFLAGS="" make $KERNEL_TARGET $KERNEL_MAKE_EXTRACMD
+
+  if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
+    LDFLAGS="" mkbootimg --kernel arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET --ramdisk $ROOT/$BUILD/image/initramfs.cpio \
+      --second "$ANDROID_BOOTIMG_SECOND" --output arch/$TARGET_KERNEL_ARCH/boot/boot.img
+    mv -f arch/$TARGET_KERNEL_ARCH/boot/boot.img arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET
+  fi
 }
 
 makeinstall_target() {
   if [ "$BOOTLOADER" = "u-boot" ]; then
+    mkdir -p $INSTALL/lib/modules/3.14.29/kernel/drivers/gpu/arm/mali
+    cp -r  drivers/gpu/arm/mali/mali.ko $INSTALL/lib/modules/3.14.29/kernel/drivers/gpu/arm/mali
     mkdir -p $INSTALL/usr/share/bootloader
-    for dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/*.dtb; do
+    for dtb in arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb; do
       cp $dtb $INSTALL/usr/share/bootloader 2>/dev/null || :
     done
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then

@@ -1,0 +1,128 @@
+diff -Naur linux-7f42343.orig/arch/arm64/boot/dts/amlogic/kvim.dts linux-7f42343/arch/arm64/boot/dts/amlogic/kvim.dts
+--- linux-7f42343.orig/arch/arm64/boot/dts/amlogic/kvim.dts	2016-07-20 19:29:10.971979769 +0800
++++ linux-7f42343/arch/arm64/boot/dts/amlogic/kvim.dts	2016-07-20 19:30:08.056001097 +0800
+@@ -506,124 +506,6 @@
+ 				card_type = <3>;  /*3:sdio device(ie:sdio-wifi), 4:SD combo (IO+mem) card, */
+ 		};
+ 	};
+-	nand{
+-		compatible = "amlogic, aml_nand";
+-		dev_name = "nand";
+-		status = "disabled";
+-		reg = <0x0 0xd0074800 0x0 0x200>;
+-		interrupts = <	0 34 1 >;
+-		pinctrl-names = "nand_rb_mod","nand_norb_mod", "nand_cs_pins_only";
+-		pinctrl-0 = <&conf_nand_pulldown &conf_nand_pullup &all_nand_pins>;
+-		pinctrl-1 = <&conf_nand_pulldown &conf_nand_pullup &all_nand_pins>;
+-		pinctrl-2 = <&nand_cs_pins>;
+-		device_id = <0>;
+-		plat-names = "nandnormal";
+-		plat-num = <1>;
+-		plat-part-0 = <&normal>;
+-		normal: normal{
+-			enable_pad ="ce0","ce1","ce2","ce3";
+-			busy_pad = "rb0";
+-		};
+-	};
+-	aml_nftl{
+-		compatible = "amlogic, nftl";
+-		/* config nftl here */
+-
+-	};
+-	/*aml_cams{
+-		compatible = "amlogic, cams_prober";
+-		status = "okay";
+-		clocks = <&clock CLK_CAMERA_24M>;
+-		clock-names = "clk_camera_24";
+-		pinctrl-names = "gpio";
+-		pinctrl-0 = <&aml_cam_gpio_pins> ;
+-					cam_0{
+-						cam_name = "sp2518";
+-						front_back = <0>;
+-						i2c_bus = "i2c_bus_a";
+-						gpio_pwdn-gpios = <&gpio       GPIOZ_14       GPIO_ACTIVE_HIGH>;
+-						gpio_rst-gpios = <&gpio       GPIOZ_12       GPIO_ACTIVE_HIGH>;
+-						mirror_flip = <1>;
+-						vertical_flip = <1>;
+-						spread_spectrum = <0>;	//0:none; 1:0.3%; 2:0.6%; 3:1.25%; 4:2.5%; 5:5%
+-						bt_path = "gpio";
+-						status = "okay";
+-					};
+-	};*/
+-	partitions: partitions{
+-        parts = <11>;
+-		part-0 = <&logo>;
+-		part-1 = <&recovery>;
+-		part-2 = <&rsv>;
+-		part-3 = <&tee>;
+-		part-4 = <&crypt>;
+-		part-5 = <&misc>;
+-		part-6 = <&instaboot>;
+-		part-7 = <&boot>;
+-		part-8 = <&system>;
+-		part-9 = <&cache>;
+-		part-10 = <&data>;
+-
+-		logo:logo{
+-			pname = "logo";
+-			size = <0x0 0x2000000>;
+-			mask = <1>;
+-		};
+-		recovery:recovery{
+-			pname = "recovery";
+-			size = <0x0 0x2000000>;
+-			mask = <1>;
+-		};
+-		rsv:rsv{
+-			pname = "rsv";
+-			size = <0x0 0x800000>;
+-			mask = <1>;
+-		};
+-		tee:tee{
+-			pname = "tee";
+-			size = <0x0 0x800000>;
+-			mask = <1>;
+-		};
+-		crypt:crypt{
+-			pname = "crypt";
+-			size = <0x0 0x2000000>;
+-			mask = <1>;
+-		};
+-		misc:misc{
+-			pname = "misc";
+-			size = <0x0 0x2000000>;
+-			mask = <1>;
+-		};
+-		instaboot:instaboot{
+-			pname = "instaboot";
+-			size = <0x0 0x20000000>;
+-			mask = <1>;
+-		};
+-		boot:boot
+-		{
+-			pname = "boot";
+-			size = <0x0 0x2000000>;
+-			mask = <1>;
+-		};
+-		system:system
+-		{
+-			pname = "system";
+-			size = <0x0 0x40000000>;
+-			mask = <1>;
+-		};
+-		cache:cache
+-		{
+-			pname = "cache";
+-			size = <0x0 0x20000000>;
+-			mask = <2>;
+-		};
+-		data:data
+-		{
+-			pname = "data";
+-			size = <0xffffffff 0xffffffff>;
+-			mask = <4>;
+-		};
+-	};
+ 	unifykey{
+ 		compatible = "amlogic, unifykey";
+ 		status = "ok";

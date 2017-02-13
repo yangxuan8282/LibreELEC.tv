@@ -21,14 +21,14 @@ PKG_REV="1"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="other"
 PKG_SITE="http://openlinux.amlogic.com"
-case $TARGET_KERNEL_ARCH in
-  arm)
+case $PROJECT in
+  WeTek_Core|WeTek_Play)
     PKG_VERSION="45a1086"
     PKG_URL="https://github.com/codesnake/libamcodec/archive/$PKG_VERSION.tar.gz"
     ;;
-  arm64)
-    PKG_VERSION="2fba80c"
-    PKG_URL="https://github.com/surkovalex/libamcodec/archive/$PKG_VERSION.tar.gz"
+  Khadas_Vim | Odroid_C2)
+    PKG_VERSION="210755d"
+    PKG_URL="http://amlinux.ru/source/$PKG_NAME-$PKG_VERSION.tar.gz"
     ;;
 esac
 PKG_DEPENDS_TARGET="toolchain"

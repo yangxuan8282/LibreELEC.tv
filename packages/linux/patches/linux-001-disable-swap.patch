@@ -1,0 +1,19 @@
+diff -Naur linux-7f42343.orig/drivers/amlogic/instaboot/instaboot_kernel.c linux-7f42343/drivers/amlogic/instaboot/instaboot_kernel.c
+--- linux-7f42343.orig/drivers/amlogic/instaboot/instaboot_kernel.c	2016-07-20 08:43:53.931820506 +0800
++++ linux-7f42343/drivers/amlogic/instaboot/instaboot_kernel.c	2016-07-20 08:45:50.782366112 +0800
+@@ -59,6 +59,7 @@
+ }
+ EXPORT_SYMBOL(aml_get_swsusp_resume_device);
+ 
++#ifdef CONFIG_SWAP
+ end_swap_bio_read_p_t aml_get_end_swap_bio_read(void)
+ {
+ 	end_swap_bio_read_p_t fun_p;
+@@ -66,6 +67,7 @@
+ 	return end_swap_bio_read;
+ }
+ EXPORT_SYMBOL(aml_get_end_swap_bio_read);
++#endif
+ 
+ unsigned int aml_nr_free_highpages(void)
+ {

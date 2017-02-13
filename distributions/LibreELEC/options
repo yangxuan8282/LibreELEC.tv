@@ -6,13 +6,13 @@
 
 # Welcome Message for e.g. SSH Server (up to 5 Lines)
   GREETING0="##############################################"
-  GREETING1="#                 LibreELEC                  #"
-  GREETING2="#            http://libreelec.tv             #"
+  GREETING1="#                Khadas Vim                  #"
+  GREETING2="#             http://khadas.com              #"
   GREETING3="##############################################"
   GREETING4=""
 
 # Root password to integrate in the target system
-  ROOT_PASSWORD="libreelec"
+  ROOT_PASSWORD="khadas"
 
 # Install glibc locales to the build (yes / no)
   GLIBC_LOCALES="yes"
@@ -57,10 +57,10 @@
   KODI_DVDCSS_SUPPORT="yes"
 
 # additional drivers to install:
-# for a list of additinoal drivers see packages/linux-drivers
+# for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU mt7610u dvbhdhomerun"
+  ADDITIONAL_DRIVERS="dvbhdhomerun"
 
 # build and install bluetooth support (yes / no)
   BLUETOOTH_SUPPORT="yes"

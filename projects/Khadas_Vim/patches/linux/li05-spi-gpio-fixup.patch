@@ -1,0 +1,12 @@
+diff -Naur linux-7f42343.orig/drivers/spi/spi-gpio.c linux-7f42343/drivers/spi/spi-gpio.c
+--- linux-7f42343.orig/drivers/spi/spi-gpio.c	2016-07-21 15:24:37.779443793 +0800
++++ linux-7f42343/drivers/spi/spi-gpio.c	2016-07-21 15:25:30.699444809 +0800
+@@ -250,7 +250,7 @@
+ 		/*
+ 		 * ... otherwise, take it from spi->controller_data
+ 		 */
+-		cs = (unsigned int) spi->controller_data;
++		cs = (uintptr_t) spi->controller_data;
+ 	}
+ 
+ 	if (!spi->controller_state) {

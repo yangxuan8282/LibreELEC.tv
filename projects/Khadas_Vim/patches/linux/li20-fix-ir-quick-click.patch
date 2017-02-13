@@ -1,0 +1,12 @@
+diff -Naur linux-7f42343.orig/drivers/media/rc/rc-main.c linux-7f42343/drivers/media/rc/rc-main.c
+--- linux-7f42343.orig/drivers/media/rc/rc-main.c	2016-07-29 09:31:58.353538391 +0800
++++ linux-7f42343/drivers/media/rc/rc-main.c	2016-07-29 09:32:39.017536901 +0800
+@@ -31,7 +31,7 @@
+ #define IR_TAB_MAX_SIZE	8192
+ 
+ /* FIXME: IR_KEYPRESS_TIMEOUT should be protocol specific */
+-#define IR_KEYPRESS_TIMEOUT 250
++#define IR_KEYPRESS_TIMEOUT 130
+ 
+ /* Used to keep track of known keymaps */
+ static LIST_HEAD(rc_map_list);

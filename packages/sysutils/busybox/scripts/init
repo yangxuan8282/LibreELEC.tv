@@ -358,7 +358,7 @@
 
     if [ -f "$UPDATE_DIR/$2" -a -b "$3" ]; then
       StartProgress spinner "Updating $1... "
-        result="$(dd if="$UPDATE_DIR/$2" of="$3" bs=64K conv=fsync 2>&1)"
+        result="$(dd if="$UPDATE_DIR/$2" of="$3" conv=fsync 2>&1)"
         StopProgress "done"
       echo "${result}"
     fi
@@ -448,9 +448,9 @@
   force_fsck() {
     echo "Filesystem corruption has been detected!"
     echo "To prevent an automatic repair attempt continuing,"
-    echo "press any key or power off your system within the next 120 seconds"
+    echo "press any key or power off your system within the next 10 seconds"
     echo ""
-    read -t120 -n1
+    read -t10 -n1
     # The exit status is 0 if input is available
     # The exit status is greater than 128 if the timeout is exceeded
     if [ "$?" -ne "0" -o "$?" -gt "128" ] ; then
@@ -680,11 +680,7 @@
       # don't make temporary files but instead copy
       # directly from mountpoint to /flash
       UPDATE_DIR=$UPDATE_ROOT/.tmp/mnt
-      if [ ! -b $IMAGE_KERNEL -o -z "@KERNEL_NAME@" ]; then
-        UPDATE_KERNEL=$(basename $IMAGE_KERNEL)
-      else
-        UPDATE_KERNEL="@KERNEL_NAME@"
-      fi
+      UPDATE_KERNEL=$(basename $IMAGE_KERNEL)
     fi
 
     sync
@@ -811,44 +807,6 @@
     [ -f "/sysroot/usr/lib/systemd/systemd" ] || error "final_check" "Could not find systemd!"
   }
 
-  install_internal() {
-    progress "Install Libreelec to internal "
-
-    if [ -f /flash/install.aml ] ; then
-      echo ""
-      echo ""
-      echo "WARNING !!!!"
-      echo ""
-      echo "To prevent an automatic repair attempt continuing,"
-      echo "press any key or power off your system within the next 20 seconds"
-      echo ""
-      read -t20 -n1
-
-      if [ "$?" -ne "0" -o "$?" -gt "28" ] ; then
-        echo ""
-        echo "Install to internal IN PROGRESS"
-        echo ""
-        echo "Please do not reboot or turn off your @DISTRONAME@ device!"
-        echo ""
-        mount -o remount,rw /flash
-        mv /flash/install.aml /flash/install.sh
-        /flash/install.sh
-        echo "****************************"
-        echo "Sucesful install to internal"
-        sync
-        sleep 3
-        echo "Poweroff system. "
-	sleep 5
-	poweroff
-      else
-        echo "Stop install to internal"
-        echo "Next start @DISTRONAME@ "
-        sleep 5
-      fi
-    fi
- }
-
-
   if [ "${boot%%=*}" = "FILE" ]; then
     error "check arguments" "boot argument can't be FILE type..."
   fi
@@ -861,7 +819,6 @@
       load_splash \
       mount_storage \
       check_update \
-      install_internal \
       prepare_sysroot; do
     $BOOT_STEP
     [ -n "$DEBUG" ] && break_after $BOOT_STEP
