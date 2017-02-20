@@ -44,7 +44,7 @@ install_to_nand() {
       echo "done."
     fi
 
-    if [ ! -f "/tmp/remote.conf" ] ; then
+    if [ ! -f $REMOTE_CONF ] ; then
       echo -n "Backing up remote.conf..."
       mount -o ro /dev/system /tmp/system
       if [ -f /tmp/system/remote.conf ]; then
@@ -82,13 +82,27 @@ install_to_nand() {
     e2fsck -n /dev/data &> /dev/null
     echo "done."
 
-    if [ -f "/tmp/remote.conf" ] ; then
-      echo -n "Restoring remote.conf..."
+    if [ -f /flash/remote.conf ] ; then
+      echo -n "Restoring remote.conf in /flash ..."
       mount -o rw /dev/system /tmp/system
-      cp /tmp/remote.conf /tmp/system/remote.conf
+      cp /flash/remote.conf /tmp/system/remote.conf
       umount /tmp/system
       echo "done."
-    fi
+    else
+      if [ -f $REMOTE_CONF ] ; then
+        echo -n "Restoring remote.conf in /tmp ..."
+        mount -o rw /dev/system /tmp/system
+        cp $REMOTE_CONF /tmp/system/remote.conf
+        umount /tmp/system
+        echo "done."
+      fi
+   fi
+
+    echo "Copying user data..."
+    mkdir -p /tmp/data
+    mount -o rw /dev/data /tmp/data
+    cp -av /storage/. /tmp/data/
+    echo "done."
 
   else
     echo "No LE image found on /flash! Exiting..."

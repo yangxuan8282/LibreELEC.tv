@@ -244,6 +244,8 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
     done
 fi # bootloader
 
+echo "image: make autoscript..."
+
 for src in $INSTALL_SRC_DIR/*autoscript.src ; do
   if [ -e "$src" ] ; then
     $MKIMAGE_TOOL_CMD "$src" "$OE_TMP/$(basename $src .src)"
@@ -260,7 +262,7 @@ if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
 fi
 
 if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
-  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot/boot.scr"
+  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot.scr"
 fi
 
 # extract part2 from image to format and copy files
@@ -291,8 +293,8 @@ fi
   dd if="$OE_TMP/part2.ext4" of="$DISK" bs=512 seek="$STORAGE_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
 
 # gzip
-#  echo "image: compressing..."
-#  gzip $DISK
+  echo "image: compressing..."
+  gzip $DISK
 
 # set owner
   if [ -n "$SUDO_USER" ] ; then
