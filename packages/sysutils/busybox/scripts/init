@@ -1009,7 +1009,13 @@
     if [ -f /flash/install.aml ] ; then
       echo ""
       echo ""
-      echo "WARNING !!!!"
+      echo "   WARNING !!!!"
+      echo ""
+      echo "   INSTALL LebreELEC to eMMC !!!!"
+      echo ""
+      echo "   WARNING !!!!"
+      echo ""
+      echo "   The installation process will DELETE all data in sections SYSTEM and DATA  !!!!"
       echo ""
       echo "To prevent an automatic repair attempt continuing,"
       echo "press any key or power off your system within the next 20 seconds"
@@ -1026,12 +1032,12 @@
         mv /flash/install.aml /flash/install.sh
         /flash/install.sh
         echo "****************************"
-        echo "Sucesful install to internal"
+        echo "Sucesful install LebreELEC to internal eMMC"
         sync
         sleep 3
         echo "Poweroff system. "
-	sleep 5
-	poweroff
+        sleep 5
+        poweroff
       else
         echo "Stop install to internal"
         echo "Next start @DISTRONAME@ "

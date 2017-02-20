@@ -273,6 +273,8 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
     fi
 fi # bootloader
 
+echo "image: make autoscript..."
+
 for src in $INSTALL_SRC_DIR/*autoscript.src ; do
   if [ -e "$src" ] ; then
     $MKIMAGE_TOOL_CMD "$src" "$LE_TMP/$(basename $src .src)"
@@ -288,8 +290,8 @@ if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
   mcopy "$INSTALL_SRC_DIR/aml_autoscript.zip" "::/aml_autoscript.zip"
 fi
 
-if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
-  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot/boot.scr"
+if [ -f "$INSTALL_SRC_DIR/remote.conf" ]; then
+  mcopy "$INSTALL_SRC_DIR/remote.conf" "::/remote.conf"
 fi
 
 # extract part2 from image to format and copy files
@@ -338,8 +340,8 @@ fi
   fi
 
 # gzip
-#  echo "image: compressing..."
-#  gzip $DISK
+  echo "image: compressing..."
+  gzip $DISK
 
 # set owner
   if [ -n "$SUDO_USER" ] ; then

@@ -89,14 +89,20 @@ install_to_nand() {
       umount /tmp/system
       echo "done."
     else
-	if [ -f $REMOTE_CONF ] ; then
-          echo -n "Restoring remote.conf in /tmp ..."
-	  mount -o rw /dev/system /tmp/system
-          cp $REMOTE_CONF /tmp/system/remote.conf
-          umount /tmp/system
-          echo "done."
-        fi
-    fi
+      if [ -f $REMOTE_CONF ] ; then
+        echo -n "Restoring remote.conf in /tmp ..."
+        mount -o rw /dev/system /tmp/system
+        cp $REMOTE_CONF /tmp/system/remote.conf
+        umount /tmp/system
+        echo "done."
+      fi
+   fi
+
+    echo "Copying user data..."
+    mkdir -p /tmp/data
+    mount -o rw /dev/data /tmp/data
+    cp -av /storage/. /tmp/data/
+    echo "done."
 
   else
     echo "No LE image found on /flash! Exiting..."

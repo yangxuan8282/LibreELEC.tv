@@ -1,7 +1,7 @@
 #!/bin/sh
+
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2014 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,18 +17,9 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-# check the Security chip if we run on a WeTek device
-  lsusb -d 096e:0006 &> /dev/null
-  LSUSB_RET=$?
-
-if [ -f /storage/.config/remote.conf ]; then
-  /usr/bin/remotecfg /storage/.config/remote.conf
-elif [ -f /flash/remote.conf ]; then
-  /usr/bin/remotecfg /flash/remote.conf
-elif [ -f /etc/amremote/remote.conf ]; then
-  /usr/bin/remotecfg /etc/amremote/remote.conf
-elif [ "$LSUSB_RET" = 0 ]; then
-  /usr/bin/remotecfg /etc/amremote/wetek.conf
-elif [ "$LSUSB_RET" = 1 ]; then
-  /usr/bin/remotecfg /etc/amremote/libreelec.conf
+if [ -f /flash/install.sh ]; then
+    mount -o rw,remount /flash
+    mv /flash/install.sh /flash/install.aml
 fi
+
+/usr/sbin/reboot switch_system
