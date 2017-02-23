@@ -57,14 +57,12 @@ post_install() {
       $STRIP --strip-debug $MOD
     done
 
-    sed -i '/aml_nftl_dev/d' ./etc/modules
-
     ln -sf /usr/lib $ROOT/$BUILD/initramfs/lib
     ln -sf /usr/bin $ROOT/$BUILD/initramfs/bin
     ln -sf /usr/sbin $ROOT/$BUILD/initramfs/sbin
 
     mkdir -p $ROOT/$BUILD/image/
     fakeroot -- sh -c \
-      "mkdir -p dev; mknod -m 600 dev/console c 5 1; find . | cpio -H newc -ov -R 0:0 | lzop > $ROOT/$BUILD/image/initramfs.cpio"
+      "mkdir -p dev; mknod -m 600 dev/console c 5 1; find . | cpio -H newc -ov -R 0:0 | lzop --best > $ROOT/$BUILD/image/initramfs.cpio"
   )
 }

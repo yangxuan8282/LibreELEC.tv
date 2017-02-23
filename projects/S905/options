@@ -58,7 +58,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="92ab78c"
+    KERNEL_VERSION="c1b4b3f"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
     KERNEL_PATCH_DIRS="amlogic-3.14"
@@ -130,6 +130,9 @@
 
   # Amlogic IR remote support (yes / no)
     AMREMOTE_SUPPORT="yes"
+
+  # build and install iSCSI support - iscsistart (yes / no)
+    ISCSI_SUPPORT="no"
 
   # build with swap support (yes / no)
     SWAP_SUPPORT="yes"

@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="a10c504"
+PKG_VERSION="b0bc68b"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -32,8 +32,12 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 case $PROJECT in
-  S805|S905)
+  S805|S812|S905)
     PKG_PATCH_DIRS="amlogic-sX05"
+    if [ "$TARGET_ARCH" = "arm" ]; then
+      CFLAGS="$CFLAGS -mthumb"
+      CXXFLAGS="$CXXFLAGS -mthumb"
+    fi
     ;;
 esac
 

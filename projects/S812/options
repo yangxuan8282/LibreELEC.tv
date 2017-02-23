@@ -35,7 +35,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="263a24f"
+    KERNEL_VERSION="a7bb5df"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
@@ -88,7 +88,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7610u mt7601u-aml"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7610u media_build mt7601u-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -103,6 +103,9 @@
 
   # Amlogic IR remote support (yes / no)
     AMREMOTE_SUPPORT="yes"
+
+  # build and install iSCSI support - iscsistart (yes / no)
+    ISCSI_SUPPORT="no"
 
   # build with swap support (yes / no)
     SWAP_SUPPORT="no"
@@ -124,7 +127,7 @@
     KERNEL_NAME="kernel.img"
 
   # set the addon dirs
-    ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
+    ADDON_SERVER_URL="http://kszaq.libreelec.tv/addons"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
   # OEM packages for OEM's (yes / no)
