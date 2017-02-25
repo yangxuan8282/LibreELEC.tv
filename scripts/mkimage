@@ -294,6 +294,10 @@ if [ -f "$INSTALL_SRC_DIR/remote.conf" ]; then
   mcopy "$INSTALL_SRC_DIR/remote.conf" "::/remote.conf"
 fi
 
+if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
+  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot.scr"
+fi
+
 # extract part2 from image to format and copy files
   echo "image: extracting part2 from image..."
   STORAGE_PART_COUNT=$(( $STORAGE_PART_END - $STORAGE_PART_START + 1 ))
