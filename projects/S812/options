@@ -128,7 +128,9 @@
 
   # set the addon dirs
     ADDON_SERVER_URL="http://kszaq.libreelec.tv/addons"
+    ADDON_PATH="$ADDON_VERSION/S805/arm"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+
 
   # OEM packages for OEM's (yes / no)
     OEM_SUPPORT="yes"
