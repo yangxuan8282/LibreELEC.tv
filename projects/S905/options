@@ -6,18 +6,6 @@
   # generated code.
     case $TARGET_ARCH in
       aarch64)
-        # TARGET_CPU:
-        # arm2 arm250 arm3 arm6 arm60 arm600 arm610 arm620 arm7 arm7m arm7d
-        # arm7dm arm7di arm7dmi arm70 arm700 arm700i arm710 arm710c
-        # arm7100 arm720 arm7500 arm7500fe arm7tdmi arm7tdmi-s arm710t
-        # arm720t arm740t strongarm strongarm110 strongarm1100
-        # strongarm1110 arm8 arm810 arm9 arm9e arm920 arm920t arm922t
-        # arm946e-s arm966e-s arm968e-s arm926ej-s arm940t arm9tdmi
-        # arm10tdmi arm1020t arm1026ej-s arm10e arm1020e arm1022e
-        # arm1136j-s arm1136jf-s mpcore mpcorenovfp arm1156t2-s
-        # arm1176jz-s arm1176jzf-s cortex-a8 cortex-a9 cortex-r4
-        # cortex-r4f cortex-m3 cortex-m1 xscale iwmmxt iwmmxt2 ep9312.
-        #
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+fp+simd"
         ;;
@@ -40,6 +28,9 @@
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE=""
 
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb"
+
   # Kernel target
     KERNEL_TARGET="Image.lzo"
 
@@ -58,7 +49,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="c1b4b3f"
+    KERNEL_VERSION="c850c92"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
     KERNEL_PATCH_DIRS="amlogic-3.14"
@@ -120,7 +111,7 @@
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8723bs_bt qca9377-firmware-aml"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml-all rtl8723bs_bt qca9377-firmware-aml"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"

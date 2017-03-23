@@ -92,13 +92,13 @@ makeinstall_init() {
     ln -sf e2fsck $INSTALL/usr/sbin/fsck.ext4
     ln -sf e2fsck $INSTALL/usr/sbin/fsck.ext4dev
 
-#  if [ $INITRAMFS_PARTED_SUPPORT = "yes" ]; then
+  if [ $INITRAMFS_PARTED_SUPPORT = "yes" ]; then
     cp misc/mke2fs $INSTALL/usr/sbin
     ln -sf mke2fs $INSTALL/usr/sbin/mkfs.ext2
     ln -sf mke2fs $INSTALL/usr/sbin/mkfs.ext3
     ln -sf mke2fs $INSTALL/usr/sbin/mkfs.ext4
     ln -sf mke2fs $INSTALL/usr/sbin/mkfs.ext4dev
-#  fi
+  fi
 }
 
 make_host() {
