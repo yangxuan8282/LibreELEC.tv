@@ -2,10 +2,11 @@
 # setup system defaults
 ################################################################################
 
-    TARGET_CPU="cortex-a53"
-
+  # The TARGET_CPU variable controls which processor should be targeted for
+  # generated code.
     case $TARGET_ARCH in
       aarch64)
+        TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+fp+simd"
         ;;
       arm)
@@ -95,6 +96,8 @@
 
   # Modules to install in initramfs for early boot
     INITRAMFS_MODULES="dwc_otg dwc3 font softcursor bitblit fbcon aml_nftl_dev"
+
+    INITRAMFS_PARTED_SUPPORT="yes"
 
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers

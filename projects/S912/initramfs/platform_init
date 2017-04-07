@@ -1,12 +1,11 @@
 #!/bin/sh
 
+hdmimode=1080p60hz
+
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
     hdmimode=*)
       hdmimode=${arg#*=}
-      ;;
-    bootfrom*)
-      bootfromext=1
       ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE=${arg#*=}
@@ -28,11 +27,7 @@ fi
 # Add information where to run LibreELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
-  if [ -n "$bootfromext" ]; then
-    cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=LIBREELEC disk=LABEL=LIBREELEC_DISK"
-  else
-    cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
-  fi
+  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
   echo "$cmdline" > /proc/cmdline
 fi
 
