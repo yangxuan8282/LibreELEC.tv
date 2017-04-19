@@ -1020,9 +1020,9 @@
       echo "To prevent an automatic repair attempt continuing,"
       echo "press any key or power off your system within the next 20 seconds"
       echo ""
-      read -t20 -n1
+      read -t30 -n1
 
-      if [ "$?" -ne "0" -o "$?" -gt "28" ] ; then
+      if [ "$?" -ne "0" -o "$?" -gt "38" ] ; then
         echo ""
         echo "Install to internal IN PROGRESS"
         echo ""

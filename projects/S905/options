@@ -2,11 +2,10 @@
 # setup system defaults
 ################################################################################
 
-  # The TARGET_CPU variable controls which processor should be targeted for
-  # generated code.
+    TARGET_CPU="cortex-a53"
+
     case $TARGET_ARCH in
       aarch64)
-        TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+fp+simd"
         ;;
       arm)
@@ -28,11 +27,11 @@
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE=""
 
-  # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb"
-
   # Kernel target
     KERNEL_TARGET="Image.lzo"
+
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -49,9 +48,14 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="c850c92"
+    KERNEL_VERSION="d1fde91"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
+
+#    KERNEL_VERSION="armbian"
+#    KERNEL_URL="https://github.com/150balbes/Amlogic_s905-kernel/archive/$KERNEL_VERSION.tar.gz"
+#    KERNEL_SOURCE_DIR="Amlogic_s905-kernel-$KERNEL_VERSION*"
+
     KERNEL_PATCH_DIRS="amlogic-3.14"
 
 ################################################################################
