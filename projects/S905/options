@@ -48,14 +48,9 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="d1fde91"
+    KERNEL_VERSION="6e79ad4"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
-
-#    KERNEL_VERSION="armbian"
-#    KERNEL_URL="https://github.com/150balbes/Amlogic_s905-kernel/archive/$KERNEL_VERSION.tar.gz"
-#    KERNEL_SOURCE_DIR="Amlogic_s905-kernel-$KERNEL_VERSION*"
-
     KERNEL_PATCH_DIRS="amlogic-3.14"
 
 ################################################################################
