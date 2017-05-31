@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <advancedsettings>
   <showexitbutton>false</showexitbutton>
+  <remotedelay>1</remotedelay>
 
   <samba>
     <clienttimeout>30</clienttimeout>
   </samba>
+
+<cputempcommand>echo "$(cat /sys/class/hwmon/hwmon1/temp1_input) C"</cputempcommand>
+
 </advancedsettings>
