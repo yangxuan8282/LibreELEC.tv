@@ -35,7 +35,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="a0e98d9"
+    KERNEL_VERSION="4c08d72"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
@@ -93,7 +93,7 @@
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml-all rtl8723bs_bt"
+    FIRMWARE="misc-firmware wlan-firmware dvb-firmware brcmfmac_sdio-firmware-aml rtl8723bs_bt"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -127,7 +127,8 @@
     KERNEL_NAME="kernel.img"
 
   # set the addon dirs
-    ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
+    ADDON_SERVER_URL="http://kszaq.libreelec.tv/addons"
+    ADDON_PATH="$ADDON_VERSION/S805/arm"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
   # OEM packages for OEM's (yes / no)
