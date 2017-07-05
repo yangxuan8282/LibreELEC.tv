@@ -29,22 +29,16 @@
 
   # Kernel extra targets to build
     case $SYSTEM in
-     MXQ)
-      KERNEL_UBOOT_EXTRA_TARGET="meson8b_mxq.dtd meson8b_mxq.dtb"
-      ;;
-     HD18Q)
-      KERNEL_UBOOT_EXTRA_TARGET="meson8b_hd18q.dtd meson8b_hd18q.dtb"
-      ;;
-     M201C)
-      KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201C_512M.dtd meson8b_m201C_512M.dtb"
-      ;;
-     M201D)
-      KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201d.dtd meson8b_m201d.dtb"
-      ;;
-     MK808B-Plus)
-      KERNEL_UBOOT_EXTRA_TARGET="meson8b_mk808bplus.dtd meson8b_mk808bplus.dtb"
-      ;;
-      esac
+      MXQ)
+        KERNEL_UBOOT_EXTRA_TARGET="meson8b_mxq.dtd meson8b_mxq.dtb"
+        ;;
+      HD18Q)
+        KERNEL_UBOOT_EXTRA_TARGET="meson8b_hd18q.dtd meson8b_hd18q.dtb"
+        ;;
+      m201d)
+        KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201d.dtd meson8b_m201d.dtb"
+        ;;
+    esac
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -58,7 +52,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="4c08d72"
+    KERNEL_VERSION="415ff35"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
@@ -111,7 +105,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7610u media_build mt7601u-aml"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7610u mt7601u-aml"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
