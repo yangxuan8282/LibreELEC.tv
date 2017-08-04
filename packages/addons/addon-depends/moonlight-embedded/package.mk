@@ -17,11 +17,11 @@
 ################################################################################
 
 PKG_NAME="moonlight-embedded"
-PKG_VERSION="9301898"
+PKG_VERSION="2.4.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/irtimmer/moonlight-embedded"
-PKG_URL="https://github.com/irtimmer/moonlight-embedded/archive/$PKG_VERSION.tar.gz"
+PKG_URL="https://github.com/irtimmer/moonlight-embedded/archive/v$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain curl libcec pulseaudio ffmpeg systemd alsa-lib moonlight-common-c libevdev enet opus"
 PKG_SECTION=""
 PKG_SHORTDESC="Gamestream client for embedded systems"
@@ -45,7 +45,7 @@ fi
 PKG_CMAKE_OPTS_TARGET="$FREESCALE_V4L_INCLUDE"
 
 pre_build_target() {
-  cp -a $(get_build_dir moonlight-common-c)/* $ROOT/$PKG_BUILD/third_party/moonlight-common-c
+  cp -a $(get_build_dir moonlight-common-c)/* $PKG_BUILD/third_party/moonlight-common-c
 }
 
 pre_configure_target() {
