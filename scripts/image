@@ -246,6 +246,11 @@ for MOD in `find $INSTALL/usr/lib/modules/ -type f -name "*.ko"`; do
   $STRIP --strip-debug $MOD
 done
 
+# delete PCI firmware for non-PCI targets
+if [ "$ARCH" = "arm" -o "$ARCH" = "aarch64" ]; then
+  find $INSTALL/usr/lib/firmware -iname "*pci*" -exec rm {} +;
+fi
+
 # make target dir
 mkdir -p $TARGET_IMG
 rm -rf $TARGET_IMG/$IMAGE_NAME.kernel
@@ -267,7 +272,7 @@ if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   DTB_BLOB_OUTPUT="arch/$TARGET_KERNEL_ARCH/boot/dtb.img"
   ANDROID_BOOTIMG_SECOND="--second $DTB_BLOB_OUTPUT"
   if [ "$DTB_BLOBS_COUNT" -gt 1 ]; then
-    $ROOT/tools/dtbTool/dtbTool -o arch/$TARGET_KERNEL_ARCH/boot/dtb.img -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
+    $TOOLCHAIN/bin/dtbTool -o arch/$TARGET_KERNEL_ARCH/boot/dtb.img -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
     ANDROID_BOOTIMG_SECOND="--second arch/$TARGET_KERNEL_ARCH/boot/dtb.img"
   elif [ "$DTB_BLOBS_COUNT" -eq 1 ]; then
     ANDROID_BOOTIMG_SECOND="--second $DTB_BLOBS"
@@ -411,6 +416,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       UUID_SYSTEM="$(uuidgen)" \
       UUID_STORAGE="$(uuidgen)" \
       UBOOT_SYSTEM="$UBOOT_SYSTEM" \
+      UBOOT_VERSION="$UBOOT_VERSION" \
       EXTRA_CMDLINE="$EXTRA_CMDLINE" \
       SYSTEM_SIZE="$SYSTEM_SIZE" \
       SYSTEM_PART_START="$SYSTEM_PART_START" \

@@ -1,7 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - https://LibreELEC.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016 Team LibreELEC
-#      Copyright (C) 2016 kszaq
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,32 +16,20 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="qca9377-firmware-aml"
-PKG_VERSION="1.0.0-4"
-PKG_REV="1"
+PKG_NAME="aml-dtbtools"
+PKG_VERSION="cce100f"
 PKG_ARCH="any"
-PKG_LICENSE="Free-to-use"
-PKG_SITE="https://boundarydevices.com/product/bd_sdmac_wifi/"
-PKG_URL="http://linode.boundarydevices.com/repos/apt/ubuntu-relx/pool/main/q/qca-firmware/qca-firmware_${PKG_VERSION}_armhf.deb"
-PKG_SOURCE_DIR="qca-firmware-$PKG_VERSION"
-PKG_DEPENDS_TARGET="toolchain"
-PKG_SECTION="firmware"
-
-PKG_IS_ADDON="no"
+PKG_LICENSE="free"
+PKG_SITE="https://github.com/Wilhansen/aml-dtbtools"
+PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
+PKG_SECTION="tools"
+PKG_SHORTDESC="AML DTB Tools"
+PKG_LONGDESC="AML DTB Tools"
 PKG_AUTORECONF="no"
 
-unpack() {
-  mkdir -p "$BUILD/$PKG_NAME-$PKG_VERSION"
-  dpkg -x "$SOURCES/$PKG_NAME/$PKG_SOURCE_NAME" "$BUILD/$PKG_NAME-$PKG_VERSION"
-}
+PKG_MAKE_OPTS_HOST="dtbTool"
 
-make_target() {
-  : # nothing todo
-}
-
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib
-
-  cp -PR lib/firmware $INSTALL/usr/lib/firmware
-  cp -P usr/share/doc/qca-firmware/copyright $INSTALL/usr/lib/firmware/LICENSE.qca
+makeinstall_host() {
+  mkdir -p $TOOLCHAIN/bin
+    cp dtbTool $TOOLCHAIN/bin
 }

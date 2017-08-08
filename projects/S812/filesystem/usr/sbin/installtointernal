@@ -37,7 +37,7 @@ install_to_nand() {
     echo "done."
 
     echo -n "Writing kernel image..."
-    dd if="$IMAGE_KERNEL" of="/dev/boot" bs=64K status=none && sync
+    dd if="$IMAGE_KERNEL" of=/dev/boot bs=64k status=none
     echo "done."
 
     echo -n "Copying SYSTEM files..."

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#display_mode=$(cat /sys/class/display/mode)
+display_mode=$(cat /sys/class/display/mode)
 
 #if [ -z "$display_mode" ]; then
     display_mode="1080p60hz"
