@@ -5,7 +5,7 @@
 +
 +/ {
 +	model = "Amlogic";
-+	amlogic-dt-id = "gxl_p212_2g";
++	amlogic-dt-id = "kvim";
 +	compatible = "amlogic, Gxbb";
 +	interrupt-parent = <0x1>;
 +	#address-cells = <0x2>;
