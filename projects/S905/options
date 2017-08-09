@@ -39,7 +39,7 @@
         KERNEL_UBOOT_EXTRA_TARGET="odroidc2.dtb"
         ;;
       *)
-        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb kvim.dtb gxbb_p201.dtb gxbb_p201_2G.dtb"
+        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxbb_p201.dtb gxbb_p201_2G.dtb"
         ;;
     esac
 
