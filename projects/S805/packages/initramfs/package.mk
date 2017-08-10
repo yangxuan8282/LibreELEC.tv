@@ -57,9 +57,7 @@ post_install() {
     ln -sf /usr/bin $BUILD/initramfs/bin
     ln -sf /usr/sbin $BUILD/initramfs/sbin
 
-    rm $BUILD/initramfs/splash/splash-768.png
-    rm $BUILD/initramfs/splash/splash-1200.png
-    rm $BUILD/initramfs/splash/splash-2160.png
+    ln -sf busybox $BUILD/initramfs/usr/bin/fbset
 
     mkdir -p $BUILD/image/
     fakeroot -- sh -c \
