@@ -38,6 +38,9 @@
       m201d)
         KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201d.dtd meson8b_m201d.dtb"
         ;;
+      m201)
+        KERNEL_UBOOT_EXTRA_TARGET="meson8b_m201_1G.dtd meson8b_m201_1G.dtb"
+        ;;
     esac
 
   # Build Android kernel image using mkbootimg

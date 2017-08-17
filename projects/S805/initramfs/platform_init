@@ -1,10 +1,10 @@
 #!/bin/sh
 
-#display_mode=$(cat /sys/class/display/mode)
+display_mode=$(cat /sys/class/display/mode)
 
-#if [ -z "$display_mode" ]; then
+if [ -z "$display_mode" ]; then
     display_mode="1080p60hz"
-#fi
+fi
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
