@@ -61,11 +61,13 @@ post_install() {
     ln -sf /usr/bin $BUILD/initramfs/bin
     ln -sf /usr/sbin $BUILD/initramfs/sbin
 
-    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/fbset ]; then
-      cp $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/fbset $BUILD/initramfs/usr/bin/fbset
-    elif [ -f $PROJECT_DIR/$PROJECT/initramfs/fbset ]; then
-      cp $PROJECT_DIR/$PROJECT/initramfs/fbset $BUILD/initramfs/usr/bin/fbset
-    fi
+	ln -sf busybox $BUILD/initramfs/usr/bin/fbset
+
+#    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/fbset ]; then
+#      cp $PROJECT_DIR/$PROJECT/devices/$DEVICE/initramfs/fbset $BUILD/initramfs/usr/bin/fbset
+#    elif [ -f $PROJECT_DIR/$PROJECT/initramfs/fbset ]; then
+#      cp $PROJECT_DIR/$PROJECT/initramfs/fbset $BUILD/initramfs/usr/bin/fbset
+#    fi
 
     mkdir -p $BUILD/image/
     fakeroot -- sh -c \

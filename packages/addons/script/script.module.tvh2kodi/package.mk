@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2017 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,21 +16,31 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="abootimg"
-PKG_VERSION="543ab92"
+PKG_NAME="script.module.tvh2kodi"
+PKG_VERSION="003c06c"
+PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/codeworkx/abootimg"
-PKG_URL="${PKG_SITE}/archive/${PKG_VERSION}.tar.gz"
-PKG_SECTION="tools"
-PKG_SHORTDESC="abootimg"
-PKG_LONGDESC="abootimg"
-
-PKG_IS_ADDON="no"
+PKG_LICENSE="GPLv3"
+PKG_SITE="https://github.com/edit4ever/script.module.tvh2kodi"
+PKG_URL="https://github.com/edit4ever/script.module.tvh2kodi/archive/$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="xmlstarlet:host"
+PKG_SECTION=""
+PKG_SHORTDESC="Tvh2Kodi provides access to basic Tvheadend server settings from the Kodi interface."
+PKG_LONGDESC="Tvh2Kodi provides access to basic Tvheadend server settings from the Kodi interface."
 PKG_AUTORECONF="no"
 
+PKG_IS_ADDON="yes"
+
+make_target() {
+  :
+}
+
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/bin
-    cp abootimg $INSTALL/usr/bin
-    $STRIP $INSTALL/usr/bin/abootimg
+  :
+}
+
+addon() {
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID
+  cp -PR $PKG_BUILD/* $ADDON_BUILD/$PKG_ADDON_ID
+  cp $PKG_DIR/changelog.txt $ADDON_BUILD/$PKG_ADDON_ID
 }

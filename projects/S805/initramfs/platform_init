@@ -2,9 +2,9 @@
 
 display_mode=$(cat /sys/class/display/mode)
 
-if [ -z "$display_mode" ]; then
-    display_mode="1080p60hz"
-fi
+#if [ -z "$display_mode" ]; then
+#    display_mode="1080p60hz"
+#fi
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
@@ -13,7 +13,8 @@ for arg in $(cat /proc/cmdline); do
       hdmitx="${arg#*=}"
       ;;
     hdmimode=*)
-      display_mode="${arg#*=}"
+#      display_mode="${arg#*=}"
+      hdmimode="${arg#*=}"
       ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE="${arg#*=}"
@@ -27,12 +28,19 @@ for arg in $(cat /proc/cmdline); do
   esac
 done
 
+# Enable HDMI output if cable is connected and not already enabled by u-boot
+if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ] && [ "$display_mode" != "$hdmimode" ]; then
+  display_mode="$hdmimode"
+fi
+
 # Add information where to run LibreELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
   cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
   echo "$cmdline" > /proc/cmdline
 fi
+
+echo $display_mode > /sys/class/display/mode
 
 # Force enable CEC if configuration parameter not present or empty
 if [ -z "$hdmitx" ]; then
@@ -49,7 +57,7 @@ esac
 
 fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
 fbset -fb /dev/fb1 -g 32 32 32 32 32
-echo $display_mode > /sys/class/display/mode
+#echo $display_mode > /sys/class/display/mode
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
 

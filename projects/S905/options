@@ -42,7 +42,7 @@
         KERNEL_UBOOT_EXTRA_TARGET="kvim.dtb"
         ;;
       *)
-        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxbb_p201.dtb gxbb_p201_2G.dtb"
+        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxbb_p201.dtb gxbb_p201_2G.dtb gxl_p230_2g.dtb"
         ;;
     esac
 
@@ -52,7 +52,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="b649026"
+    KERNEL_VERSION="8c1f5c4"
     KERNEL_URL="https://github.com/kszaq/linux-amlogic-le/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-le-$KERNEL_VERSION*"
     KERNEL_PATCH_DIRS="amlogic-3.14"
