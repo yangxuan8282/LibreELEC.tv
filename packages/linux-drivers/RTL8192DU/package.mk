@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8192DU"
-PKG_VERSION="4201fd6"
+PKG_VERSION="5cb0486"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/lwfinger/rtl8192du"
@@ -31,12 +31,6 @@ PKG_LONGDESC="Realtek RTL8192DU Linux 3.x driver"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
-  export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
-  TARGET_PREFIX=aarch64-linux-gnu-
-fi
 
 pre_make_target() {
   unset LDFLAGS

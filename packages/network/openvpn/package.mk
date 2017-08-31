@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016-2017 Christian Hewitt (chewitt@libreelec.tv)
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 ################################################################################
 
 PKG_NAME="openvpn"
-PKG_VERSION="2.4.0"
+PKG_VERSION="2.4.1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://openvpn.net"

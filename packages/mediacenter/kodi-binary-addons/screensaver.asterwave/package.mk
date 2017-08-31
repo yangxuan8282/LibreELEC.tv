@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="screensaver.asterwave"
-PKG_VERSION="c39ed33"
-PKG_REV="1"
+PKG_VERSION="aea811d"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/screensaver.asterwave"

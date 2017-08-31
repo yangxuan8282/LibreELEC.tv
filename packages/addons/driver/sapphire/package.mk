@@ -18,7 +18,7 @@
 
 PKG_NAME="sapphire"
 PKG_VERSION="6.6"
-PKG_REV="102"
+PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="https://libreelec.tv"
@@ -32,12 +32,6 @@ PKG_AUTORECONF="no"
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Sapphire Remote Driver"
 PKG_ADDON_TYPE="xbmc.service"
-
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
-  export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
-  TARGET_PREFIX=aarch64-linux-gnu-
-fi
 
 if [ -f $SYSROOT_PREFIX/usr/include/linux/input-event-codes.h ]; then
   INPUT_H="$SYSROOT_PREFIX/usr/include/linux/input-event-codes.h"

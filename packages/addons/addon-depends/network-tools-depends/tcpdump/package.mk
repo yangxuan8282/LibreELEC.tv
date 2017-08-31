@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016 Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ pre_configure_target() {
   sed -i -e 's/ac_cv_linux_vers=unknown/ac_cv_linux_vers=2/' ../configure
 }
 
-pre_make_target() {
+pre_build_target() {
   # discard native system includes
   sed -i "s%-I/usr/include%%g" Makefile
 }

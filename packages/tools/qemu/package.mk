@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016- Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="qemu"
-PKG_VERSION="2.7.0"
+PKG_VERSION="2.8.1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://wiki.qemu.org"

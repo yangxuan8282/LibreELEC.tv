@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="RTL8192EU"
-PKG_VERSION="c23c613"
+PKG_VERSION="addef14"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/Mange/rtl8192eu-linux-driver"
@@ -31,12 +31,6 @@ PKG_LONGDESC="Realtek RTL8192EU Linux 3.x driver"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
-  export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
-  TARGET_PREFIX=aarch64-linux-gnu-
-fi
 
 pre_make_target() {
   unset LDFLAGS

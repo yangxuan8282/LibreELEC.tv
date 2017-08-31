@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="screensaver.pyro"
-PKG_VERSION="4810d75"
-PKG_REV="1"
+PKG_VERSION="2eaaa39"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/screensaver.pyro"

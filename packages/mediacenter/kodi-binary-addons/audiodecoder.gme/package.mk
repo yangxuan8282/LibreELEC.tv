@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="audiodecoder.gme"
-PKG_VERSION="4f8c49a"
-PKG_REV="1"
+PKG_VERSION="7458853"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/audiodecoder.gme"

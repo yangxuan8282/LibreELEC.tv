@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="visualization.fishbmc"
-PKG_VERSION="93d8845"
-PKG_REV="1"
+PKG_VERSION="c5835e0"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"

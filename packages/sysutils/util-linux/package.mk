@@ -17,10 +17,11 @@
 ################################################################################
 
 PKG_NAME="util-linux"
-PKG_VERSION="2.29"
+PKG_VERSION="2.29.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_URL="http://www.kernel.org/pub/linux/utils/util-linux/v2.29/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_DEPENDS_HOST="toolchain"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain"
 PKG_SECTION="system"
@@ -36,7 +37,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --enable-tls \
                           --disable-all-programs \
                           --enable-chsh-only-listed \
-                          --enable-libmount-force-mountinfo \
                           --disable-bash-completion \
                           --disable-colors-default \
                           --disable-pylibmount \
@@ -51,7 +51,6 @@ UTILLINUX_CONFIG_DEFAULT="--disable-gtk-doc \
                           --without-ncurses \
                           --without-readline \
                           --without-slang \
-                          --without-termcap \
                           --without-tinfo \
                           --without-utempter \
                           --without-util \

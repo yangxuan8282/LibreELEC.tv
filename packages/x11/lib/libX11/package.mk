@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="libX11"
-PKG_VERSION="1.6.4"
+PKG_VERSION="1.6.5"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.x.org/"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain xproto:host xproto util-macros xextproto xcmiscproto bigreqsproto kbproto inputproto xtrans libXau libxcb util-macros"
+PKG_DEPENDS_TARGET="toolchain xproto:host xproto util-macros xextproto xcmiscproto bigreqsproto kbproto inputproto xtrans libXau libxcb"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libx11: The X11 library"
 PKG_LONGDESC="LibX11 is the main X11 library containing all the client-side code to access the X11 windowing system."

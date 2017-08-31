@@ -18,7 +18,7 @@
 
 PKG_NAME="lcdd"
 PKG_VERSION="466edd3"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://lcdproc.org/"
@@ -33,8 +33,6 @@ PKG_AUTORECONF="yes"
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="LCDproc"
 PKG_ADDON_TYPE="xbmc.service"
-
-CFLAGS="$CFLAGS -DHAVE_SYS_POLL_H=1"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-ft-prefix=$SYSROOT_PREFIX/usr \
                            --enable-libusb \

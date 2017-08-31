@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="busybox"
-PKG_VERSION="1.25.1"
+PKG_VERSION="1.26.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.busybox.net"
@@ -174,9 +174,6 @@ makeinstall_target() {
     cp $PKG_DIR/config/inputrc $INSTALL/etc
     cp $PKG_DIR/config/httpd.conf $INSTALL/etc
     cp $PKG_DIR/config/suspend-modules.conf $INSTALL/etc
-
-  mkdir -p $INSTALL/usr/config/sysctl.d
-    cp $PKG_DIR/config/transmission.conf $INSTALL/usr/config/sysctl.d
 
   # /etc/fstab is needed by...
     touch $INSTALL/etc/fstab

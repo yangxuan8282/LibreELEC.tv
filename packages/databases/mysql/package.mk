@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="mysql"
-PKG_VERSION="5.7.17"
+PKG_VERSION="5.7.18"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://www.mysql.com"
 PKG_URL="http://ftp.gwdg.de/pub/misc/$PKG_NAME/Downloads/MySQL-5.7/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS_HOST="zlib:host"
+PKG_DEPENDS_HOST="toolchain zlib:host"
 PKG_DEPENDS_TARGET="toolchain zlib netbsd-curses openssl boost mysql:host"
 PKG_SECTION="database"
 PKG_SHORTDESC="mysql: A database server"
@@ -56,6 +56,12 @@ PKG_CMAKE_OPTS_HOST="-DCMAKE_BUILD_TYPE=Release \
                      -DLOCAL_BOOST_DIR=$(get_build_dir boost) \
                      -DWITH_UNIT_TESTS=OFF \
                      -DWITH_ZLIB=bundled"
+
+if [ "$DEBUG" = yes -a "$TARGET_ARCH" = aarch64 ]; then
+  pre_configure_target() {
+    strip_lto
+  }
+fi
 
 make_host() {
   make comp_err

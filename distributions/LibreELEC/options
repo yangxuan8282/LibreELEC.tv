@@ -12,7 +12,7 @@
 
 # Welcome Message for e.g. SSH Server (up to 5 Lines)
   GREETING0="##############################################"
-  GREETING1="#                  LibreELEC                 #"
+  GREETING1="#                 LibreELEC                  #"
   GREETING2="#            https://libreelec.tv            #"
   GREETING3="##############################################"
   GREETING4=""
@@ -63,7 +63,7 @@
   KODI_DVDCSS_SUPPORT="yes"
 
 # additional drivers to install:
-# for a list of additinoal drivers see packages/linux-drivers
+# for a list of additional drivers see packages/linux-drivers
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8188EU RTL8812AU"
@@ -136,7 +136,7 @@
 # Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia)
 # Space separated list is supported,
 # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia"
-  GRAPHIC_DRIVERS="r300 r600 radeonsi i915 i965 nvidia nvidia-legacy vmware"
+  GRAPHIC_DRIVERS="r300 r600 radeonsi i915 i965 nvidia vmware virtio"
 
 # build and install remote support (yes / no)
   REMOTE_SUPPORT="yes"

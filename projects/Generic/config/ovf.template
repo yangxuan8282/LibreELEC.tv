@@ -6,7 +6,7 @@ xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemS
   </References>
   <DiskSection>
     <Info>Virtual disk information</Info>
-    <Disk ovf:capacity="@DISK_SIZE@" ovf:diskId="disk" ovf:fileRef="file" ovf:format="http://www.vmware.com/interfaces/specifications/vmdk.html#streamOptimized"/>
+    <Disk ovf:capacity="548" ovf:capacityAllocationUnits="byte * 2^20" ovf:diskId="disk" ovf:fileRef="file" ovf:format="http://www.vmware.com/interfaces/specifications/vmdk.html#streamOptimized"/>
   </DiskSection>
   <NetworkSection>
     <Info>The list of logical networks</Info>
@@ -21,8 +21,8 @@ xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemS
       <Info>Meta-information about the installed software</Info>
       <Product>LibreELEC</Product>
       <Vendor>LibreELEC</Vendor>
-      <ProductUrl>https://libreelec.tv</ProductUrl>
-      <VendorUrl>https://libreelec.tv</VendorUrl>
+      <ProductUrl>http://libreelec.tv</ProductUrl>
+      <VendorUrl>http://libreelec.tv</VendorUrl>
     </ProductSection>
     <AnnotationSection>
       <Info>A human-readable annotation</Info>

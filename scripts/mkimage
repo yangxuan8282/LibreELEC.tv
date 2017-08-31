@@ -121,7 +121,7 @@ fi
 
   if [ "$BOOTLOADER" = "syslinux" ]; then
     mformat -v "$FAT_VOLUME_LABEL" -N "$FAT_SERIAL_NUMBER" ::
-  elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
+  elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" -o "$BOOTLOADER" = "u-boot-v2" ]; then
     mformat -v "$FAT_VOLUME_LABEL" ::
   fi
   sync
@@ -201,7 +201,7 @@ EOF
       mcopy -s $RELEASE_DIR/3rdparty/bootloader/overlays ::
     fi
 
-elif [ "$BOOTLOADER" = "u-boot" ]; then
+elif [ "$BOOTLOADER" = "u-boot" -o "$BOOTLOADER" = "u-boot-v2" ]; then
   # create bootloader configuration
     echo "image: creating bootloader configuration..."
     if [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/uEnv-$UBOOT_SYSTEM.txt" ]; then
@@ -326,34 +326,15 @@ done
   echo "image: checking filesystem on part1..."
   fsck -n $LE_TMP/part1.fat >"$SAVE_ERROR" 2>&1 || show_error
 
-# create virtual image
+# create virtual images
   if [ "$PROJECT" = "Generic" ]; then
     echo "image: creating open virtual appliance..."
-    # duplicate $DISK so anything we do to it directly doesn't effect original
-    dd if="$DISK" of="${DISK/img/tmp}" bs=1M >"$SAVE_ERROR" 2>&1 || show_error
-    # change syslinux default to 'run'
-    echo "image: modifying fs on part1 for open virtual appliance..."
-    sed -i "/DEFAULT/ s/installer/run/" "$LE_TMP"/syslinux.cfg
-    # FIXME: an unalias should work here, but it does not; call mcopy directly
-    $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/syslinux.cfg ::/EFI/BOOT
-    $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/syslinux.cfg ::
-    sync
-    # merge modified part1 back to tmp disk image
-    echo "image: merging part1 back to open virtual appliance..."
-    dd if="$LE_TMP/part1.fat" of="${DISK/img/tmp}" bs=512 seek="$SYSTEM_PART_START" conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
-    # create vmdk from tmp $DISK
-    qemu-img convert -O vmdk -o subformat=streamOptimized "${DISK/img/tmp}" "${DISK/img/vmdk}"
-    # generate ovf from template
-    sed -e "s,@DISTRO@,$DISTRO,g" -e "s,@DISK@,$(basename ${DISK/.img}),g" \
-        -e "s,@DISK_SIZE@,$(($DISK_SIZE*1024*1024)),g" \
-        $PROJECT_DIR/$PROJECT/config/ovf.template > ${DISK/img/ovf}
-    # combine ovf and vmdk into official ova
-    tar -C $TARGET_IMG -cf ${DISK/img/ova} $(basename ${DISK/img/ovf}) $(basename ${DISK/img/vmdk})
+    qemu-img convert -O vmdk -o subformat=streamOptimized "$DISK" "$DISK.vmdk"
+    sed -e "s,@DISTRO@,$DISTRO,g" -e "s,@DISK@,$(basename $DISK),g" -e "s,@DISK_SIZE@,$(ls -l $DISK.vmdk | awk '{print $5}'),g" $PROJECT_DIR/$PROJECT/config/ovf.template > $DISK.ovf
+    tar -C $TARGET_IMG -cf $DISK.ova $(basename $DISK).ovf $(basename $DISK).vmdk
     echo "image: cleaning up..."
-    # remove tmp $DISK, vmdk and ovf
-    rm ${DISK/img/tmp} ${DISK/img/vmdk} ${DISK/img/ovf}
-    # set owner
-    [ -n "$SUDO_USER" ] && chown $SUDO_USER: ${DISK/img/ova}
+    rm $DISK.vmdk $DISK.ovf
+    [ -n "$SUDO_USER" ] && chown $SUDO_USER: $DISK.ova
   fi
 
 # gzip

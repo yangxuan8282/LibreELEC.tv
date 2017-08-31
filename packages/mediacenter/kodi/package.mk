@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="7fc6da0"
+PKG_VERSION="423072a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL="https://github.com/xbmc/xbmc/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="xbmc-$PKG_VERSION*"
-PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host xmlstarlet:host Python zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt yajl sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun"
+PKG_DEPENDS_TARGET="toolchain JsonSchemaBuilder:host TexturePacker:host xmlstarlet:host Python zlib systemd pciutils lzo pcre swig:host libass curl fontconfig fribidi tinyxml libjpeg-turbo freetype libcdio taglib libxml2 libxslt rapidjson sqlite ffmpeg crossguid giflib libdvdnav libhdhomerun libfmt"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi: Kodi Mediacenter"
 PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or XBMC) is a free and open source cross-platform media player and home entertainment system software with a 10-foot user interface designed for the living-room TV. Its graphical user interface allows the user to easily manage video, photos, podcasts, and music from a computer, optical disk, local network, and the internet using a remote control."
@@ -31,42 +31,22 @@ PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or X
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-case $PROJECT in
-  S805|S812|S905|S912)
-    PKG_PATCH_DIRS="amlogic-sX05"
-    if [ "$TARGET_ARCH" = "arm" ]; then
-      CFLAGS="$CFLAGS -mthumb"
-      CXXFLAGS="$CXXFLAGS -mthumb"
-    fi
-    ;;
-esac
+get_graphicdrivers
 
-PKG_CMAKE_SCRIPT="$PKG_BUILD/project/cmake/CMakeLists.txt"
-
-  get_graphicdrivers
-
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
+PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dbus"
 
 if [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
-  KODI_XORG="-DENABLE_X11=ON"
-else
-  KODI_XORG="-DENABLE_X11=OFF"
+  KODI_XORG="-DCORE_PLATFORM_NAME=x11"
 fi
 
-if [ ! "$OPENGL" = "no" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL glu"
-  KODI_OPENGL="-DENABLE_OPENGL=ON"
-else
-  KODI_OPENGL="-DENABLE_OPENGL=OFF"
-fi
+#if [ ! "$OPENGL" = "no" ]; then
+#  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGL glu"
+#fi
 
-if [ "$OPENGLES_SUPPORT" = yes ]; then
+#if [ "$OPENGLES_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $OPENGLES"
-  KODI_OPENGLES="-DENABLE_OPENGLES=ON"
-else
-  KODI_OPENGLES="-DENABLE_OPENGLES=OFF"
-fi
+#fi
 
 if [ "$ALSA_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET alsa-lib"
@@ -186,7 +166,7 @@ else
 fi
 
 if [ "$VAAPI_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libva-intel-driver"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET intel-vaapi-driver"
   KODI_VAAPI="-DENABLE_VAAPI=ON"
 else
   KODI_VAAPI="-DENABLE_VAAPI=OFF"
@@ -198,17 +178,27 @@ else
   KODI_ARCH="-DWITH_ARCH=$TARGET_ARCH"
 fi
 
+if [ "$DEVICE" = "Slice" -o "$DEVICE" = "Slice3" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET led_tools"
+fi
+
 if [ ! "$KODIPLAYER_DRIVER" = default ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET $KODIPLAYER_DRIVER"
   if [ "$KODIPLAYER_DRIVER" = bcm2835-driver ]; then
-    KODI_PLAYER="-DENABLE_MMAL=ON -DCORE_SYSTEM_NAME=rbpi"
+    KODI_PLAYER="-DCORE_SYSTEM_NAME=rbpi"
+  elif [ "$KODIPLAYER_DRIVER" = mesa ]; then
+    KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm"
+    CFLAGS="$CFLAGS -DMESA_EGL_NO_X11_HEADERS"
+    CXXFLAGS="$CXXFLAGS -DMESA_EGL_NO_X11_HEADERS"
   elif [ "$KODIPLAYER_DRIVER" = libfslvpuwrap ]; then
-    KODI_PLAYER="-DENABLE_IMX=ON"
+    KODI_PLAYER="-DCORE_PLATFORM_NAME=imx"
     CFLAGS="$CFLAGS -DHAS_IMXVPU -DLINUX -DEGL_API_FB"
     CXXFLAGS="$CXXFLAGS -DHAS_IMXVPU -DLINUX -DEGL_API_FB"
   elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
-    KODI_PLAYER="-DENABLE_AML=ON"
+    KODI_PLAYER="-DCORE_PLATFORM_NAME=aml"
   fi
+elif [ -n "$KODIPLAYER_PLATFORM" ] ; then
+  KODI_PLAYER="-DCORE_PLATFORM_NAME=$KODIPLAYER_PLATFORM"
 fi
 
 KODI_LIBDVD="$KODI_DVDCSS \
@@ -218,8 +208,10 @@ KODI_LIBDVD="$KODI_DVDCSS \
 PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        -DWITH_TEXTUREPACKER=$TOOLCHAIN/bin/TexturePacker \
                        -DDEPENDS_PATH=$PKG_BUILD/depends \
+                       -DPYTHON_EXECUTABLE=$TOOLCHAIN/bin/python2.7 \
                        -DPYTHON_INCLUDE_DIRS=$SYSROOT_PREFIX/usr/include/python2.7 \
                        -DGIT_VERSION=$PKG_VERSION \
+                       -DWITH_FFMPEG=$(get_build_dir ffmpeg) \
                        -DENABLE_INTERNAL_FFMPEG=OFF \
                        -DFFMPEG_INCLUDE_DIRS=$SYSROOT_PREFIX/usr \
                        -DENABLE_INTERNAL_CROSSGUID=OFF \
@@ -233,8 +225,6 @@ PKG_CMAKE_OPTS_TARGET="-DNATIVEPREFIX=$TOOLCHAIN \
                        -DENABLE_EVENTCLIENTS=ON \
                        -DENABLE_LDGOLD=ON \
                        $KODI_ARCH \
-                       $KODI_OPENGL \
-                       $KODI_OPENGLES \
                        $KODI_OPENMAX \
                        $KODI_VDPAU \
                        $KODI_VAAPI \
@@ -276,8 +266,6 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/share/kodi/addons/visualization.vortex
   rm -rf $INSTALL/usr/share/xsessions
 
-  mv $INSTALL/usr/lib/python2.7/dist-packages $INSTALL/usr/lib/python2.7/site-packages
-
   mkdir -p $INSTALL/usr/lib/kodi
     cp $PKG_DIR/scripts/kodi-config $INSTALL/usr/lib/kodi
     cp $PKG_DIR/scripts/kodi.sh $INSTALL/usr/lib/kodi
@@ -298,41 +286,31 @@ post_makeinstall_target() {
     cp -R $PKG_DIR/config/repository.libreelec.tv $INSTALL/usr/share/kodi/addons
     $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/kodi/addons/repository.libreelec.tv/addon.xml
     cp -R $PKG_DIR/config/repository.kodi.game $INSTALL/usr/share/kodi/addons
+    cp -R $PKG_DIR/config/repository.retroplayer.libreelec.tv $INSTALL/usr/share/kodi/addons
+    $SED "s|@ADDON_URL@|http://lrusak.libreelec.tv/addons/$ADDON_PATH|g" $INSTALL/usr/share/kodi/addons/repository.retroplayer.libreelec.tv/addon.xml
 
   mkdir -p $INSTALL/usr/share/kodi/config
-    cp $PKG_DIR/config/guisettings.xml $INSTALL/usr/share/kodi/config
-    cp $PKG_DIR/config/sources.xml $INSTALL/usr/share/kodi/config
-
-# install project specific configs
-    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/guisettings.xml ]; then
-      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/guisettings.xml $INSTALL/usr/share/kodi/config
-    elif [ -f $PROJECT_DIR/$PROJECT/kodi/guisettings.xml ]; then
-      cp -R $PROJECT_DIR/$PROJECT/kodi/guisettings.xml $INSTALL/usr/share/kodi/config
-    fi
-
-    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml ]; then
-      cp -R $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml $INSTALL/usr/share/kodi/config
-    elif [ -f $PROJECT_DIR/$PROJECT/kodi/sources.xml ]; then
-      cp -R $PROJECT_DIR/$PROJECT/kodi/sources.xml $INSTALL/usr/share/kodi/config
-    fi
-
-  mkdir -p $INSTALL/usr/share/kodi/system/
-    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/advancedsettings.xml ]; then
-      cp $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/advancedsettings.xml $INSTALL/usr/share/kodi/system/
-    elif [ -f $PROJECT_DIR/$PROJECT/kodi/advancedsettings.xml ]; then
-      cp $PROJECT_DIR/$PROJECT/kodi/advancedsettings.xml $INSTALL/usr/share/kodi/system/
-    else
-      cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/kodi/system/
-    fi
-
   mkdir -p $INSTALL/usr/share/kodi/system/settings
-    if [ -n "$DEVICE" -a -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml ]; then
-      cp $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml $INSTALL/usr/share/kodi/system/settings
-    elif [ -f $PROJECT_DIR/$PROJECT/kodi/appliance.xml ]; then
-      cp $PROJECT_DIR/$PROJECT/kodi/appliance.xml $INSTALL/usr/share/kodi/system/settings
-    else
-      cp $PKG_DIR/config/appliance.xml $INSTALL/usr/share/kodi/system/settings
-    fi
+
+  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/guisettings.xml \
+                                $PROJECT_DIR/$PROJECT/kodi/guisettings.xml \
+                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/guisettings.xml \
+                                > $INSTALL/usr/share/kodi/config/guisettings.xml
+
+  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/sources.xml \
+                                $PROJECT_DIR/$PROJECT/kodi/sources.xml \
+                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/sources.xml \
+                                > $INSTALL/usr/share/kodi/config/sources.xml
+
+  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/advancedsettings.xml \
+                                $PROJECT_DIR/$PROJECT/kodi/advancedsettings.xml \
+                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/advancedsettings.xml \
+                                > $INSTALL/usr/share/kodi/system/advancedsettings.xml
+
+  $PKG_DIR/scripts/xml_merge.py $PKG_DIR/config/appliance.xml \
+                                $PROJECT_DIR/$PROJECT/kodi/appliance.xml \
+                                $PROJECT_DIR/$PROJECT/devices/$DEVICE/kodi/appliance.xml \
+                                > $INSTALL/usr/share/kodi/system/settings/appliance.xml
 
   # update addon manifest
   ADDON_MANIFEST=$INSTALL/usr/share/kodi/system/addon-manifest.xml
@@ -342,6 +320,7 @@ post_makeinstall_target() {
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "os.libreelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "os.openelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.libreelec.tv" $ADDON_MANIFEST
+  xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "repository.retroplayer.libreelec.tv" $ADDON_MANIFEST
   xmlstarlet ed -L --subnode "/addons" -t elem -n "addon" -v "service.libreelec.settings" $ADDON_MANIFEST
 
   # more binaddons cross compile badness meh
@@ -355,12 +334,6 @@ post_makeinstall_target() {
   fi
 
   debug_strip $INSTALL/usr/lib/kodi/kodi.bin
-
-  case $PROJECT in
-    S805|S812|S905|S912)
-      cp $PKG_DIR/scripts/aml-hdmimonitor.sh $INSTALL/usr/lib/kodi/aml-hdmimonitor.sh
-      ;;
-  esac
 }
 
 post_install() {
@@ -373,10 +346,4 @@ post_install() {
   enable_service kodi-waitonnetwork.service
   enable_service kodi.service
   enable_service kodi-lirc-suspend.service
-
-  case $PROJECT in
-    S805|S812|S905|S912)
-      enable_service kodi-aml-hdmimonitor.service
-      ;;
-  esac
 }

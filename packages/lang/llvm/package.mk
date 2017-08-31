@@ -17,12 +17,13 @@
 ################################################################################
 
 PKG_NAME="llvm"
-PKG_VERSION="3.9.0"
+PKG_VERSION="4.0.0"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://llvm.org/"
 PKG_URL="http://llvm.org/releases/$PKG_VERSION/${PKG_NAME}-${PKG_VERSION}.src.tar.xz"
 PKG_SOURCE_DIR="${PKG_NAME}-${PKG_VERSION}.src"
+PKG_DEPENDS_HOST="toolchain"
 PKG_DEPENDS_TARGET="toolchain llvm:host zlib"
 PKG_SECTION="lang"
 PKG_SHORTDESC="llvm: Low Level Virtual Machine"
@@ -48,7 +49,8 @@ PKG_CMAKE_OPTS_HOST="-DLLVM_INCLUDE_TOOLS=ON \
                      -DLLVM_ENABLE_ASSERTIONS=OFF \
                      -DLLVM_ENABLE_WERROR=OFF \
                      -DLLVM_ENABLE_ZLIB=OFF \
-                     -DLLVM_OPTIMIZED_TABLEGEN=ON"
+                     -DLLVM_OPTIMIZED_TABLEGEN=ON \
+                     -DCMAKE_INSTALL_RPATH=$TOOLCHAIN/lib"
 
 make_host() {
   make llvm-config llvm-tblgen

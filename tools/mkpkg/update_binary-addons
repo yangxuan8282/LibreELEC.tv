@@ -96,14 +96,13 @@ validate_pkg_url() {
   [ "${url1}" = "${url2}" ] && return 0 || return 1
 }
 
-if [ ! -d $KODI_DIR ] ; then
-  echo "meh.. $KODI_DIR does not exist"
-  exit 127
+if [ ! -d ${KODI_DIR} ] ; then
+  git_clone https://github.com/xbmc/xbmc ${KODI_BRANCH} ${KODI_DIR}
 fi
 
 # p8-platform
-REPO=$(cat $KODI_DIR/project/cmake/addons/depends/common/p8-platform/p8-platform.txt | awk '{print $2}')
-GIT_HASH=$(cat $KODI_DIR/project/cmake/addons/depends/common/p8-platform/p8-platform.txt | awk '{print $3}')
+REPO=$(cat $KODI_DIR/cmake/addons/depends/common/p8-platform/p8-platform.txt | awk '{print $2}')
+GIT_HASH=$(cat $KODI_DIR/cmake/addons/depends/common/p8-platform/p8-platform.txt | awk '{print $3}')
 PKG_NAME="p8-platform"
 
 git_clone $REPO master $PKG_NAME.git $GIT_HASH
@@ -115,8 +114,8 @@ fi
 rm -rf $PKG_NAME.git
 
 # kodi-platform
-REPO=$(cat $KODI_DIR/project/cmake/addons/depends/common/kodi-platform/kodi-platform.txt | awk '{print $2}')
-GIT_HASH=$(cat $KODI_DIR/project/cmake/addons/depends/common/kodi-platform/kodi-platform.txt | awk '{print $3}')
+REPO=$(cat $KODI_DIR/cmake/addons/depends/common/kodi-platform/kodi-platform.txt | awk '{print $2}')
+GIT_HASH=$(cat $KODI_DIR/cmake/addons/depends/common/kodi-platform/kodi-platform.txt | awk '{print $3}')
 PKG_NAME="kodi-platform"
 
 git_clone $REPO master $PKG_NAME.git $GIT_HASH
@@ -130,13 +129,16 @@ fi
 rm -rf $PKG_NAME.git
 
 # addons
-for addontxt in $KODI_DIR/project/cmake/addons/bootstrap/repositories/*-addons.txt ; do
+for addontxt in $KODI_DIR/cmake/addons/bootstrap/repositories/*-addons.txt ; do
   ADDONS=$(cat $addontxt | awk '{print $1}')
   ADDONREPO=$(cat $addontxt | awk '{print $2}')
   GIT_HASH=$(cat $addontxt | awk '{print $3}')
   git_clone $ADDONREPO ${KODI_BRANCH} $ADDONS.git $GIT_HASH
   for addon in $ADDONS.git/*.*/ ; do
     ADDON=$(basename $addon)
+
+    [[ ${ADDON} =~ ^game.* ]] && continue # ignore game.* addons - handled by update_retroplayer-addons
+
     REPO=$(cat $addon/$ADDON.txt | awk '{print $2}')
     GIT_HASH=$(cat $addon/$ADDON.txt | awk '{print $3}')
     PKG_NAME="$ADDON"
@@ -166,12 +168,17 @@ for addontxt in $KODI_DIR/project/cmake/addons/bootstrap/repositories/*-addons.t
       SKIPPED_ADDONS="$SKIPPED_ADDONS $ADDON"
     fi
   done
-  echo "followed addons was skipped, please add packages for this:"
-  echo "$SKIPPED_ADDONS"
+
+  echo
+  echo "The following addons were skipped, please add packages for these addons:"
+  echo "[${SKIPPED_ADDONS}]"
+  echo
 done
 
 # finally, any other unofficial addons
 for ADDON in $(ls -1 ../../packages/mediacenter/kodi-binary-addons); do
+  [[ ${ADDON} =~ ^game.* ]] && continue # ignore game.* addons - handled by update_retroplayer-addons
+
   # ignore already processed addons
   echo -e "${PROCESSED}" | grep -qE "^${ADDON}$" && continue
 

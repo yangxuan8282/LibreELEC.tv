@@ -18,7 +18,7 @@
 
 PKG_NAME="syncthing"
 PKG_VERSION="0.14.29"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="MPLv2"
 PKG_SITE="https://syncthing.net/"
@@ -70,16 +70,6 @@ configure_target() {
       esac
       ;;
   esac
-
-  export GOOS=linux
-  export CGO_ENABLED=1
-  export CGO_NO_EMULATION=1
-  export CGO_CFLAGS=$CFLAGS
-  export LDFLAGS="-w -linkmode external -extldflags -Wl,--unresolved-symbols=ignore-in-shared-libs -extld $CC -X main.Version=v$PKG_VERSION"
-  export GOLANG=$TOOLCHAIN/lib/golang/bin/go
-  export GOPATH=$PKG_BUILD/src/github.com/syncthing/syncthing:$PKG_BUILD/vendor:$PKG_BUILD/Godeps/_workspace
-  export GOROOT=$TOOLCHAIN/lib/golang
-  export PATH=$PATH:$GOROOT/bin
 }
 
 make_target() {
