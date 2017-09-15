@@ -267,7 +267,7 @@ fi # bootloader
 echo "image: make autoscript..."
 
 if [ "$UBOOT_VERSION" != "hardkernel" ]; then
-  for src in $INSTALL_SRC_DIR/*autoscript.src ; do
+  for src in $INSTALL_SRC_DIR/*autoscript*.src ; do
     if [ -e "$src" ] ; then
       $MKIMAGE_TOOL_CMD "$src" "$LE_TMP/$(basename $src .src)"
       mcopy "$LE_TMP/$(basename $src .src)" ::
