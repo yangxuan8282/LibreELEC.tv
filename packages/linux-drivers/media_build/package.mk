@@ -54,7 +54,7 @@ make_target() {
     if [ -f $PKG_DIR/config/generic.config ]; then
       cp $PKG_DIR/config/generic.config v4l/.config
     fi
-  elif [ "$PROJECT" != "S805" ] && [ "$PROJECT" != "S812" ] && [ "$PROJECT" != "S905" ] && [ "$PROJECT" != "S912" ]; then
+  elif [ "$PROJECT" != "S805" ] && [ "$PROJECT" != "S905" ] && [ "$PROJECT" != "S912" ]; then
     if [ -f $PKG_DIR/config/usb.config ]; then
       cp $PKG_DIR/config/usb.config v4l/.config
     fi
@@ -85,7 +85,9 @@ make_target() {
       cp -a "$DVB_TV_AML_DIR" "linux/drivers/media/dvb_tv"
       echo "obj-y += dvb_tv/" >> "linux/drivers/media/Makefile"
     fi 
-    echo "obj-y += amlogic/dvb_tv/" >> "linux/drivers/media/Makefile"
+    if [ "$PROJECT" = "S905" ]; then
+      echo "obj-y += amlogic/dvb_tv/" >> "linux/drivers/media/Makefile"
+    fi
   fi
 
   make VER=$KERNEL_VER SRCDIR=$(kernel_path)

@@ -191,7 +191,7 @@ index 0000000..eb46cdd
 +                compatible = "amlogic,vdec";
 +                dev_name = "vdec.0";
 +                status = "okay";
-+								reserve-memory = <0x04000000>; // 64M
++								reserve-memory = <0x10000000>; // 256M
 +//		reserve-iomap = "true";
 +        };
 +///	-	picture decoder
@@ -205,7 +205,7 @@ index 0000000..eb46cdd
 +		status = "okay";
 +                share-memory-name = "vdec0";
 +                share-memory-offset = <0>;
-+                share-memory-size = <0x02000000>; //64M
++                share-memory-size = <0x04000000>; //64M
 +	};
 +
 +/// ***************************************************************************************
