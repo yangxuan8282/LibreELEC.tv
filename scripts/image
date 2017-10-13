@@ -253,7 +253,6 @@ if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   fi
   for extra_target in $KERNEL_UBOOT_EXTRA_TARGET; do
     LDFLAGS="" make $extra_target 
-#> /dev/null
   done
   DTB_BLOBS=($(ls arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb 2>/dev/null || true))
   DTB_BLOBS_COUNT="${#DTB_BLOBS[@]}"
@@ -262,7 +261,7 @@ if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   if [ "$DTB_BLOBS_COUNT" -gt 1 ]; then
     $TOOLCHAIN/bin/dtbTool -o arch/$TARGET_KERNEL_ARCH/boot/dtb.img -p scripts/dtc/ arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/
   elif [ "$DTB_BLOBS_COUNT" -eq 1 ]; then
-    cp -f $DTB_BLOBS $DTB_BLOB_OUTPUT
+    cp -PR $DTB_BLOBS $DTB_BLOB_OUTPUT
   else
     ANDROID_BOOTIMG_SECOND=""
   fi
