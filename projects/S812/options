@@ -7,6 +7,7 @@
     TARGET_CPU="cortex-a9"
     TARGET_FLOAT="hard"
     TARGET_FPU="neon-fp16"
+    TARGET_FEATURES="32bit neon"
 
   # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
     BOOTLOADER="u-boot"
@@ -48,7 +49,7 @@
   # Kernel to use. values can be:
   # default:  default mainline kernel
     LINUX="custom"
-    KERNEL_VERSION="b69865e"
+    KERNEL_VERSION="1be06c2"
     KERNEL_URL="https://github.com/kszaq/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
