@@ -1,10 +1,10 @@
 #!/bin/sh
 
-display_mode=$(cat /sys/class/display/mode)
+#display_mode=$(cat /sys/class/display/mode)
 
-if [ -z "$display_mode" ]; then
+#if [ -z "$display_mode" ]; then
     display_mode="720p"
-fi
+#fi
 
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
@@ -73,3 +73,7 @@ for part in /sys/block/*/queue/add_random; do
 done
 
 echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
+
+# Use hotplug governor for m201d board
+#[ $(cat /proc/device-tree/amlogic-dt-id) = "m8b_m201C_512M" ] && 
+echo hotplug > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor

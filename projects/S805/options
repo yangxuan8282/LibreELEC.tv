@@ -2,8 +2,8 @@
 # setup system defaults
 ################################################################################
 
-    if [ -z "$SYSTEM" ]; then
-      SYSTEM="MXQ"
+    if [ -z "$BOARD" ]; then
+      BOARD="MXQ"
     fi
 
   # Setup controls which processor should be targeted for generated code.
@@ -28,7 +28,7 @@
     KERNEL_TARGET="uImage"
 
   # Kernel extra targets to build
-    case $SYSTEM in
+    case $BOARD in
       MXQ)
         KERNEL_UBOOT_EXTRA_TARGET="meson8b_mxq.dtd meson8b_mxq.dtb"
         ;;
