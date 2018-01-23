@@ -18,8 +18,21 @@
   # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
     BOOTLOADER="u-boot"
 
+  # u-boot version to use (default)
+    UBOOT_VERSION=""
+
+  # Configuration for u-boot
+    UBOOT_CONFIG=""
+
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE=""
+
   # Kernel target
     KERNEL_TARGET="Image.lzo"
+
+  # Kernel and u-boot options
+    KERNEL_UBOOT_EXTRA_TARGET=""
+
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -29,28 +42,6 @@
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=""
-
-  # Kernel and u-boot options
-    case $SYSTEM in
-      C2)
-        UBOOT_VERSION="hardkernel"
-        UBOOT_CONFIG="odroidc2_defconfig"
-        UBOOT_CONFIGFILE="boot.ini"
-        KERNEL_UBOOT_EXTRA_TARGET="odroidc2.dtb"
-        ;;
-      LePotato)
-        UBOOT_VERSION="lepotato"
-        UBOOT_CONFIG="libretech_cc_defconfig"
-        UBOOT_CONFIGFILE="boot.ini"
-        KERNEL_UBOOT_EXTRA_TARGET="gxl_p212_1g_lepotato.dtb gxl_p212_2g_lepotato.dtb"
-        ;;
-      KVIM)
-        KERNEL_UBOOT_EXTRA_TARGET="kvim.dtb"
-        ;;
-      *)
-        KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxbb_p201.dtb gxbb_p201_2G.dtb"
-        ;;
-    esac
 
   # kernel image name
     KERNEL_NAME="kernel.img"
