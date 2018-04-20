@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -33,9 +33,8 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Raspberry Pi Tools"
 PKG_ADDON_TYPE="xbmc.python.module"
 PKG_ADDON_PROVIDES=""
-PKG_ADDON_PROJECTS="RPi RPi2"
+PKG_ADDON_PROJECTS="RPi"
 
-PKG_AUTORECONF="no"
 
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib/RPi/

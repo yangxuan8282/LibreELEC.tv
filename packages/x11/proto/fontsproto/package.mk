@@ -18,6 +18,7 @@
 
 PKG_NAME="fontsproto"
 PKG_VERSION="2.1.3"
+PKG_SHA256="259046b0dd9130825c4a4c479ba3591d6d0f17a33f54e294b56478729a6e5ab8"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="fontsproto: Fonts extension headers"
 PKG_LONGDESC="Fonts extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

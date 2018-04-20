@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="screensaver.cpblobs"
-PKG_VERSION="04c1938"
-PKG_REV="1"
+PKG_VERSION="f08e473"
+PKG_SHA256="eae30010f1f3c5ddf50679ab5fce6a655a176f687d744b1dc5b7a81aa67cb530"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/screensaver.cpblobs"
@@ -27,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform soil"
 PKG_SECTION=""
 PKG_SHORTDESC="screensaver.cpblobs"
 PKG_LONGDESC="screensaver.cpblobs"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.ui.screensaver"
@@ -35,11 +35,3 @@ PKG_ADDON_TYPE="xbmc.ui.screensaver"
 if [ "$OPENGL" = "no" ] ; then
   exit 0
 fi
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="moonlight-embedded"
-PKG_VERSION="82b956a"
+PKG_VERSION="dcda1a5"
+PKG_SHA256="b0fead77d77a6ffa73488ead2564ecba43d5c6ac397d5a751ef687f5fb42f29d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/irtimmer/moonlight-embedded"
@@ -26,14 +27,10 @@ PKG_DEPENDS_TARGET="toolchain curl libcec pulseaudio ffmpeg systemd alsa-lib moo
 PKG_SECTION=""
 PKG_SHORTDESC="Gamestream client for embedded systems"
 PKG_LONGDESC="Moonlight Embedded is an open source implementation of NVIDIA's GameStream, as used by the NVIDIA Shield, but built for Linux"
-PKG_AUTORECONF="no"
 
 FREESCALE_V4L_INCLUDE=""
 if [ "$KODIPLAYER_DRIVER" = "bcm2835-driver" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET bcm2835-driver"
-elif [ "$KODIPLAYER_DRIVER" = "libfslvpuwrap" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libfslvpuwrap gpu-viv-bin-mx6q v4l-utils"
-  FREESCALE_V4L_INCLUDE="-DFREESCALE_INCLUDE_DIR=$(get_build_dir v4l-utils)/lib/include"
 elif [ "$KODIPLAYER_DRIVER" = "libamcodec" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libamcodec"
 elif [ "$DISPLAYSERVER" = "x11" ]; then
@@ -44,10 +41,6 @@ PKG_CMAKE_OPTS_TARGET="$FREESCALE_V4L_INCLUDE"
 
 pre_build_target() {
   cp -a $(get_build_dir moonlight-common-c)/* $PKG_BUILD/third_party/moonlight-common-c
-}
-
-pre_configure_target() {
-  [ "$PROJECT" = "imx6" ] && strip_gold || true
 }
 
 makeinstall_target() {

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="icu"
 PKG_VERSION="57.1"
+PKG_SHA256="ff8c67cb65949b1e7808f2359f2b80f722697048e90e7cfc382ec1fe229e9581"
 PKG_ARCH="any"
 PKG_LICENSE="Custom"
 PKG_SITE="http://www.icu-project.org"
@@ -27,9 +28,6 @@ PKG_DEPENDS_TARGET="toolchain icu:host"
 PKG_SECTION="textproc"
 PKG_SHORTDESC="International Components for Unicode library"
 PKG_LONGDESC="International Components for Unicode library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared"
 

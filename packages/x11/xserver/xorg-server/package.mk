@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="xorg-server"
-PKG_VERSION="1.19.1"
+PKG_VERSION="1.19.6"
+PKG_SHA256="a732502f1db000cf36a376cd0c010ffdbf32ecdd7f1fa08ba7f5bdf9601cc197"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -27,9 +28,7 @@ PKG_NEED_UNPACK="$(get_pkg_directory xf86-video-nvidia) $(get_pkg_directory xf86
 PKG_SECTION="x11/xserver"
 PKG_SHORTDESC="xorg-server: The Xorg X server"
 PKG_LONGDESC="Xorg is a full featured X server that was originally designed for UNIX and UNIX-like operating systems running on Intel x86 hardware."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="autotools"
 
 get_graphicdrivers
 
@@ -41,7 +40,7 @@ else
 fi
 
 if [ ! "$OPENGL" = "no" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto $OPENGL libepoxy glu"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto $OPENGL libepoxy"
   XORG_MESA="--enable-glx --enable-dri --enable-glamor"
 else
   XORG_MESA="--disable-glx --disable-dri --disable-glamor"
@@ -157,11 +156,8 @@ post_makeinstall_target() {
   fi
 
   mkdir -p $INSTALL/etc/X11
-    if [ -f $PROJECT_DIR/$PROJECT/xorg/xorg.conf ]; then
-      cp $PROJECT_DIR/$PROJECT/xorg/xorg.conf $INSTALL/etc/X11
-    elif [ -f $PKG_DIR/config/xorg.conf ]; then
-      cp $PKG_DIR/config/xorg.conf $INSTALL/etc/X11
-    fi
+    find_file_path config/xorg.conf &&
+      cp $FOUND_PATH $INSTALL/etc/X11
 
   if [ ! "$DEVTOOLS" = yes ]; then
     rm -rf $INSTALL/usr/bin/cvt

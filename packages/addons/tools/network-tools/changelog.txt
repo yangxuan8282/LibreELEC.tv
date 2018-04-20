@@ -1,2 +1,2 @@
-100
-- Initial add-on
+8.0.100
+- Initial Release

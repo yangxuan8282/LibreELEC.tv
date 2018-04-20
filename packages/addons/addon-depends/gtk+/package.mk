@@ -20,6 +20,7 @@
 
 PKG_NAME="gtk+"
 PKG_VERSION="2.24.30"
+PKG_SHA256="0d15cec3b6d55c60eac205b1f3ba81a1ed4eadd9d0f8e7c508bc7065d0c4ca50"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.gtk.org/"
@@ -28,9 +29,7 @@ PKG_DEPENDS_TARGET="toolchain atk libX11 libXrandr libXi glib pango cairo gdk-pi
 PKG_SECTION="x11/toolkits"
 PKG_SHORTDESC="gtk+: The Gimp ToolKit (GTK)"
 PKG_LONGDESC="This is GTK+. GTK+, which stands for the Gimp ToolKit, is a library for creating graphical user interfaces for the X Window System. It is designed to be small, efficient, and flexible. GTK+ is written in C with a very object-oriented approach."
-PKG_IS_ADDON="no"
-
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_path_GLIB_GENMARSHAL=$TOOLCHAIN/bin/glib-genmarshal \
                            --disable-glibtest \

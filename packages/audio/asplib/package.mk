@@ -18,6 +18,7 @@
 
 PKG_NAME="asplib"
 PKG_VERSION="da66f51"
+PKG_SHA256="94b140029311b8cc5bb3568e4d938e197298c4e208db5a5fe734b20da334a264"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/AchimTuran/asplib"
@@ -26,8 +27,5 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="audio"
 PKG_SHORTDESC="asplib: Achim's Signal Processing LIBrary"
 PKG_LONGDESC="asplib is a small and lightweight C++ library for digital signal processing."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 CXXFLAGS="$CXXFLAGS -DTARGET_LINUX"

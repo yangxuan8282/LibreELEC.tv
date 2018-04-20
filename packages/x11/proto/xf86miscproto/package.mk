@@ -18,6 +18,7 @@
 
 PKG_NAME="xf86miscproto"
 PKG_VERSION="0.9.3"
+PKG_SHA256="45b8ec6a4a8ca21066dce117e09dcc88539862e616e60fb391de05b36f63b095"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="xf86miscproto: XF86Misc extension headers"
 PKG_LONGDESC="XF86Misc extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

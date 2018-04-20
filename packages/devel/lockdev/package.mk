@@ -18,6 +18,7 @@
 
 PKG_NAME="lockdev"
 PKG_VERSION="16b8996"
+PKG_SHA256="49900093c12099047afa9f9d341da07b1a4a719e35c43db8409f65555ce09eb4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://alioth.debian.org/scm/?group_id=100443"
@@ -26,15 +27,10 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="system"
 PKG_SHORTDESC="lockdev: Manage character and block device lockfiles."
 PKG_LONGDESC="lockdev manages character and block device lockfiles."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
-
-pre_configure_target() {
-  CFLAGS="$CFLAGS -fPIC -DPIC"
-}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr

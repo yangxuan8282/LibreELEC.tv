@@ -18,6 +18,7 @@
 
 PKG_NAME="faad2"
 PKG_VERSION="2.7"
+PKG_SHA256="ee26ed1e177c0cd8fa8458a481b14a0b24ca0b51468c8b4c8b676fd3ceccd330"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.audiocoding.com/"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="audio"
 PKG_SHORTDESC="faad: An MPEG-4 AAC decoder"
 PKG_LONGDESC="The FAAD project includes the AAC decoder FAAD2. It supports several MPEG-4 object types (LC, Main, LTP, HE AAC, PS) and file formats (ADTS AAC, raw AAC, MP4), multichannel and gapless decoding as well as MP4 metadata tags. The codecs are compatible with standard-compliant audio applications using one or more of these profiles."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_MAINTAINER="Team LibreELEC (addons@libreelec.tv)"
 

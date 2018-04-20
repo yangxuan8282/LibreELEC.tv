@@ -24,7 +24,7 @@ PKG_NAME="myprogram"                               # same as the folder name
 PKG_VERSION="1.0.1"                                # version or 7 digit-hash
 PKG_REV="100"                                      # currently we start at 100 to solve OE update problems
 PKG_ARCH="any"                                     # for available architectures, see LE/config/arch.* files
-# PKG_ADDON_PROJECTS="RPi RPi2"                    # for available projects, see projects subdirectory
+# PKG_ADDON_PROJECTS="any !RPi1 !Amlogic"          # for available projects or devices, see projects subdirectory (note: Use RPi for RPi project, and RPi1 for RPi device)
 PKG_LICENSE="GPL"                                  # program licenses, see licenses subdirectory for a list
 PKG_SITE="http://www.site.org"
 PKG_URL="http://www.site.org/$PKG_VERSION.tar.xz"  # for github see the other packages, prefer tar.xz over .gz
@@ -33,7 +33,7 @@ PKG_DEPENDS_TARGET="toolchain curl"                # dependencies that are neede
 PKG_SECTION="service"                              # service, tools, virtual, driver, driver.remote ...
 PKG_SHORTDESC="Addon name: sort description"       # Addon: is a program that does this and that
 PKG_LONGDESC="Addon name ($PKG_VERSION): detailed description"
-PKG_AUTORECONF="no"                                # yes or no
+PKG_TOOLCHAIN="auto"                               # auto, meson, cmake, cmake-make, configure, make, ninja, autotools, manual
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Addon name"                        # proper name of the addon that is shown at the repo

@@ -33,7 +33,6 @@ PKG_ADDON_NAME="System Tools"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_ADDON_PROVIDES=""
 
-PKG_AUTORECONF="no"
 
 PKG_DEPENDS_TARGET="toolchain \
                     autossh \
@@ -174,6 +173,4 @@ addon() {
 
     # vim
     cp -P $(get_build_dir vim)/.install_pkg/usr/bin/vim $ADDON_BUILD/$PKG_ADDON_ID/bin
-
-  debug_strip $ADDON_BUILD/$PKG_ADDON_ID/bin
 }

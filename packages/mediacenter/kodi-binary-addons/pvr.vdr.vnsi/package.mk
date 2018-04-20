@@ -17,25 +17,17 @@
 ################################################################################
 
 PKG_NAME="pvr.vdr.vnsi"
-PKG_VERSION="fa1e4f5"
-PKG_REV="1"
+PKG_VERSION="4db947c"
+PKG_SHA256="5b1d0482b15e8ca11ed86120b3b22b87a7808e2606c1c5f4db846418a9d3e90f"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.kodi.tv"
-PKG_URL="https://github.com/kodi-pvr/pvr.vdr.vnsi/archive/$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/FernetMenta/pvr.vdr.vnsi"
+PKG_URL="https://github.com/FernetMenta/pvr.vdr.vnsi/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain kodi-platform"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.vdr.vnsi"
 PKG_LONGDESC="pvr.vdr.vnsi"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.pvrclient"
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

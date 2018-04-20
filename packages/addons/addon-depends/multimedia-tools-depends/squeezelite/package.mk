@@ -18,6 +18,7 @@
 
 PKG_NAME="squeezelite"
 PKG_VERSION="e92c09c"
+PKG_SHA256="935106bfc11ed27f5e5d3c3e08a8edb30876dc967b2ed9ca9b75a8a19afb6bca"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/ralph-irving/squeezelite"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain faad2 ffmpeg flac libmad libvorbis mpg123 soxr lib
 PKG_SECTION="tools"
 PKG_SHORTDESC="squeezelite"
 PKG_LONGDESC="A client for the Logitech Media Server"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 pre_make_target() {
   OPTS="-DDSD -DFFMPEG -DRESAMPLE -DVISEXPORT -DLINKALL"

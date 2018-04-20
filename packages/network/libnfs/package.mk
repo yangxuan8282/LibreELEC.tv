@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libnfs"
-PKG_VERSION="1.11.0"
+PKG_VERSION="2.0.0"
+PKG_SHA256="7ea6cd8fa6c461d01091e584d424d28e137d23ff4b65b95d01a3fd0ef95d120e"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/sahlberg/libnfs"
@@ -27,9 +28,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="network"
 PKG_SHORTDESC="libnfs: a client library for accessing NFS shares over a network."
 PKG_LONGDESC="LIBNFS is a client library for accessing NFS shares over a network."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-examples --disable-tirpc"
 

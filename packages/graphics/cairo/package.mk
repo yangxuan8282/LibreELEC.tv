@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="cairo"
-PKG_VERSION="1.14.6"
+PKG_VERSION="1.14.10"
+PKG_SHA256="7e87878658f2c9951a14fc64114d4958c0e65ac47530b8ac3078b2ce41b66a09"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://cairographics.org/"
@@ -26,12 +27,18 @@ PKG_DEPENDS_TARGET="toolchain zlib freetype fontconfig libpng pixman"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="cairo: Multi-platform 2D graphics library"
 PKG_LONGDESC="Cairo is a vector graphics library with cross-device output support. Currently supported output targets include the X Window System and in-memory image buffers. PostScript and PDF file output is planned. Cairo is designed to produce identical output on all output media while taking advantage of display hardware acceleration when available."
-PKG_IS_ADDON="no"
+PKG_TOOLCHAIN="configure" # ToDo
 
-PKG_AUTORECONF="no" # ToDo
+if [ "$OPENGL" != "no" ]; then
+  PKG_DEPENDS_TARGET+=" $OPENGL"
+fi
+
+if [ "$OPENGLES" != "no" ]; then
+  PKG_DEPENDS_TARGET+=" $OPENGLES"
+fi
 
 if [ "$DISPLAYSERVER" = "x11" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libXrender libX11 mesa glu"
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libXrender libX11 mesa"
   PKG_CAIRO_CONFIG="--x-includes="$SYSROOT_PREFIX/usr/include" \
                     --x-libraries="$SYSROOT_PREFIX/usr/lib" \
                     --enable-xlib \
@@ -42,7 +49,6 @@ if [ "$DISPLAYSERVER" = "x11" ]; then
                     --disable-egl \
                     --with-x"
 
-
 elif [ "$DISPLAYSERVER" = "weston" ]; then
   PKG_CAIRO_CONFIG="--disable-xlib \
                     --disable-xlib-xrender \
@@ -50,6 +56,14 @@ elif [ "$DISPLAYSERVER" = "weston" ]; then
                     --disable-glx \
                     --enable-glesv2 \
                     --enable-egl \
+                    --without-x"
+else
+  PKG_CAIRO_CONFIG="--disable-xlib \
+                    --disable-xlib-xrender \
+                    --disable-gl \
+                    --disable-glx \
+                    --disable-glesv2 \
+                    --disable-egl \
                     --without-x"
 fi
 

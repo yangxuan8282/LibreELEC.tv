@@ -18,6 +18,7 @@
 
 PKG_NAME="mtpfs"
 PKG_VERSION="fd3864d"
+PKG_SHA256="f004136a82452d13362581277eb2496033aa13a6c3f35d0501327248f3120456"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.adebenham.com/mtpfs/"
@@ -26,7 +27,7 @@ PKG_DEPENDS_TARGET="toolchain fuse libmtp glib"
 PKG_SECTION="tools"
 PKG_SHORTDESC="MTPfs is a FUSE filesystem that supports reading and writing from any MTP device"
 PKG_LONGDESC="MTPfs is a FUSE filesystem that supports reading and writing from any MTP device"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-mad"
 

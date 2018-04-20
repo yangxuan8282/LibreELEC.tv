@@ -18,6 +18,7 @@
 
 PKG_NAME="inputproto"
 PKG_VERSION="2.3.2"
+PKG_SHA256="893a6af55733262058a27b38eeb1edc733669f01d404e8581b167f03c03ef31d"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="inputproto: Input extension headers"
 PKG_LONGDESC="Input extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

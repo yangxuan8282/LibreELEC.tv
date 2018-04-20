@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="visualization.pictureit"
-PKG_VERSION="8eb74a6"
-PKG_REV="1"
+PKG_VERSION="ea11faa"
+PKG_SHA256="62f677e1853a900a66d95f4be935b1000d6da8fcfbea6a7a999b8e700d0e0d74"
+PKG_REV="2"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -27,15 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform"
 PKG_SECTION=""
 PKG_SHORTDESC="visualization.pictureit"
 PKG_LONGDESC="visualization.pictureit"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.player.musicviz"
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

@@ -18,6 +18,7 @@
 
 PKG_NAME="giflib"
 PKG_VERSION="5.1.4"
+PKG_SHA256="df27ec3ff24671f80b29e6ab1c4971059c14ac3db95406884fc26574631ba8d5"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://giflib.sourceforge.net/"
@@ -27,9 +28,6 @@ PKG_DEPENDS_TARGET="toolchain zlib"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="giflib: giflib service library"
 PKG_LONGDESC="giflib: giflib service library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_HOST="--disable-shared --enable-static"
 PKG_CONFIGURE_OPTS_TARGET="--with-sysroot=$SYSROOT_PREFIX"

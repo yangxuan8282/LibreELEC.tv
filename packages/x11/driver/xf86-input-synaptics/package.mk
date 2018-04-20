@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="xf86-input-synaptics"
 PKG_VERSION="1.9.0"
+PKG_SHA256="afba3289d7a40217a19d90db98ce181772f9ca6d77e1898727b0afcf02073b5a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://lists.freedesktop.org/mailman/listinfo/xorg"
@@ -26,8 +27,6 @@ PKG_DEPENDS_TARGET="toolchain libXi"
 PKG_SECTION="x11/driver"
 PKG_SHORTDESC="Synaptics touchpad driver for X.Org."
 PKG_LONGDESC="Synaptics touchpad driver for X.Org."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-xorg-module-dir=$XORG_PATH_MODULES"

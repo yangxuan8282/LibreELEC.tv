@@ -18,6 +18,7 @@
 
 PKG_NAME="diffutils"
 PKG_VERSION="3.6"
+PKG_SHA256="d621e8bdd4b573918c8145f7ae61817d1be9deb4c8d2328a65cea8e11d783bd6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/diffutils/"
@@ -26,7 +27,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="GNU Diffutils"
 PKG_LONGDESC="GNU Diffutils is a package of several programs related to finding differences between files."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-nls \
         --without-libsigsegv-prefix \

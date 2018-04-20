@@ -19,6 +19,7 @@
 
 PKG_NAME="attr"
 PKG_VERSION="2.4.47"
+PKG_SHA256="25772f653ac5b2e3ceeb89df50e4688891e21f723c460636548971652af0a859"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE=""
@@ -28,15 +29,12 @@ PKG_SECTION="accessibility"
 PKG_SHORTDESC="attr: Extended Attributes Of Filesystem Objects"
 PKG_LONGDESC="Extended attributes are name:value pairs associated permanently with files and directories, similar to the environment strings associated with a process. An attribute may be defined or undefined. If it is defined, its value may be empty or non-empty. Extended attributes are extensions to the normal attributes which are associated with all inodes in the system (i.e. the stat(2) data). They are often used to provide additional functionality to a filesystem - for example, additional security features such as Access Control Lists (ACLs) may be implemented using extended attributes."
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
 PKG_CONFIGURE_OPTS_TARGET="OPTIMIZER= \
                            CONFIG_SHELL=/bin/bash \
                            INSTALL_USER=root INSTALL_GROUP=root \
                            --disable-shared --enable-static"
 
-if [ "$DEBUG" = yes ]; then
+if build_with_debug; then
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET DEBUG=-DDEBUG"
 else
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET DEBUG=-DNDEBUG"

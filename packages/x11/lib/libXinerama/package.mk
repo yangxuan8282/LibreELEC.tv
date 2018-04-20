@@ -18,6 +18,7 @@
 
 PKG_NAME="libXinerama"
 PKG_VERSION="1.1.3"
+PKG_SHA256="7a45699f1773095a3f821e491cbd5e10c887c5a5fce5d8d3fced15c2ff7698e2"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,8 +27,5 @@ PKG_DEPENDS_TARGET="toolchain util-macros xineramaproto libXext"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libXinerama: The Xinerama library."
 PKG_LONGDESC="libXinerama is the Xinerama library."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --enable-malloc0returnsnull"

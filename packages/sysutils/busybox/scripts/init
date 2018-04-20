@@ -53,14 +53,17 @@
   RUN_FSCK="yes"
   RUN_FSCK_DISKS=""
   SYSLINUX_DEFAULT=""
+  GRUB_DEFAULT=""
 
   NBD_DEVS="0"
   FLASH_FREE_MIN="5"
 
   INSTALLED_MEMORY=`cat /proc/meminfo | grep 'MemTotal:' | awk '{print $2}'`
-  SYSTEM_TORAM_LIMIT=768000
+  SYSTEM_TORAM_LIMIT=1024000
 
   LIVE="no"
+
+  BREAK_TRIPPED="no"
 
   # Get a serial number if present (eg. RPi) otherwise use MAC address from eth0
   MACHINE_UID="$(cat /proc/cpuinfo | awk '/^Serial/{s=$3; gsub ("^0*","",s); print s}')"
@@ -151,6 +154,13 @@
       portable)
         SYSLINUX_DEFAULT="run"
         ;;
+      grub_live)
+        LIVE=yes
+        GRUB_DEFAULT="Live"
+        ;;
+      grub_portable)
+        GRUB_DEFAULT="Run"
+        ;;
       overlay)
         OVERLAY=yes
         ;;
@@ -182,11 +192,11 @@
   }
 
   debug_shell() {
-    echo "### Starting debugging shell... type  exit  to quit ###"
+    echo "### Starting debugging shell for boot step: $BOOT_STEP... type  exit  to quit ###"
 
     showcursor
 
-    sh </dev/tty1 >/dev/tty1 2>&1
+    setsid cttyhack sh
   }
 
   error() {
@@ -200,12 +210,17 @@
   }
 
   break_after() {
-    # Start debug shell after boot step $1
-    case $BREAK in
-      all|*$1*)
-        debug_shell
-        ;;
-    esac
+    # Start debug shell after boot step $1, and all subsequent steps
+    if [ $BREAK_TRIPPED == yes ]; then
+      debug_shell
+    else
+      case $BREAK in
+        all|*$1*)
+          BREAK_TRIPPED=yes
+          debug_shell
+          ;;
+      esac
+    fi
   }
 
   # Mount handlers
@@ -693,7 +708,7 @@
   }
 
   # Make last bootloader label (installer, live, run etc.) as the new default
-  update_syslinux() {
+  update_bootmenu() {
     local crnt_default
 
     if [ -n "$SYSLINUX_DEFAULT" -a -f /flash/syslinux.cfg ]; then
@@ -705,6 +720,20 @@
           mount -o remount,rw /flash
           sed -i "s/^DEFAULT .*/DEFAULT $SYSLINUX_DEFAULT/" /flash/syslinux.cfg
           [ -f /flash/EFI/BOOT/syslinux.cfg ] && cp /flash/syslinux.cfg /flash/EFI/BOOT/syslinux.cfg
+          mount -o remount,ro /flash
+        fi
+      fi
+    fi
+
+    if [ -n "\"$GRUB_DEFAULT\"" -a -f /flash/grub.cfg ]; then
+      if grep -q "^menuentry \"$GRUB_DEFAULT\"" /flash/grub.cfg; then
+        crnt_default="$(awk '/^set default/ {print substr($2,9,19)}' /flash/grub.cfg)"
+        if [ ! "$crnt_default" = "\"$GRUB_DEFAULT\"" ]; then
+          progress "Updating /flash/grub.cfg [$crnt_default -> \"$GRUB_DEFAULT\"]"
+
+          mount -o remount,rw /flash
+          sed -i "s/^set default=.*/set default=\"$GRUB_DEFAULT\"/" /flash/grub.cfg
+          [ -f /flash/EFI/BOOT/grub.cfg ] && cp /flash/grub.cfg /flash/EFI/BOOT/grub.cfg
           mount -o remount,ro /flash
         fi
       fi
@@ -847,7 +876,7 @@
       losetup $LOOP $IMG_FILE
 
       # check for MBR partititon
-      OFFSET=$(fdisk -u -l $LOOP 2>/dev/null | awk '/^[ ]*Device/{part=1; next}; part{if ($2 == "*") {print $3} else {print $2} ; exit}')
+      OFFSET=$(fdisk -u -l $LOOP 2>/dev/null | awk '/^[ ]*Device/{part=1; next}; part{if ($2 == "*") {print $5} else {print $4} ; exit}')
       if [ -z "$OFFSET" ]; then
         # check for GPT partititon
         OFFSET=$(fdisk -u -l $LOOP 2>/dev/null | awk '/^Number/{part=1; next}; part{print $2; exit}')
@@ -1004,7 +1033,7 @@
     mount --move /flash /sysroot/flash
     mount --move /storage /sysroot/storage
 
-    if [ ! -d "/sysroot/usr/lib/modules/$(uname -r)/" -a -f "/sysroot/usr/lib/systemd/systemd" ]; then
+    if [ ! -d "/sysroot/usr/lib/kernel-overlays/base/lib/modules/$(uname -r)/" -a -f "/sysroot/usr/lib/systemd/systemd" ]; then
       echo ""
       echo "NEVER TOUCH boot= in extlinux.conf / cmdline.txt!"
       echo "If you don't know what you are doing,"
@@ -1075,7 +1104,7 @@
       load_modules \
       check_disks \
       mount_flash \
-      update_syslinux \
+      update_bootmenu \
       load_splash \
       mount_storage \
       check_update \

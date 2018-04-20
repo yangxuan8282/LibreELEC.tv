@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libevdev"
-PKG_VERSION="1.5.5"
+PKG_VERSION="1.5.7"
+PKG_SHA256="a1e59e37a2f0d397ffd7e83b73af0e638db83b8dd08902ef0f651a21cc1dd422"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/libevdev/"
@@ -26,15 +27,9 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="system"
 PKG_SHORTDESC="libevdev: a wrapper library for evdev devices."
 PKG_LONGDESC="libevdev is a wrapper library for evdev devices. it moves the common tasks when dealing with evdev devices into a library and provides a library interface to the callers, thus avoiding erroneous ioctls, etc."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-shared --disable-static"
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC -DPIC"
-}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin

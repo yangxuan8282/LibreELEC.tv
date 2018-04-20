@@ -18,7 +18,8 @@
 
 PKG_NAME="boblightd"
 PKG_VERSION="478"
-PKG_REV="100"
+PKG_SHA256="78b82c9b133ce20c3d24aba96abe4a8302ec8dc640460b3b7302aa1d368c543a"
+PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://code.google.com/p/boblight"
@@ -31,7 +32,7 @@ PKG_LONGDESC="Boblight($PKG_VERSION) is an opensource AmbiLight implementation."
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Boblight"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 if [ "$DISPLAYSERVER" = "x11" ] ; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libXrender"

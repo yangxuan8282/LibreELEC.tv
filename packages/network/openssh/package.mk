@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="openssh"
-PKG_VERSION="7.3p1"
+PKG_VERSION="7.5p1"
+PKG_SHA256="9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.openssh.com/"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain zlib openssl"
 PKG_SECTION="network"
 PKG_SHORTDESC="openssh: An open re-implementation of the SSH package"
 PKG_LONGDESC="This is a Linux port of OpenBSD's excellent OpenSSH. OpenSSH is based on the last free version of Tatu Ylonen's SSH with all patent-encumbered algorithms removed, all known security bugs fixed, new features reintroduced, and many other clean-ups. SSH (Secure Shell) is a program to log into another computer over a network, to execute commands in a remote machine, and to move files from one machine to another. It provides strong authentication and secure communications over insecure channels. It is intended as a replacement for rlogin, rsh, rcp, and rdist."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--sysconfdir=/etc/ssh \
                            --libexecdir=/usr/lib/openssh \
@@ -41,6 +40,7 @@ PKG_CONFIGURE_OPTS_TARGET="--sysconfdir=/etc/ssh \
                            --disable-wtmpx \
                            --without-rpath \
                            --with-ssl-engine \
+                           --with-privsep-user=nobody \
                            --disable-pututline \
                            --disable-pututxline \
                            --disable-etc-default-login \
@@ -64,7 +64,6 @@ post_makeinstall_target() {
 
   sed -e "s|^#PermitRootLogin.*|PermitRootLogin yes|g" \
       -e "s|^#StrictModes.*|StrictModes no|g" \
-      -e "s|^#UsePrivilegeSeparation.*|UsePrivilegeSeparation no|g" \
       -i $INSTALL/etc/ssh/sshd_config
 
   echo "PubkeyAcceptedKeyTypes +ssh-dss" >> $INSTALL/etc/ssh/sshd_config

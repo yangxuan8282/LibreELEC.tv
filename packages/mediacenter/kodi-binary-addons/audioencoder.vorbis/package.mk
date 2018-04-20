@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="audioencoder.vorbis"
-PKG_VERSION="8c928ed"
-PKG_REV="1"
+PKG_VERSION="6ebadfd"
+PKG_SHA256="2c561df3e34efa41be9467bd643fa15af438737632d0422e7e67eb059f53abf9"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -27,15 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform libogg libvorbis"
 PKG_SECTION=""
 PKG_SHORTDESC="audioencoder.vorbis: A audioencoder addon for Kodi"
 PKG_LONGDESC="audioencoder.vorbis is a audioencoder addon for Kodi"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.audioencoder"
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

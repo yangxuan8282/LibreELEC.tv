@@ -17,18 +17,17 @@
 ################################################################################
 
 PKG_NAME="ntfs-3g_ntfsprogs"
-PKG_VERSION="2016.2.22"
+PKG_VERSION="2017.3.23"
+PKG_SHA256="3e5a021d7b761261836dcb305370af299793eedbded731df3d6943802e1262d5"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.ntfs-3g.org/"
 PKG_URL="http://tuxera.com/opensource/$PKG_NAME-$PKG_VERSION.tgz"
-PKG_DEPENDS_TARGET="toolchain fuse"
+PKG_DEPENDS_TARGET="toolchain fuse libgcrypt"
 PKG_SECTION="system"
 PKG_SHORTDESC="ntfs-3g_ntfsprogs: NTFS-3G Read/Write userspace driver"
 PKG_LONGDESC="The NTFS-3G_ntfsprogs driver is an open source, freely available NTFS driver for Linux with read and write support. It provides safe and fast handling of the Windows XP, Windows Server 2003, Windows 2000 and Windows Vista file systems."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--exec-prefix=/usr/ \
                            --disable-dependency-tracking \

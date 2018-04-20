@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 
 PKG_NAME="touchscreen"
 PKG_VERSION="1.0"
-PKG_REV="100"
+PKG_REV="101"
 PKG_ARCH="any"
-PKG_ADDON_PROJECTS="Generic RPi RPi2 imx6"
+PKG_ADDON_PROJECTS="Generic RPi Amlogic"
 PKG_LICENSE="GPL"
 PKG_SITE=""
 PKG_URL=""
@@ -30,19 +30,11 @@ PKG_SHORTDESC="Touchscreen: support addon for Touchscreens"
 PKG_LONGDESC="Touchscreen: addon creates new virtual input device and \
 converts data from touchscreen to Kodi. Short tap sends button press event \
 and long tap sends only xy coordinates. Also includes calibration program."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Touchscreen"
 PKG_ADDON_TYPE="xbmc.service"
-
-make_target() {
-  : # only pack everything
-}
-
-makeinstall_target() {
-  : # only pack everything
-}
 
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin

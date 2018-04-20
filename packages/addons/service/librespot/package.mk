@@ -18,17 +18,19 @@
 ################################################################################
 
 PKG_NAME="librespot"
-PKG_VERSION="ddfc28f"
-PKG_REV="108"
+PKG_VERSION="685fb4e"
+PKG_SHA256="10ff0e5520e576e72b259f69d37e25ec3e520a4be13cbe9707c68614f24526fc"
+PKG_REV="110"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
-PKG_SITE="https://github.com/plietar/$PKG_NAME/"
-PKG_URL="https://github.com/plietar/$PKG_NAME/archive/$PKG_VERSION.zip"
-PKG_DEPENDS_TARGET="toolchain avahi libvorbis pulseaudio pyalsaaudio rust"
+PKG_SITE="https://github.com/librespot-org/$PKG_NAME/"
+PKG_URL="https://github.com/librespot-org/$PKG_NAME/archive/$PKG_VERSION.zip"
+PKG_DEPENDS_TARGET="toolchain avahi pulseaudio pyalsaaudio rust"
 PKG_SECTION="service"
 PKG_SHORTDESC="Librespot: play Spotify through LibreELEC using a Spotify app as a remote"
 PKG_LONGDESC="Librespot ($PKG_VERSION) plays Spotify through LibreELEC using the open source librespot library using a Spotify app as a remote."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
+PKG_BUILD_FLAGS="-lto"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Librespot"
@@ -38,23 +40,18 @@ PKG_MAINTAINER="Anton Voyl (awiouy)"
 configure_target() {
   . "$TOOLCHAIN/.cargo/env"
   export PKG_CONFIG_ALLOW_CROSS=0
-  strip_lto
 }
 
 make_target() {
   cd src
-  $CARGO_BUILD --no-default-features --features "alsa-backend pulseaudio-backend"
+  $CARGO_BUILD --no-default-features --features "alsa-backend pulseaudio-backend with-dns-sd"
   cd "$PKG_BUILD/.$TARGET_NAME"/*/release
   $STRIP librespot
 }
 
-makeinstall_target() {
-  :
-}
-
 addon() {
   mkdir -p "$ADDON_BUILD/$PKG_ADDON_ID"
-  cp "$(get_build_dir pyalsaaudio)/.install_pkg/usr/lib/python2.7/site-packages/alsaaudio.so" \
+  cp "$(get_build_dir pyalsaaudio)/.install_pkg/usr/lib/$PKG_PYTHON_VERSION/site-packages/alsaaudio.so" \
      "$ADDON_BUILD/$PKG_ADDON_ID"
 
   mkdir -p "$ADDON_BUILD/$PKG_ADDON_ID/bin"

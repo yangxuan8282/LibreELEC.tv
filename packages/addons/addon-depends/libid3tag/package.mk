@@ -20,6 +20,7 @@
 
 PKG_NAME="libid3tag"
 PKG_VERSION="0.15.1b"
+PKG_SHA256="63da4f6e7997278f8a3fef4c6a372d342f705051d1eeb6a46a86b03610e26151"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.mars.org/home/rob/proj/mpeg/"
@@ -28,9 +29,6 @@ PKG_DEPENDS_TARGET="toolchain zlib"
 PKG_SECTION="audio"
 PKG_SHORTDESC="library for id3 tagging"
 PKG_LONGDESC="library for id3 tagging"
-PKG_IS_ADDON="no"
-
-PKG_AUTORECONF="no"
 
 PKG_MAINTAINER="Lukas Sabota (LTsmooth42@gmail.com)"
 

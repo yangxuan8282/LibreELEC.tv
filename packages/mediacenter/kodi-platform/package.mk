@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="kodi-platform"
-PKG_VERSION="c8188d8"
+PKG_VERSION="e8574b8"
+PKG_SHA256="132d5398b3bb72c6b5394ffa473c52e556419d6df8c52eb0830555dae87eb75a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain tinyxml $MEDIACENTER p8-platform"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="kodi-platform:"
 PKG_LONGDESC="kodi-platform:"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CMAKE_OPTS_TARGET="-DCMAKE_INSTALL_LIBDIR:STRING=lib \
                        -DCMAKE_INSTALL_LIBDIR_NOARCH:STRING=lib \

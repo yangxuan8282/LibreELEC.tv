@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2009-2016 Team LibreELEC (team@libreelec.tv)
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libdvdcss"
-PKG_VERSION="2f12236"
+PKG_VERSION="8f5dba3"
+PKG_SHA256="669868984d1cac32e85ea7e2e669b22b960354e3078073b9176d857844fedc3c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/libdvdcss"
@@ -26,18 +27,4 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="libdvdcss: a simple library designed for accessing DVDs as a block device without having to bother about the decryption."
 PKG_LONGDESC="libdvdcss is a simple library designed for accessing DVDs as a block device without having to bother about the decryption."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-configure_target() {
-  :
-}
-
-make_target() {
-  :
-}
-
-makeinstall_target() {
-  :
-}
+PKG_TOOLCHAIN="manual"

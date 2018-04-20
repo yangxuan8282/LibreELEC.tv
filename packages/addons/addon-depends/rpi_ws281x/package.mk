@@ -18,6 +18,7 @@
 
 PKG_NAME="rpi_ws281x"
 PKG_VERSION="f580777"
+PKG_SHA256="edc831ff9daac354c54bfab1dad52f282ad44225d5769e6ae2b45160fe21762e"
 PKG_ARCH="any"
 PKG_LICENSE="BSD-3c"
 PKG_SITE="https://github.com/hyperion-project/rpi_ws281x"
@@ -26,12 +27,4 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION=""
 PKG_SHORTDESC="Userspace Raspberry Pi PWM library for WS281X LEDs"
 PKG_LONGDESC="Userspace Raspberry Pi PWM library for WS281X LEDs"
-PKG_AUTORECONF="no"
-
-make_target() {
-  :
-}
-
-makeinstall_target() {
-  :
-}
+PKG_TOOLCHAIN="manual"

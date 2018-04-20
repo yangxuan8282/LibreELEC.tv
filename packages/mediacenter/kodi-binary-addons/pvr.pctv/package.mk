@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.pctv"
-PKG_VERSION="85d6eae"
-PKG_REV="1"
+PKG_VERSION="5b47d9f"
+PKG_SHA256="fa23524622e1d2a4ebc1de4c6c8766b7a1987e2b900551049bbcec9d6055d354"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -27,15 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform jsoncpp"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.pctv"
 PKG_LONGDESC="pvr.pctv"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.pvrclient"
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

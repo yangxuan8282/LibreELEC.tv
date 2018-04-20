@@ -17,25 +17,19 @@
 ################################################################################
 
 PKG_NAME="RTL8812AU"
-PKG_VERSION="4.3.20"
+PKG_VERSION="da70677"
+PKG_SHA256="2a8950db3314833b32cf7ea2720509d05210ce11daa01d8f19c2ecc70c705fe2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/Grawp/rtl8812au_rtl8821au"
-PKG_URL="https://github.com/Grawp/rtl8812au_rtl8821au/archive/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="rtl8812au_rtl8821au-$PKG_VERSION"
+PKG_SITE="https://github.com/paspro/rtl8812au"
+PKG_URL="https://github.com/paspro/rtl8812au/archive/$PKG_VERSION.tar.gz"
+PKG_SOURCE_DIR="rtl8812au-$PKG_VERSION*"
 PKG_DEPENDS_TARGET="toolchain linux"
 PKG_NEED_UNPACK="$LINUX_DEPENDS"
 PKG_SECTION="driver"
 PKG_SHORTDESC="Realtek RTL8812AU Linux 3.x driver"
 PKG_LONGDESC="Realtek RTL8812AU Linux 3.x driver"
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-if [ "$TARGET_KERNEL_ARCH" = "arm64" -a "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-linux-gnu:host"
-  export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-linux-gnu/bin/:$PATH
-  TARGET_PREFIX=aarch64-linux-gnu-
-fi
+PKG_IS_KERNEL_PKG="yes"
 
 pre_make_target() {
   unset LDFLAGS
@@ -45,11 +39,11 @@ make_target() {
   make V=1 \
        ARCH=$TARGET_KERNEL_ARCH \
        KSRC=$(kernel_path) \
-       CROSS_COMPILE=$TARGET_PREFIX \
+       CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
        CONFIG_POWER_SAVING=n
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
-    cp *.ko $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+  mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
+    cp *.ko $INSTALL/$(get_full_module_dir)/$PKG_NAME
 }

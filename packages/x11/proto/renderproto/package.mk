@@ -18,6 +18,7 @@
 
 PKG_NAME="renderproto"
 PKG_VERSION="0.11.1"
+PKG_SHA256="06735a5b92b20759204e4751ecd6064a2ad8a6246bb65b3078b862a00def2537"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.x.org/"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="renderproto: KB extension headers"
 PKG_LONGDESC="Render extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

@@ -26,6 +26,3 @@ PKG_DEPENDS_TARGET="toolchain $PROJECT"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="OEM: Metapackage for various OEM packages"
 PKG_LONGDESC="OEM: Metapackage for various OEM packages"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"

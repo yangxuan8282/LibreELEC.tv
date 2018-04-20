@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,17 +17,19 @@
 ################################################################################
 
 PKG_NAME="webgrabplus"
-PKG_VERSION="56.29pre-20161021"
-PKG_REV="104"
+PKG_VERSION="2.1.5_beta"
+PKG_SHA256="bee5d6c12bc5b62366a0d05b48c1693d715199b28b12240fa74c0b2c0f613a72"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="prop."
 PKG_SITE="http://www.webgrabplus.com/"
-PKG_URL="https://github.com/awiouy/webgrabplus/archive/$PKG_VERSION.tar.gz"
+PKG_URL="http://webgrabplus.com/sites/default/files/download/SW/V2.1.5/WebGrabPlus_V2.1.5_beta_install.tar.gz"
+PKG_SOURCE_DIR=".wg++"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="service"
 PKG_SHORTDESC="WebGrab+Plus: a multi-site incremental xmltv epg grabber"
 PKG_LONGDESC="WebGrab+Plus ($PKG_VERSION) collects tv-program guide data from selected tvguide sites for your favourite channels."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="WebGrab+Plus"
@@ -35,15 +37,7 @@ PKG_ADDON_TYPE="xbmc.service"
 PKG_ADDON_REQUIRES="tools.mono:0.0.0"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
 
-make_target() {
-  : # nop
-}
-
-makeinstall_target() {
-  : # nop
-}
-
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID
-  cp -PR $PKG_BUILD/* $ADDON_BUILD/$PKG_ADDON_ID
+  cp -r $PKG_BUILD/bin $ADDON_BUILD/$PKG_ADDON_ID
 }

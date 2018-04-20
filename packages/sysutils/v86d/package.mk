@@ -18,6 +18,7 @@
 
 PKG_NAME="v86d"
 PKG_VERSION="0.1.10"
+PKG_SHA256="634964ae18ef68c8493add2ce150e3b4502badeb0d9194b4bd81241d25e6735c"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://dev.gentoo.org/~spock/projects/uvesafb/"
@@ -26,9 +27,6 @@ PKG_DEPENDS_INIT="toolchain gcc:init"
 PKG_SECTION="system"
 PKG_SHORTDESC="v86d: A userspace helper that runs x86 code in an emulated environment."
 PKG_LONGDESC="v86d is the userspace helper that runs x86 code in an emulated environment. uvesafb will not work without v86d. v86d currently supports the x86 and amd64 (x86-64) architectures."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 INIT_CONFIGURE_OPTS="--with-x86emu"
 

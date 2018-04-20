@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="lftp"
 PKG_VERSION="4.7.4"
+PKG_SHA256="8f55c37cfdfbce24a9cb47b621ca127f40d3a7de5b4c49f8c49f17bff728fb31"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://lftp.yar.ru/"
@@ -26,7 +27,6 @@ PKG_DEPENDS_TARGET="toolchain readline openssl zlib"
 PKG_SECTION="tools"
 PKG_SHORTDESC="ftp client"
 PKG_LONGDESC="LFTP is a sophisticated ftp/http client, and a file transfer program supporting a number of network protocols"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-nls \
                            --without-gnutls \

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,35 +17,29 @@
 ################################################################################
 
 PKG_NAME="kernel-firmware"
-PKG_VERSION="df40d15"
+PKG_VERSION="7344ec9"
+PKG_SHA256="f9c9077d7170afc3080aba1bc884f27dfb4e8da0e3d176e356e2fa07d4cf9f0d"
 PKG_ARCH="any"
 PKG_LICENSE="other"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/"
 PKG_URL="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="$PKG_VERSION"
+PKG_NEED_UNPACK="${PROJECT_DIR}/${PROJECT}/packages/${PKG_NAME} ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/packages/${PKG_NAME}"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="linux-firmware"
 PKG_SHORTDESC="kernel-firmware: kernel related firmware"
 PKG_LONGDESC="kernel-firmware: kernel related firmware"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-configure_target() {
-  :
-}
-
-make_target() {
-  :
-}
+PKG_TOOLCHAIN="manual"
 
 # Install additional miscellaneous drivers
 makeinstall_target() {
-  FW_TARGET_DIR=$INSTALL/usr/lib/firmware
+  FW_TARGET_DIR=$INSTALL/$(get_full_firmware_dir)
 
-  FW_LISTS="${PKG_DIR}/firmwares/any.dat ${PKG_DIR}/firmwares/${TARGET_ARCH}.dat"
-  FW_LISTS+=" ${PROJECT_DIR}/${PROJECT}/${PKG_NAME}/firmwares/any.dat"
-  [ -n "${DEVICE}" ] && FW_LISTS+=" ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/${PKG_NAME}/firmwares/any.dat"
+  if find_file_path firmwares/kernel-firmware.dat; then
+    FW_LISTS="${FOUND_FILE}"
+  else
+    FW_LISTS="${PKG_DIR}/firmwares/any.dat ${PKG_DIR}/firmwares/${TARGET_ARCH}.dat"
+  fi
 
   for fwlist in ${FW_LISTS}; do
     [ -f ${fwlist} ] || continue
@@ -68,7 +62,10 @@ makeinstall_target() {
     done < ${fwlist}
   done
 
-  # The following file is installed by brcmfmac_sdio-firmware-rpi
+  # The following files are RPi specific and installed by brcmfmac_sdio-firmware-rpi instead
   rm -fr $FW_TARGET_DIR/brcm/brcmfmac43430*-sdio.bin
   rm -fr $FW_TARGET_DIR/brcm/brcmfmac43455*-sdio.bin
+
+  # Cleanup - which may be project or device specific
+  find_file_path scripts/cleanup.sh && ${FOUND_PATH} ${FW_TARGET_DIR} || true
 }

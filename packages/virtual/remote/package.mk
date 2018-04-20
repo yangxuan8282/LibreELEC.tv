@@ -27,9 +27,6 @@ PKG_SECTION="virtual"
 PKG_SHORTDESC="remote: Meta package for installing various tools needed for remote support"
 PKG_LONGDESC="Meta package for installing various tools needed for remote support"
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
 if [ "$ATVCLIENT_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET atvclient"
 fi

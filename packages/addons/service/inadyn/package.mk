@@ -18,6 +18,7 @@
 
 PKG_NAME="inadyn"
 PKG_VERSION="2.2"
+PKG_SHA256="d6c69f0571161d9623fd4dcd2fa8515639b82e7f433058f524269c1e77d49b1a"
 PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
@@ -27,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain libconfuse openssl"
 PKG_SECTION="service/system"
 PKG_SHORTDESC="Inadyn: a small and simple Dynamic Domain Name System client"
 PKG_LONGDESC="Inadyn ($PKG_VERSION) is a small and simple Dynamic Domain Name System (DDNS) client with HTTPS support. It is commonly available in many GNU/Linux distributions, used in off-the-shelf routers and Internet gateways to automate the task of keeping your DNS record up to date with any IP address changes from your ISP. It can also be used in installations with redundant (backup) connections to the Internet."
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Inadyn"

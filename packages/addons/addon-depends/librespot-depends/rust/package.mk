@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="rust"
-PKG_VERSION="1.20.0"
+PKG_VERSION="1.23.0"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://www.rust-lang.org"
@@ -25,15 +25,9 @@ PKG_URL=""
 PKG_DEPENDS="toolchain"
 PKG_SECTION="devel"
 PKG_LONGDESC="Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety."
-PKG_IS_ADDON="no"
-
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 unpack() {
-  :
-}
-
-configure_target() {
   :
 }
 
@@ -74,8 +68,4 @@ EOF
 
   echo "CARGO_BUILD=\"cargo build --release --target $RUST_TRIPLE\"" \
        >>"$CARGO_HOME/env"
-}
-
-makeinstall_target() {
-  :
 }

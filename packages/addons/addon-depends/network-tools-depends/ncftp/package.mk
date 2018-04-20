@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="ncftp"
 PKG_VERSION="3.2.5"
+PKG_SHA256="b4ebe2415761a5137cd1d313c8fc1352f26d8963cc9e9e354e29720aa2089d42"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.ncftp.com/ncftp/"
@@ -26,7 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="NcFTP Client (also known as just NcFTP) is a set of FREE application programs implementing the File Transfer Protocol (FTP)."
 PKG_LONGDESC="NcFTP Client (also known as just NcFTP) is a set of FREE application programs implementing the File Transfer Protocol (FTP)."
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_header_librtmp_rtmp_h=yes \
             --enable-readline \

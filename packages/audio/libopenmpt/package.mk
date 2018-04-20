@@ -17,19 +17,16 @@
 ################################################################################
 
 PKG_NAME="libopenmpt"
-PKG_VERSION="0.2.7386-beta20.3"
+PKG_VERSION="0.3.1"
+PKG_SHA256="6fc5614926edd523d5585e40fdaf0b2ea08689d4dc91de49511d02503744cbb5"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
 PKG_SITE="http://lib.openmpt.org/libopenmpt/"
-PKG_URL="http://lib.openmpt.org/files/libopenmpt/src/${PKG_NAME}-${PKG_VERSION}-autotools.tar.gz"
-PKG_SOURCE_DIR="${PKG_NAME}-${PKG_VERSION//-beta*/}-autotools"
+PKG_URL="http://lib.openmpt.org/files/libopenmpt/src/${PKG_NAME}-${PKG_VERSION}+release.autotools.tar.gz"
 PKG_DEPENDS_TARGET="toolchain libogg libvorbis"
 PKG_SECTION="audio"
 PKG_SHORTDESC="libopenmpt: renders mod music files as raw audio data, for playing or conversion."
 PKG_LONGDESC="libopenmpt renders mod music files as raw audio data, for playing or conversion."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --disable-shared \

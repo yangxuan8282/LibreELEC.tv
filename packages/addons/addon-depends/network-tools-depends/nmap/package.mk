@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="nmap"
 PKG_VERSION="7.11"
+PKG_SHA256="dfc95db3a8ee4c56650dbaa5a1a1e989b2963de8faea2531c21e6fd6e0bccc2a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://nmap.org/"
@@ -26,7 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="network tool"
 PKG_LONGDESC="Free Security Scanned for Network"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --with-pcap=linux \

@@ -18,6 +18,7 @@
 
 PKG_NAME="libzip"
 PKG_VERSION="0.11.2"
+PKG_SHA256="7cfbbc2c540e154b933b6e9ec781e2671086bd8114eb744ae1a1ade34d2bb6bb"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.nih.at/libzip/"
@@ -25,10 +26,7 @@ PKG_URL="http://www.nih.at/libzip/${PKG_NAME}-${PKG_VERSION}.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SHORTDESC="libzip"
 PKG_LONGDESC="libzip"
-
-PKG_IS_ADDON="no"
-PKG_USE_CMAKE="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="configure"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static"
 

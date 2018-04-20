@@ -18,6 +18,7 @@
 
 PKG_NAME="rpi-cirrus-config"
 PKG_VERSION="0.0.1"
+PKG_SHA256="a2a580d9738aaf4e901d8215cedd1df5d95b1e057165cfd9b72335e0dc6c40e4"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/HiassofT/rpi-cirrus-config"
@@ -26,10 +27,7 @@ PKG_DEPENDS_TARGET="alsa-utils"
 PKG_SECTION="driver"
 PKG_SHORTDESC="Config scripts for the Wolfson/Cirrus Logic audio card"
 PKG_LONGDESC="Config scripts for the Wolfson/Cirrus Logic audio card"
-
-make_target() {
- : #
-}
+PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/lib/udev

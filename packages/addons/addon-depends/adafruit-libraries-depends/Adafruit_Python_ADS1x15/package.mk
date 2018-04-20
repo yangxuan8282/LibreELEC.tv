@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,21 +17,15 @@
 ################################################################################
 
 PKG_NAME="Adafruit_Python_ADS1x15"
-PKG_VERSION="733d179"
+PKG_VERSION="a963cc0"
+PKG_SHA256="2f81a9a6b7b7f46b79faa5b01df0c25fa5f16af80842d74e35b5fbf01ab0c619"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
 PKG_SITE="https://github.com/adafruit/${PKG_NAME}"
 PKG_URL="https://github.com/adafruit/${PKG_NAME}/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python distutilscross:host"
+PKG_DEPENDS_TARGET="toolchain Python2 distutilscross:host"
 PKG_SECTION="python"
 PKG_SHORTDESC="Adafruit Python ADS1x15 Library"
 PKG_LONGDESC="Python code to use the ADS1015 and ADS1115 analog to digital converters with a Raspberry Pi or BeagleBone black."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
-make_target() {
-  : # nop
-}
-
-makeinstall_target() {
-  : # nop
-}

@@ -18,6 +18,7 @@
 
 PKG_NAME="recordproto"
 PKG_VERSION="1.14.2"
+PKG_SHA256="a777548d2e92aa259f1528de3c4a36d15e07a4650d0976573a8e2ff5437e7370"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="recordproto: Record extension headers"
 PKG_LONGDESC="Record extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

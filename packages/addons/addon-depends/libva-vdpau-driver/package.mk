@@ -18,6 +18,7 @@
 
 PKG_NAME="libva-vdpau-driver"
 PKG_VERSION="0.7.4"
+PKG_SHA256="155c1982f0ac3f5435ba20b221bcaa11be212c37db548cd1f2a030ffa17e9bb9"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://freedesktop.org/wiki/Software/vaapi"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain libva libvdpau mesa"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="VDPAU backend for VA API"
 PKG_LONGDESC="VDPAU backend for VA API"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/va/s3g_drv_video.so

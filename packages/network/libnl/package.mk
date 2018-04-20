@@ -18,6 +18,7 @@
 
 PKG_NAME="libnl"
 PKG_VERSION="3.2.27"
+PKG_SHA256="4bbbf92b3c78a90f423cf96260bf419a28b75db8cced47051217a56795f58ec6"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://people.suug.ch/~tgr/libnl/"
@@ -26,8 +27,5 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="network"
 PKG_SHORTDESC="libnl: libnl - netlink library"
 PKG_LONGDESC="libnl is a library for applications dealing with netlink socket. It provides an easy to use interface for raw netlink message but also netlink family specific APIs."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-cli"

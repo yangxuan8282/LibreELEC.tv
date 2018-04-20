@@ -17,19 +17,18 @@
 ################################################################################
 
 PKG_NAME="e2fsprogs"
-PKG_VERSION="1.43.4"
+PKG_VERSION="1.43.9"
+PKG_SHA256="926f8e8de1ffba55d791f21b71334e8a32b5227257ad370f2bf7e4396629e97f"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://e2fsprogs.sourceforge.net/"
-PKG_URL="$SOURCEFORGE_SRC/$PKG_NAME/$PKG_NAME/1.42/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_URL="https://www.kernel.org/pub/linux/kernel/people/tytso/$PKG_NAME/v$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_DEPENDS_INIT="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="e2fsprogs: Utilities for use with the ext2 filesystem"
 PKG_LONGDESC="The filesystem utilities for the EXT2 filesystem, including e2fsck, mke2fs, dumpe2fs, fsck, and others."
-PKG_IS_ADDON="no"
-
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="-parallel"
 
 if [ "$HFSTOOLS" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET diskdev_cmds"
@@ -43,8 +42,6 @@ PKG_CONFIGURE_OPTS_TARGET="BUILD_CC=$HOST_CC \
                            --enable-verbose-makecmds \
                            --enable-symlink-install \
                            --enable-symlink-build \
-                           --enable-compression \
-                           --enable-htree \
                            --disable-elf-shlibs \
                            --disable-bsd-shlibs \
                            --disable-profile \
@@ -67,10 +64,6 @@ PKG_CONFIGURE_OPTS_TARGET="BUILD_CC=$HOST_CC \
 
 PKG_CONFIGURE_OPTS_INIT="$PKG_CONFIGURE_OPTS_TARGET"
 
-pre_make_host() {
-  # dont build parallel
-  MAKEFLAGS=-j1
-}
 
 post_makeinstall_target() {
   make -C lib/et LIBMODE=644 DESTDIR=$SYSROOT_PREFIX install
@@ -113,4 +106,3 @@ makeinstall_host() {
   make -C lib/et LIBMODE=644 install
   make -C lib/ext2fs LIBMODE=644 install
 }
-

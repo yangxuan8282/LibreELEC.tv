@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 PKG_NAME="multimedia-tools"
 PKG_VERSION=""
-PKG_REV="105"
+PKG_REV="107"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE=""
@@ -33,7 +33,6 @@ PKG_ADDON_NAME="Multimedia Tools"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_ADDON_PROVIDES=""
 
-PKG_AUTORECONF="no"
 
 PKG_DEPENDS_TARGET="toolchain \
                     alsa-utils \
@@ -72,6 +71,4 @@ addon() {
 
     # tstools
     cp -P $(get_build_dir tstools)/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin/
-
-  debug_strip $ADDON_BUILD/$PKG_ADDON_ID/bin
 }

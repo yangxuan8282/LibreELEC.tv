@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-
 PKG_NAME="pcscd"
 PKG_VERSION="1.0"
 PKG_REV="100"
@@ -29,19 +28,11 @@ PKG_DEPENDS_TARGET="toolchain pcsc-lite libusb ccid"
 PKG_SECTION="service"
 PKG_SHORTDESC="Middleware to access a smart card using SCard API (PC/SC)"
 PKG_LONGDESC="Middleware to access a smart card using SCard API (PC/SC)"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="PC/SC Smart Card Daemon"
 PKG_ADDON_TYPE="xbmc.service"
-
-make_target() {
-  :
-}
-
-makeinstall_target() {
-  : 
-}
 
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin/

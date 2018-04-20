@@ -18,6 +18,7 @@
 
 PKG_NAME="enet"
 PKG_VERSION="e33ca1d"
+PKG_SHA256="0ba5547de2c4c7fc79d367179a9bc92a7ac27e9258dd50fb277cd8761afaf9b0"
 PKG_ARCH="any"
 PKG_LICENSE=""
 PKG_SITE="https://github.com/cgutman/enet/"
@@ -26,8 +27,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="network"
 PKG_SHORTDESC="ENet's purpose is to provide a relatively thin, simple and robust network communication layer on top of UDP (User Datagram Protocol)"
 PKG_LONGDESC="ENet's purpose is to provide a relatively thin, simple and robust network communication layer on top of UDP (User Datagram Protocol)"
-PKG_USE_CMAKE="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
 

@@ -18,6 +18,7 @@
 
 PKG_NAME="libfontenc"
 PKG_VERSION="1.1.3"
+PKG_SHA256="70588930e6fc9542ff38e0884778fbc6e6febf21adbab92fd8f524fe60aefd21"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,12 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros xproto zlib font-util"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libfontenc: X11 font encoding library"
 PKG_LONGDESC="Libfontenc is a library which helps font libraries portably determine and deal with different encodings of fonts."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC -DPIC"
-}

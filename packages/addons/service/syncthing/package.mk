@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 
 PKG_NAME="syncthing"
 PKG_VERSION="0.14.29"
-PKG_REV="104"
+PKG_SHA256="99002701279abedace88283b1381ff7850b6c20df62ae119b271ffd89716fcfd"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="MPLv2"
 PKG_SITE="https://syncthing.net/"
@@ -27,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain go:host"
 PKG_SECTION="service/system"
 PKG_SHORTDESC="Syncthing: open source continuous file synchronization"
 PKG_LONGDESC="Syncthing ($PKG_VERSION) replaces proprietary sync and cloud services with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the Internet."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Syncthing"
@@ -64,32 +65,18 @@ configure_target() {
         arm1176jzf-s)
           export GOARM=6
           ;;
-        cortex-a7|cortex-a9)
+        *)
           export GOARM=7
           ;;
       esac
       ;;
   esac
-
-  export GOOS=linux
-  export CGO_ENABLED=1
-  export CGO_NO_EMULATION=1
-  export CGO_CFLAGS=$CFLAGS
-  export LDFLAGS="-w -linkmode external -extldflags -Wl,--unresolved-symbols=ignore-in-shared-libs -extld $CC -X main.Version=v$PKG_VERSION"
-  export GOLANG=$TOOLCHAIN/lib/golang/bin/go
-  export GOPATH=$PKG_BUILD/src/github.com/syncthing/syncthing:$PKG_BUILD/vendor:$PKG_BUILD/Godeps/_workspace
-  export GOROOT=$TOOLCHAIN/lib/golang
-  export PATH=$PATH:$GOROOT/bin
 }
 
 make_target() {
   cd $PKG_BUILD/src/github.com/syncthing/syncthing
   mkdir -p bin
   $GOLANG build -v -o bin/syncthing -a -ldflags "$LDFLAGS" ./cmd/syncthing
-}
-
-makeinstall_target() {
-  :
 }
 
 addon() {

@@ -18,6 +18,7 @@
 
 PKG_NAME="libbluray"
 PKG_VERSION="1.0.1"
+PKG_SHA256="0f9f9a1db2f48cafc70ed2596ff3594b597e2027408f5f2be6191c245d67853a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.videolan.org/developers/libbluray.html"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain fontconfig freetype libxml2"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="libbluray: A Blu-Ray Discs playback library"
 PKG_LONGDESC="libbluray is an open-source library designed for Blu-Ray Discs playback for media players, like VLC or MPlayer."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 if [ "$BLURAY_AACS_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libaacs"

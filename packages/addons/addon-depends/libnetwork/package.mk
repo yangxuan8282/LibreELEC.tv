@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libnetwork"
-PKG_VERSION="0f53435"
-PKG_REV="1"
+PKG_VERSION="7b2b1fe"
+PKG_SHA256="2eee331b6ded567a36e7db708405b34032b93938682cf049025f48b96d755bf6"
 PKG_ARCH="any"
 PKG_LICENSE="APL"
 PKG_SITE="https://github.com/docker/libnetwork"
@@ -27,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain go:host"
 PKG_SECTION="system"
 PKG_SHORTDESC="Libnetwork provides a native Go implementation for connecting containers"
 PKG_LONGDESC="Libnetwork provides a native Go implementation for connecting containers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 pre_make_target() {
   case $TARGET_ARCH in
@@ -43,9 +41,9 @@ pre_make_target() {
         arm1176jzf-s)
           export GOARM=6
           ;;
-        cortex-a7)
-         export GOARM=7
-         ;;
+        *)
+          export GOARM=7
+          ;;
       esac
       ;;
     aarch64)
@@ -67,8 +65,4 @@ pre_make_target() {
 make_target() {
   mkdir -p bin
   $GOLANG build -v -o bin/docker-proxy -a -ldflags "$LDFLAGS" ./cmd/proxy
-}
-
-makeinstall_target() {
-  :
 }

@@ -18,6 +18,7 @@
 
 PKG_NAME="libXcomposite"
 PKG_VERSION="0.4.4"
+PKG_SHA256="ede250cd207d8bee4a338265c3007d7a68d5aca791b6ac41af18e9a2aeb34178"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,12 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros compositeproto fixesproto libXfixes li
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libxcomposite: X Composite Library"
 PKG_LONGDESC="X Composite Library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC"
-}

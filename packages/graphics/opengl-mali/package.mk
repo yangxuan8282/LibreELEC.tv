@@ -18,6 +18,7 @@
 
 PKG_NAME="opengl-mali"
 PKG_VERSION="20130520"
+PKG_SHA256="4832c8b56fa2b844ff5ead96185a83e08731767062ed711b86fd70543211a9db"
 PKG_ARCH="arm"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.arm.com/products/multimedia/mali-graphics-hardware/mali-400-mp.php"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="opengl-mali: OpenGL-ES and Mali driver for Mali 400 GPUs"
 PKG_LONGDESC="opengl-mali: OpenGL-ES and Mali driver for Mali 400 GPUs"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 make_target() {
  : # nothing todo
@@ -50,4 +48,3 @@ makeinstall_target() {
     ln -sf libGLESv1_CM.so.1.1 $INSTALL/usr/lib/libGLESv1_CM.so
     ln -sf libGLESv2.so.2.0 $INSTALL/usr/lib/libGLESv2.so
 }
-

@@ -18,6 +18,7 @@
 
 PKG_NAME="syslinux"
 PKG_VERSION="6.03"
+PKG_SHA256="26d3986d2bea109d5dc0e4f8c4822a459276cf021125e8c9f23c3cca5d8c850e"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
 PKG_SITE="http://syslinux.zytor.com/"
@@ -27,9 +28,6 @@ PKG_DEPENDS_TARGET="toolchain util-linux e2fsprogs syslinux:host"
 PKG_SECTION="tools"
 PKG_SHORTDESC="syslinux: Linux bootloader collection"
 PKG_LONGDESC="The SYSLINUX project covers lightweight linux bootloaders for floppy media (syslinux), network booting (pxelinux) and bootable el-torito cd-roms (isolinux)."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_MAKE_OPTS_TARGET="CC=$CC AR=$AR RANLIB=$RANLIB installer"
 

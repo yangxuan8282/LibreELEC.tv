@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,43 +18,19 @@
 
 PKG_NAME="gcc-linaro-aarch64-elf"
 PKG_VERSION="4.9-2016.02"
+PKG_SHA256="67b8d6d3c764a5b2e21bf4a9cc990f6d6db691df5fcc814e34051c521346ec10"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE=""
 PKG_URL="https://releases.linaro.org/components/toolchain/binaries/${PKG_VERSION}/aarch64-elf/gcc-linaro-${PKG_VERSION}-x86_64_aarch64-elf.tar.xz"
 PKG_SOURCE_DIR="gcc-linaro-${PKG_VERSION}-x86_64_aarch64-elf"
-PKG_DEPENDS_HOST="toolchain ccache:host"
+PKG_DEPENDS_HOST="toolchain"
 PKG_SECTION="lang"
 PKG_SHORTDESC=""
 PKG_LONGDESC=""
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-make_host() {
-  :
-}
+PKG_TOOLCHAIN="manual"
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/lib/gcc-linaro-aarch64-elf/
     cp -a * $TOOLCHAIN/lib/gcc-linaro-aarch64-elf
-
-  # wrap gcc and g++ with ccache like in gcc package.mk
-  PKG_GCC_PREFIX="$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/aarch64-elf-"
-
-  cp "${PKG_GCC_PREFIX}gcc" "${PKG_GCC_PREFIX}gcc.real"
-cat > "${PKG_GCC_PREFIX}gcc" << EOF
-#!/bin/sh
-$TOOLCHAIN/bin/ccache ${PKG_GCC_PREFIX}gcc.real "\$@"
-EOF
-
-  chmod +x "${PKG_GCC_PREFIX}gcc"
-
-  cp "${PKG_GCC_PREFIX}g++" "${PKG_GCC_PREFIX}g++.real"
-cat > "${PKG_GCC_PREFIX}g++" << EOF
-#!/bin/sh
-$TOOLCHAIN/bin/ccache ${PKG_GCC_PREFIX}g++.real "\$@"
-EOF
-
-  chmod +x "${PKG_GCC_PREFIX}g++"
 }

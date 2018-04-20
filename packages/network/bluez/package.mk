@@ -17,20 +17,19 @@
 ################################################################################
 
 PKG_NAME="bluez"
-PKG_VERSION="5.43"
+PKG_VERSION="5.48"
+PKG_SHA256="a89ba9f21eabdc28a6eec046c14f901ee2d9809d303f8df25e9e2d4d7c4c2dc8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.bluez.org/"
-PKG_URL="http://www.kernel.org/pub/linux/bluetooth/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://git.kernel.org/pub/scm/bluetooth/bluez.git/snapshot/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain dbus glib readline systemd"
 PKG_SECTION="network"
 PKG_SHORTDESC="bluez: Bluetooth Tools and System Daemons for Linux."
 PKG_LONGDESC="Bluetooth Tools and System Daemons for Linux."
+PKG_TOOLCHAIN="autotools"
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
-
-if [ "$DEBUG" = "yes" ]; then
+if build_with_debug; then
   BLUEZ_CONFIG="--enable-debug"
 else
   BLUEZ_CONFIG="--disable-debug"
@@ -50,7 +49,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
                            --disable-obex \
                            --enable-client \
                            --enable-systemd \
-                           --enable-tools \
+                           --enable-tools --enable-deprecated \
                            --enable-datafiles \
                            --disable-experimental \
                            --enable-sixaxis \
@@ -63,7 +62,7 @@ pre_configure_target() {
   cd $PKG_BUILD
     rm -rf .$TARGET_NAME
 
-  export LIBS="-ltermcap"
+  export LIBS="-lncurses"
 }
 
 post_makeinstall_target() {

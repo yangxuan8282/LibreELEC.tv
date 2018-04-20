@@ -18,18 +18,17 @@
 ################################################################################
 
 PKG_NAME="open-vm-tools"
-PKG_VERSION="stable-10.1.0"
+PKG_VERSION="stable-10.1.5"
+PKG_SHA256="53c281119a6ef43022853f858f91aa6985baed2e668c85fdfa0eb39c9c2c24a9"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
-PKG_SITE="http://open-vm-tools.sourceforge.net"
+PKG_SITE="https://github.com/vmware/open-vm-tools"
 PKG_URL="https://github.com/vmware/open-vm-tools/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain glib:host glib libdnet fuse"
 PKG_SECTION="virtualization"
 PKG_SHORTDESC="open-vm-tools: open source implementation of VMware Tools"
 PKG_LONGDESC="open-vm-tools: open source implementation of VMware Tools"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-docs \
                            --disable-tests \

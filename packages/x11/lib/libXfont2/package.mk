@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libXfont2"
-PKG_VERSION="2.0.1"
+PKG_VERSION="2.0.2"
+PKG_SHA256="94088d3b87f7d42c7116d9adaad155859e93330c6e47f5989f2de600b9a6c111"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros fontcacheproto fontsproto xtrans freet
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libxfont: X font Library"
 PKG_LONGDESC="X font Library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
                            --disable-ipv6 \
@@ -40,4 +38,3 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
                            --enable-fc \
                            --with-gnu-ld \
                            --without-xmlto"
-

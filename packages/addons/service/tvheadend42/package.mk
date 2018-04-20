@@ -17,19 +17,19 @@
 ################################################################################
 
 PKG_NAME="tvheadend42"
-PKG_VERSION="c1c2293"
-PKG_VERSION_NUMBER="4.2.5"
-PKG_REV="113"
+PKG_VERSION="fc63a8a"
+PKG_SHA256="38c25e191733a0e0944ec3e32de2aab6a1cff9ddfc597fc328a73579f7c8bf41"
+PKG_VERSION_NUMBER="4.2.5-31"
+PKG_REV="114"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.tvheadend.org"
 PKG_URL="https://github.com/tvheadend/tvheadend/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="tvheadend-${PKG_VERSION}*"
-PKG_DEPENDS_TARGET="toolchain avahi curl dvb-apps ffmpegx libdvbcsa libiconv openssl pngquant:host Python:host"
+PKG_DEPENDS_TARGET="toolchain avahi curl dvb-apps ffmpegx libdvbcsa libhdhomerun libiconv openssl pngquant:host Python2:host tvh-dtv-scan-tables"
 PKG_SECTION="service"
 PKG_SHORTDESC="Tvheadend: a TV streaming server for Linux"
 PKG_LONGDESC="Tvheadend ($PKG_VERSION_NUMBER): is a TV streaming server for Linux supporting DVB-S/S2, DVB-C, DVB-T/T2, IPTV, SAT>IP, ATSC and ISDB-T"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Tvheadend Server 4.2"
@@ -71,8 +71,9 @@ PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
                            --disable-dbus_1 \
                            --enable-dvbcsa \
                            --enable-dvben50221 \
+                           --disable-dvbscan \
                            --enable-hdhomerun_client \
-                           --enable-hdhomerun_static \
+                           --disable-hdhomerun_static \
                            --enable-epoll \
                            --enable-inotify \
                            --enable-pngquant \
@@ -100,6 +101,9 @@ pre_configure_target() {
   CFLAGS="$CFLAGS -I$(get_build_dir ffmpegx)/.INSTALL_PKG/usr/local/include"
   LDFLAGS="$LDFLAGS -L$(get_build_dir ffmpegx)/.INSTALL_PKG/usr/local/lib"
 
+# pass libhdhomerun to build
+  CFLAGS="$CFLAGS -I$(get_build_dir libhdhomerun)"
+
   export CROSS_COMPILE="$TARGET_PREFIX"
   export CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr/include/iconv -L$SYSROOT_PREFIX/usr/lib/iconv"
 }
@@ -114,6 +118,20 @@ makeinstall_target() {
 
 addon() {
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
+
+  cp $PKG_DIR/addon.xml $ADDON_BUILD/$PKG_ADDON_ID
+
+  # set only version (revision will be added by buildsystem)
+  $SED -e "s|@ADDON_VERSION@|$ADDON_VERSION|g" \
+       -i $ADDON_BUILD/$PKG_ADDON_ID/addon.xml
+
   cp -P $PKG_BUILD/build.linux/tvheadend $ADDON_BUILD/$PKG_ADDON_ID/bin
   cp -P $PKG_BUILD/capmt_ca.so $ADDON_BUILD/$PKG_ADDON_ID/bin
+
+  #dvb-scan files
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/dvb-scan
+  cp -r $(get_build_dir tvh-dtv-scan-tables)/atsc \
+        $(get_build_dir tvh-dtv-scan-tables)/dvb-* \
+        $(get_build_dir tvh-dtv-scan-tables)/isdb-t \
+        $ADDON_BUILD/$PKG_ADDON_ID/dvb-scan
 }

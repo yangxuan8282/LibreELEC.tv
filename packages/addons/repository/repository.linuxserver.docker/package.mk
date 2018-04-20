@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - https://LibreELEC.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,32 +17,27 @@
 ################################################################################
 
 PKG_NAME="repository.linuxserver.docker"
-PKG_VERSION="8.1"
-PKG_REV="101"
+PKG_VERSION="9.0"
+PKG_REV="102"
 PKG_ARCH="any"
-PKG_ADDON_PROJECTS="Generic RPi RPi2 imx6 WeTek_Hub WeTek_Play_2 Odroid_C2 S905"
+PKG_ADDON_PROJECTS="any !WeTek_Core !WeTek_Play"
 PKG_LICENSE="GPL"
 PKG_SITE="https://linuxserver.io"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain xmlstarlet:host"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION=""
 PKG_SHORTDESC="LinuxServer.io docker add-on repository"
 PKG_LONGDESC="LinuxServer.io docker add-on repository"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="LinuxServer.io Repository"
 PKG_ADDON_TYPE="xbmc.addon.repository"
 
-
 make_target() {
   $SED -e "s|@PKG_VERSION@|$PKG_VERSION|g" \
        -e "s|@PKG_REV@|$PKG_REV|g" \
        -i addon.xml
-}
-
-makeinstall_target() {
-  : # nop
 }
 
 addon() {

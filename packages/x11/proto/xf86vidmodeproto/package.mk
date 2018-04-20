@@ -18,6 +18,7 @@
 
 PKG_NAME="xf86vidmodeproto"
 PKG_VERSION="2.3.1"
+PKG_SHA256="45d9499aa7b73203fd6b3505b0259624afed5c16b941bd04fcf123e5de698770"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="xf86vidmodeproto: XF86VidMode extension headers"
 PKG_LONGDESC="XF86VidMode extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

@@ -18,6 +18,7 @@
 
 PKG_NAME="sidplay-libs"
 PKG_VERSION="2.1.1"
+PKG_SHA256="e9a24ada48215a46d2c232a70c5601bc9505e997f120e8f2ba3713e09e28d1f9"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://sidplay2.sourceforge.net/"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="audio"
 PKG_SHORTDESC="sidplay-libs"
 PKG_LONGDESC="sidplay-libs"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static"
 

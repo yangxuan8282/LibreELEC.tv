@@ -1,8 +1,8 @@
 # VERSION: set full version, use "devel" for development version
-  LIBREELEC_VERSION="17.6_20180122"
+  LIBREELEC_VERSION="18.0_20180417"
 
 # OS_VERSION: OS Version
-  OS_VERSION="8.2"
+  OS_VERSION="9.0"
 
 # ADDON_VERSION: Addon version
-  ADDON_VERSION="8.2"
+  ADDON_VERSION="9.0"

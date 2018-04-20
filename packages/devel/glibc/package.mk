@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="glibc"
-PKG_VERSION="2.24"
+PKG_VERSION="2.27"
+PKG_SHA256="5172de54318ec0b7f2735e5a91d908afe1c9ca291fec16b5374d9faadfc1fc72"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/libc/"
@@ -27,9 +28,7 @@ PKG_DEPENDS_INIT="glibc"
 PKG_SECTION="toolchain/devel"
 PKG_SHORTDESC="glibc: The GNU C library"
 PKG_LONGDESC="The Glibc package contains the main C library. This library provides the basic routines for allocating memory, searching directories, opening and closing files, reading and writing files, string handling, pattern matching, arithmetic, and so on."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="-lto -gold"
 
 PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            ac_cv_path_PERL=no \
@@ -49,22 +48,19 @@ PKG_CONFIGURE_OPTS_TARGET="BASH_SHELL=/bin/sh \
                            --without-cvs \
                            --without-gd \
                            --enable-obsolete-rpc \
+                           --enable-obsolete-nsl \
                            --disable-build-nscd \
                            --disable-nscd \
                            --enable-lock-elision \
                            --disable-timezone-tools"
 
-if [ "$DEBUG" = yes ]; then
+if build_with_debug; then
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-debug"
 else
   PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --disable-debug"
 fi
 
 NSS_CONF_DIR="$PKG_BUILD/nss"
-
-GLIBC_EXCLUDE_BIN="catchsegv gencat getconf iconv iconvconfig ldconfig"
-GLIBC_EXCLUDE_BIN="$GLIBC_EXCLUDE_BIN makedb mtrace pcprofiledump"
-GLIBC_EXCLUDE_BIN="$GLIBC_EXCLUDE_BIN pldd rpcgen sln sotruss sprof xtrace"
 
 pre_build_target() {
   cd $PKG_BUILD
@@ -74,12 +70,6 @@ pre_build_target() {
 }
 
 pre_configure_target() {
-# Fails to compile with GCC's link time optimization.
-  strip_lto
-
-# glibc dont support GOLD linker.
-  strip_gold
-
 # Filter out some problematic *FLAGS
   export CFLAGS=`echo $CFLAGS | sed -e "s|-ffast-math||g"`
   export CFLAGS=`echo $CFLAGS | sed -e "s|-Ofast|-O2|g"`
@@ -115,6 +105,9 @@ echo "libdir=/usr/lib" >> configparms
 echo "slibdir=/usr/lib" >> configparms
 echo "sbindir=/usr/bin" >> configparms
 echo "rootsbindir=/usr/bin" >> configparms
+echo "build-programs=yes" >> configparms
+
+GLIBC_INCLUDE_BIN="getent ldd locale"
 }
 
 post_makeinstall_target() {
@@ -122,9 +115,18 @@ post_makeinstall_target() {
   ln -sf $(basename $INSTALL/usr/lib/ld-*.so) $INSTALL/usr/lib/ld.so
 
 # cleanup
-  for i in $GLIBC_EXCLUDE_BIN; do
-    rm -rf $INSTALL/usr/bin/$i
+# remove any programs we don't want/need, keeping only those we want
+  for f in $(find $INSTALL/usr/bin -type f); do
+    fb="$(basename "${f}")"
+    for ib in $GLIBC_INCLUDE_BIN; do
+      if [ "${ib}" == "${fb}" ]; then
+        fb=
+        break
+      fi
+    done
+    [ -n "${fb}" ] && rm -rf ${f}
   done
+
   rm -rf $INSTALL/usr/lib/audit
   rm -rf $INSTALL/usr/lib/glibc
   rm -rf $INSTALL/usr/lib/libc_pic

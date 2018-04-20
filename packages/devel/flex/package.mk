@@ -18,6 +18,7 @@
 
 PKG_NAME="flex"
 PKG_VERSION="2.5.39"
+PKG_SHA256="add2b55f3bc38cb512b48fad7d72f43b11ef244487ff25fc00aabec1e32b617f"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://flex.sourceforge.net/"
@@ -26,9 +27,7 @@ PKG_DEPENDS_HOST="ccache:host"
 PKG_SECTION="toolchain/devel"
 PKG_SHORTDESC="flex: Fast lexical analyzer generator"
 PKG_LONGDESC="flex is a tool for generating programs that perform pattern-matching on text."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared --disable-rpath --with-gnu-ld"
 

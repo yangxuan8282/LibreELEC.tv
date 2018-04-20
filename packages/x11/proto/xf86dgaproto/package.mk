@@ -18,6 +18,7 @@
 
 PKG_NAME="xf86dgaproto"
 PKG_VERSION="2.1"
+PKG_SHA256="ac5ef65108e1f2146286e53080975683dae49fc94680042e04bd1e2010e99050"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="xf86dgaproto: XF86DGA extension headers"
 PKG_LONGDESC="XF86DGA extension headers"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

@@ -18,6 +18,7 @@
 
 PKG_NAME="libXtst"
 PKG_VERSION="1.2.3"
+PKG_SHA256="4655498a1b8e844e3d6f21f3b2c4e2b571effb5fd83199d428a6ba7ea4bf5204"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,8 +27,5 @@ PKG_DEPENDS_TARGET="toolchain util-macros recordproto xextproto libXext inputpro
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libxtst: The Xtst Library"
 PKG_LONGDESC="The Xtst Library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --with-gnu-ld --without-xmlto"

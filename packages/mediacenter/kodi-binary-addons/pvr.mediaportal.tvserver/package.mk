@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="pvr.mediaportal.tvserver"
-PKG_VERSION="d261c83"
-PKG_REV="1"
+PKG_VERSION="74e2bea"
+PKG_SHA256="74eaa93d659584401fef4bf9e709f290494ee82a54d566dc2343cce1ecb5b2ba"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -27,19 +28,10 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform"
 PKG_SECTION=""
 PKG_SHORTDESC="pvr.mediaportal.tvserver"
 PKG_LONGDESC="pvr.mediaportal.tvserver"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.pvrclient"
 
 pre_configure_target() {
-  CXXFLAGS="$CXXFLAGS -Wno-narrowing"
-}
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
+  CXXFLAGS="$CXXFLAGS -Wno-narrowing -DXLOCALE_NOT_USED"
 }

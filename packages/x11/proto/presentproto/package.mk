@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="presentproto"
-PKG_VERSION="1.0"
+PKG_VERSION="1.1"
+PKG_SHA256="f69b23a8869f78a5898aaf53938b829c8165e597cda34f06024d43ee1e6d26b9"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros"
 PKG_SECTION="x11/proto"
 PKG_SHORTDESC="presentproto: Present extension headers"
 PKG_LONGDESC="The Present extension provides a way for applications to update their window contents from a pixmap in a well defined fashion, synchronizing with the display refresh and potentially using a more efficient mechanism than copying the contents of the source pixmap."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--without-xmlto"

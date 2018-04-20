@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="inotify-tools"
 PKG_VERSION="1df9af4"
+PKG_SHA256="628b8efabb65a739dd747fe43b73b29a609b5cfa9628caa127764ed77766a6e1"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="http://wiki.github.com/rvoicilas/inotify-tools/"
@@ -26,9 +27,8 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="inotify-tools"
 PKG_LONGDESC="a C library and a set of command-line programs for Linux providing a simple interface to inotify"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
-PKG_IS_ADDON="no"
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --disable-doxygen"
 
 pre_configure_target() {

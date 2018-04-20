@@ -18,6 +18,7 @@
 
 PKG_NAME="libmad"
 PKG_VERSION="0.15.1b"
+PKG_SHA256="bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.mars.org/home/rob/proj/mpeg/"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="audio"
 PKG_SHORTDESC="libmad: MPEG Audio Decoder"
 PKG_LONGDESC="MAD is a high-quality MPEG audio decoder. It currently supports MPEG-1 and the MPEG-2 extension to Lower Sampling Frequencies, as well as the so-called MPEG 2.5 format. All three audio layers (Layer I, Layer II, and Layer III a.k.a. MP3) are fully implemented."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"

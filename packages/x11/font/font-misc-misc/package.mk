@@ -18,6 +18,7 @@
 
 PKG_NAME="font-misc-misc"
 PKG_VERSION="1.1.2"
+PKG_SHA256="b8e77940e4e1769dc47ef1805918d8c9be37c708735832a07204258bacc11794"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros font-util font-cursor-misc"
 PKG_SECTION="x11/font"
 PKG_SHORTDESC="font-misc-misc: A misc. public domain font"
 PKG_LONGDESC="A misc. public domain font."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--with-fontrootdir=/usr/share/fonts \
                            --disable-silent-rules \

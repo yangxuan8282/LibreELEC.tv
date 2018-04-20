@@ -19,6 +19,7 @@
 
 PKG_NAME="ccid"
 PKG_VERSION="1.4.28"
+PKG_SHA256="875836ac5d9d952b40dc1a253a726e74361671864d81337285a3260268f8ade0"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://pcsclite.alioth.debian.org/ccid.html"
@@ -27,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain pcsc-lite"
 PKG_SECTION="driver"
 PKG_SHORTDESC="CCID free software driver"
 PKG_LONGDESC="CCID free software driver"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --enable-twinserial"
 

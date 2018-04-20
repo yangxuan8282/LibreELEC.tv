@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="opencaster"
 PKG_VERSION="3.2.2"
+PKG_SHA256="c9d77f98b31d53f521e3179003a9cb66b0586704717e9d401f3bc0dafa243865"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.avalpa.com/the-key-values/15-free-software/33-opencaster"
@@ -26,7 +27,8 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="MPEG2 transport stream data generator and packet manipulator"
 PKG_LONGDESC="OpenCaster is a free and open source MPEG2 transport stream data generator and packet manipulator"
-PKG_AUTORECONF="no"
+
+PKG_MAKE_OPTS_TARGET="CC=$CC"
 
 pre_makeinstall_target() {
   mkdir -p $PKG_BUILD/.install_pkg

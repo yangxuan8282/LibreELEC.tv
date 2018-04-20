@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="newt"
-PKG_VERSION="0.52.19"
+PKG_VERSION="0.52.20"
+PKG_SHA256="8d66ba6beffc3f786d4ccfee9d2b43d93484680ef8db9397a4fb70b5adbb6dbc"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://pagure.io/newt"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain slang popt"
 PKG_SECTION="tools"
 PKG_SHORTDESC="newt: A programming library for color text mode, widget based user interfaces"
 PKG_LONGDESC="Newt is a programming library for color text mode, widget based user interfaces. Newt can be used to add stacked windows, entry widgets, checkboxes, radio buttons, labels, plain text fields, scrollbars, etc., to text mode user interfaces. Newt is based on the S-Lang library."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-nls \
                            --without-python \
@@ -45,4 +44,3 @@ pre_configure_host() {
  cd $PKG_BUILD
  rm -rf .$HOST_NAME
 }
-

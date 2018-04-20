@@ -18,7 +18,7 @@
 
 PKG_NAME="sundtek-mediatv"
 PKG_VERSION="7.0"
-PKG_REV="104"
+PKG_REV="105"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://support.sundtek.com/"
@@ -27,11 +27,11 @@ PKG_DEPENDS_TARGET=""
 PKG_SECTION="driver/dvb"
 PKG_SHORTDESC="Sundtek MediaTV: a Linux driver to add support for SUNDTEK USB DVB devices"
 PKG_LONGDESC="Install this to add support for Sundtek USB DVB devices."
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Sundtek MediaTV"
 PKG_ADDON_TYPE="xbmc.service"
-PKG_AUTORECONF="no"
 
 make_target() {
   mkdir -p $PKG_BUILD
@@ -48,22 +48,18 @@ make_target() {
       INSTALLER_URL="http://sundtek.de/media/netinst/arm64/installer.tar.gz"
       ;;
   esac
-  
+
   wget -O installer.tar.gz $INSTALLER_URL
-  
+
   tar -xzf installer.tar.gz
-  
+
   chmod -R 755 opt/ etc/
-  
+
   rm -f  opt/bin/getinput.sh
   rm -f  opt/bin/lirc.sh
   rm -fr opt/lib/pm/
 
   wget -O version.used http://sundtek.de/media/latest.phtml
-}
-
-makeinstall_target() {
-  : # nothing to do here
 }
 
 addon() {

@@ -18,6 +18,7 @@
 
 PKG_NAME="libXft"
 PKG_VERSION="2.3.2"
+PKG_SHA256="f5a3c824761df351ca91827ac221090943ef28b248573486050de89f4bfcdc4c"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,8 +27,5 @@ PKG_DEPENDS_TARGET="toolchain util-macros xproto libXrender fontconfig freetype"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libxft: X FreeType library"
 PKG_LONGDESC="X FreeType library"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"

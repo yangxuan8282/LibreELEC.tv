@@ -18,6 +18,7 @@
 
 PKG_NAME="wireless-regdb"
 PKG_VERSION="2017.03.07"
+PKG_SHA256="371eafa3b26ece916ef83aca02c4bed2e54099eb5b8c6d22d3a4358dce6535b9"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://wireless.kernel.org/en/developers/Regulatory"
@@ -26,14 +27,4 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="network"
 PKG_SHORTDESC="wireless-regdb: regulatory database"
 PKG_LONGDESC="wireless-regdb is a regulatory database"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-make_target() {
-  : # nothing to do
-}
-
-makeinstall_target() {
-  : # nothing to do
-}
+PKG_TOOLCHAIN="manual"

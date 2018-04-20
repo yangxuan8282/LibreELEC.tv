@@ -18,6 +18,7 @@
 
 PKG_NAME="libftdi1"
 PKG_VERSION="1.3"
+PKG_SHA256="9a8c95c94bfbcf36584a0a58a6e2003d9b133213d9202b76aec76302ffaa81f4"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://www.intra2net.com/en/developer/libftdi/"
@@ -26,19 +27,13 @@ PKG_DEPENDS_TARGET="toolchain libusb"
 PKG_SECTION="devel"
 PKG_SHORTDESC="libFTDI is an open source library to talk to FTDI chips"
 PKG_LONGDESC="libFTDI is an open source library to talk to FTDI chips"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CMAKE_OPTS_TARGET="-DSTATICLIBS=ON \
                        -DDOCUMENTATION=FALSE \
                        -DEXAMPLES=FALSE \
                        -DFTDIPP=FALSE \
                        -DPYTHON_BINDINGS=FALSE"
-
-pre_configure_target() {
-  CFLAGS="$CFLAGS -fPIC -DPIC"
-}
 
 makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/include/libftdi1

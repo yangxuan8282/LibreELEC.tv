@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2016-     Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -27,5 +27,6 @@ PKG_SECTION="virtual"
 PKG_SHORTDESC="virtual: Meta package to install Virtual project extra deps"
 PKG_LONGDESC="virtual is a Meta package to install Virtual project extra dependencies"
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+get_graphicdrivers
+
+listcontains "$GRAPHIC_DRIVERS" "vmware" && PKG_DEPENDS_TARGET+=" open-vm-tools" || true

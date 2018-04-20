@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="wireless_tools"
 PKG_VERSION="29"
+PKG_SHA256="6fb80935fe208538131ce2c4178221bab1078a1656306bce8909c19887e2e5a1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html"
@@ -27,12 +28,8 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="debug/tools"
 PKG_SHORTDESC="wireless-tools: tools allowing to manipulate the Wireless Extensions"
 PKG_LONGDESC="The Wireless Tools (WT) is a set of tools allowing to manipulate the Wireless Extensions. They use a textual interface and are rather crude, but aim to support the full Wireless Extension. There are many other tools you can use with Wireless Extensions, however Wireless Tools is the reference implementation."
-PKG_AUTORECONF="no"
-
-pre_configure_Target() {
-  # wireless_tools fails to build on some systems with LTO enabled
-  strip_lto
-}
+# wireless_tools fails to build on some systems with LTO enabled
+PKG_BUILD_FLAGS="-lto"
 
 make_target() {
   make PREFIX=/usr CC="$CC" AR="$AR" \

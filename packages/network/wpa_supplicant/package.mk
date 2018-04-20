@@ -18,6 +18,7 @@
 
 PKG_NAME="wpa_supplicant"
 PKG_VERSION="2.6"
+PKG_SHA256="b4936d34c4e6cdd44954beba74296d964bc2c9668ecaa5255e499636fe2b1450"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://w1.fi/wpa_supplicant/"
@@ -26,7 +27,7 @@ PKG_DEPENDS_TARGET="toolchain dbus libnl openssl"
 PKG_SECTION="network"
 PKG_SHORTDESC="wpa_supplicant: An IEEE 802.11i supplicant implementation"
 PKG_LONGDESC="The wpa_supplicant is a free software implementation of an IEEE 802.11i supplicant. In addition to being a full-featured WPA2 supplicant, it also has support for WPA and older wireless LAN security protocols."
-PKG_IS_ADDON="no"
+PKG_TOOLCHAIN="make"
 
 PKG_MAKE_OPTS_TARGET="-C wpa_supplicant V=1 LIBDIR=/usr/lib BINDIR=/usr/bin"
 PKG_MAKEINSTALL_OPTS_TARGET="-C wpa_supplicant V=1 LIBDIR=/usr/lib BINDIR=/usr/bin"

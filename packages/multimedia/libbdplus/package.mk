@@ -18,6 +18,7 @@
 
 PKG_NAME="libbdplus"
 PKG_VERSION="0.1.2"
+PKG_SHA256="a631cae3cd34bf054db040b64edbfc8430936e762eb433b1789358ac3d3dc80a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.videolan.org/developers/libbdplus.html"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain libgcrypt libgpg-error"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="libbdplus: A project to implement the BD+ System Specifications"
 PKG_LONGDESC="libbdplus is a research project to implement the BD+ System Specifications."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-werror \
                            --disable-extra-warnings \

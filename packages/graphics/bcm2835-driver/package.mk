@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="93aae13"
+PKG_VERSION="75de5d7"
+PKG_SHA256="76790225b155dc119ff1115e15ace032f90028ec06cdb66bdda0aeb54b83e267"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.broadcom.com"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain dtc"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
 PKG_LONGDESC="OpenMAX-bcm2835: OpenGL-ES and OpenMAX driver for BCM2835"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 if [ "$TARGET_FLOAT" = "softfp" -o "$TARGET_FLOAT" = "soft" ]; then
   FLOAT="softfp"
@@ -45,6 +44,7 @@ make_target() {
     ln -sf $SYSROOT_PREFIX/usr/lib/libbrcmEGL.so $SYSROOT_PREFIX/usr/lib/libEGL.so
     ln -sf $SYSROOT_PREFIX/usr/lib/libbrcmGLESv2.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so
     cp -PRv $FLOAT/opt/vc/lib/*.a $SYSROOT_PREFIX/usr/lib
+    cp -PRv $FLOAT/opt/vc/lib/pkgconfig $SYSROOT_PREFIX/usr/lib
 }
 
 makeinstall_target() {
@@ -54,7 +54,9 @@ makeinstall_target() {
   mkdir -p $INSTALL/usr/lib
     cp -PRv $FLOAT/opt/vc/lib/*.so $INSTALL/usr/lib
     ln -sf /usr/lib/libbrcmEGL.so $INSTALL/usr/lib/libEGL.so
+    ln -sf /usr/lib/libbrcmEGL.so $INSTALL/usr/lib/libEGL.so.1
     ln -sf /usr/lib/libbrcmGLESv2.so $INSTALL/usr/lib/libGLESv2.so
+    ln -sf /usr/lib/libbrcmGLESv2.so $INSTALL/usr/lib/libGLESv2.so.2
 
 # some usefull debug tools
   mkdir -p $INSTALL/usr/bin

@@ -1,5 +1,5 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2009-2016 Team LibreELEC (team@libreelec.tv)
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libdvdread"
-PKG_VERSION="17d99db"
+PKG_VERSION="86f9500"
+PKG_SHA256="a73888c81d14443d9f09fa02f5e5ecc08d9ab09639789fab810557069d335f34"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/xbmc/libdvdread"
@@ -26,18 +27,4 @@ PKG_DEPENDS_TARGET="toolchain libdvdcss"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="libdvdread: a library which provides a simple foundation for reading DVDs."
 PKG_LONGDESC="libdvdread is a library which provides a simple foundation for reading DVDs."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-configure_target() {
-  :
-}
-
-make_target() {
-  :
-}
-
-makeinstall_target() {
-  :
-}
+PKG_TOOLCHAIN="manual"

@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - https://LibreELEC.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,30 +18,25 @@
 
 PKG_NAME="repository.kodinerds"
 PKG_VERSION="8.1"
-PKG_REV="102"
+PKG_REV="103"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodinerds.net"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain xmlstarlet:host"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION=""
 PKG_SHORTDESC="Kodinerds add-on repository"
 PKG_LONGDESC="Kodinerds add-on repository"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Kodinerds Repository"
 PKG_ADDON_TYPE="xbmc.addon.repository"
 
-
 make_target() {
   $SED -e "s|@PKG_VERSION@|$PKG_VERSION|g" \
        -e "s|@PKG_REV@|$PKG_REV|g" \
        -i addon.xml
-}
-
-makeinstall_target() {
-  : # nop
 }
 
 addon() {

@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="libpciaccess"
-PKG_VERSION="0.13.4"
+PKG_VERSION="0.14"
+PKG_SHA256="3df543e12afd41fea8eac817e48cbfde5aed8817b81670a4e9e493bb2f5bf2a4"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://freedesktop.org"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros zlib"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libpciaccess: X.org libpciaccess library"
 PKG_LONGDESC="X.org libpciaccess library."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 CFLAGS="$CFLAGS -D_LARGEFILE64_SOURCE"
 

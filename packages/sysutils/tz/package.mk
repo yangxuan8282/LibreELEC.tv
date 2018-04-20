@@ -17,7 +17,8 @@
 ################################################################################
 
 PKG_NAME="tz"
-PKG_VERSION="2017b"
+PKG_VERSION="2018c"
+PKG_SHA256="9c653d7b7b127d81f7db07920d1c3f7a0a7f1e5bc042d7907e01427593954e15"
 PKG_ARCH="any"
 PKG_LICENSE="Public Domain"
 PKG_SITE="http://www.iana.org/time-zones"
@@ -27,18 +28,14 @@ PKG_SECTION="system"
 PKG_SHORTDESC="tzdata"
 PKG_LONGDESC="tzdata"
 
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
 PKG_MAKE_OPTS_TARGET="CC=$HOST_CC LDFLAGS="
 
 makeinstall_target() {
-  make TOPDIR="$INSTALL" install
+  make TZDIR="$INSTALL/usr/share/zoneinfo" REDO=posix_only TOPDIR="$INSTALL" install
 }
 
 post_makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/zoneinfo
-  mv $INSTALL/etc/zoneinfo/* $INSTALL/usr/share/zoneinfo
+  rm -rf $INSTALL/usr/bin $INSTALL/usr/sbin
 
   rm -rf $INSTALL/etc
   mkdir -p $INSTALL/etc

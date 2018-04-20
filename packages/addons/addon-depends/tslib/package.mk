@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="tslib"
 PKG_VERSION="1.1"
+PKG_SHA256="fe35e5f710ea933b118f710e2ce4403ac076fe69926b570333867d4de082a51c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/kergoth/tslib"
@@ -26,9 +27,7 @@ PKG_DEPENDS_TARGET="toolchain evtest"
 PKG_SECTION="service/system"
 PKG_SHORTDESC="Touchscreen access library with ts_uinput_touch daemon."
 PKG_LONGDESC="Touchscreen access library with ts_uinput_touch daemon."
-PKG_AUTORECONF="yes"
-
-PKG_IS_ADDON="no"
+PKG_TOOLCHAIN="autotools"
 
 TSLIB_MODULES_ENABLED="linear dejitter variance pthres ucb1x00 tatung input galax dmc touchkit st1232 waveshare"
 TSLIB_MODULES_DISABLED="arctic2 corgi collie h3600 linear_h2200 mk712 cy8mrln_palmpre"

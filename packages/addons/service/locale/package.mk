@@ -17,26 +17,23 @@
 ################################################################################
 
 PKG_NAME="locale"
-PKG_REV="101"
+PKG_REV="102"
 PKG_ARCH="any"
 PKG_DEPENDS_TARGET="toolchain glibc"
 PKG_SECTION="service"
 PKG_SHORTDESC="Locale: allows users to set a custom locale to override the POSIX default"
 PKG_LONGDESC="Locale ($PKG_REV) allows users to set a custom locale in the OS to override the POSIX default"
+PKG_TOOLCHAIN="manual"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="Locale"
 PKG_ADDON_TYPE="xbmc.service"
 
-make_target() {
-  : # nothing to do
-}
-
-makeinstall_target() {
-  : # nothing to do
-}
-
 addon() {
+  mkdir -p "$ADDON_BUILD/$PKG_ADDON_ID/bin"
+  cp -PR "$(get_build_dir glibc)/.$TARGET_NAME/locale/localedef" \
+         "$ADDON_BUILD/$PKG_ADDON_ID/bin"
+
   mkdir -p "$ADDON_BUILD/$PKG_ADDON_ID/i18n"
   cp -PR "$(get_build_dir glibc)/localedata/charmaps" \
          "$(get_build_dir glibc)/localedata/locales" \

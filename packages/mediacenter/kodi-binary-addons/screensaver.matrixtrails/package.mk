@@ -17,8 +17,9 @@
 ################################################################################
 
 PKG_NAME="screensaver.matrixtrails"
-PKG_VERSION="8cebb75"
-PKG_REV="1"
+PKG_VERSION="b9987ca"
+PKG_SHA256="89e5c75fff9c3f475d8ce733825acb92020f7c5b53068d69b6952c710f8284d4"
+PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/notspiff/screensaver.matrixtrails"
@@ -27,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform soil"
 PKG_SECTION=""
 PKG_SHORTDESC="screensaver.matrixtrails"
 PKG_LONGDESC="screensaver.matrixtrails"
-PKG_AUTORECONF="no"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.ui.screensaver"
@@ -35,11 +35,3 @@ PKG_ADDON_TYPE="xbmc.ui.screensaver"
 if [ "$OPENGL" = "no" ] ; then
   exit 0
 fi
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/
-  cp -R $PKG_BUILD/.install_pkg/usr/share/$MEDIACENTER/addons/$PKG_NAME/* $ADDON_BUILD/$PKG_ADDON_ID/
-
-  ADDONSO=$(xmlstarlet sel -t -v "/addon/extension/@library_linux" $ADDON_BUILD/$PKG_ADDON_ID/addon.xml)
-  cp -L $PKG_BUILD/.install_pkg/usr/lib/$MEDIACENTER/addons/$PKG_NAME/$ADDONSO $ADDON_BUILD/$PKG_ADDON_ID/
-}

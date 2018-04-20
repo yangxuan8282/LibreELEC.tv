@@ -17,24 +17,17 @@
 ################################################################################
 
 PKG_NAME="nss-mdns"
-PKG_VERSION="0.10"
+PKG_VERSION="47edc38"
+PKG_SHA256="f02e8baeceea30e82a2ecdaa8cafdbcabfdaa33a766f6942e7dc8aa81948f7b6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://0pointer.de/lennart/projects/nss-mdns/"
-# PKG_URL="http://0pointer.de/lennart/projects/nss-mdns/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_URL="http://sources.openelec.tv/mirror/nss-mdns/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_SITE="https://github.com/lathiat/nss-mdns"
+PKG_URL="https://github.com/lathiat/nss-mdns/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain avahi"
 PKG_SECTION="network"
 PKG_SHORTDESC="nss-mdns is a plugin for nss to allow name resolution via Multicast DNS."
-PKG_LONGDESC="nss-mdns is a plugin for the GNU Name Service Switch (NSS) functionality of the GNU C Library (glibc) providing host name resolution via Multicast DNS (aka Zeroconf, aka Apple Rendezvous, aka Apple Bonjour), effectively allowing name resolution by common Unix/Linux programs in the ad-hoc mDNS domain .local."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-PKG_CONFIGURE_OPTS_TARGET="--disable-lynx \
-        --enable-avahi \
-        --disable-legacy \
-        --disable-search-domains"
+PKG_LONGDESC="nss-mdns is a plugin for the GNU Name Service Switch (NSS) functionality of the GNU C Library (glibc) providing host name resolution via Multicast DNS"
+PKG_TOOLCHAIN="autotools"
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/etc

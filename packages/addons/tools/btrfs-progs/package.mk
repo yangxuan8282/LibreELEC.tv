@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 
 PKG_NAME="btrfs-progs"
 PKG_VERSION="4.8.4"
-PKG_REV="100"
+PKG_SHA256="4741764daa4eee9179ae1d366f25b08e8ec99a2857bab03487e6a991f26a25ff"
+PKG_REV="101"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://btrfs.wiki.kernel.org/index.php/Main_Page"
@@ -27,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain util-linux zlib lzo"
 PKG_SECTION="tools"
 PKG_SHORTDESC="tools for the btrfs filesystem"
 PKG_LONGDESC="tools for the btrfs filesystem"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="configure"
 
 PKG_IS_ADDON="yes"
 PKG_ADDON_NAME="BTRFS Tools"

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 PKG_NAME="libestr"
 PKG_VERSION="0.1.10"
+PKG_SHA256="bd655e126e750edd18544b88eb1568d200a424a0c23f665eb14bbece07ac703c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://libestr.adiscon.com/"
@@ -26,9 +27,6 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="rsyslog"
 PKG_SHORTDESC="libestr: some essentials for string handling (and a bit more)"
 PKG_LONGDESC="libestr: some essentials for string handling (and a bit more)"
-
-PKG_AUTORECONF="no"
-PKG_IS_ADDON="no"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared \
                            ac_cv_func_malloc_0_nonnull=yes \

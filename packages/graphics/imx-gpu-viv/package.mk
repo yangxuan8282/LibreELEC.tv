@@ -19,8 +19,10 @@
 PKG_NAME="imx-gpu-viv"
 if [ "$LINUX" = "imx6-3.14-sr" ]; then
   PKG_VERSION="5.0.11.p4.5-hfp"
+  PKG_SHA256="2dfcacd17f8009b1a235a2df2b398f22afccb6f671953e442c04cd74234312f0"
 elif [ "$LINUX" = "imx6-4.4-xbian" ]; then
   PKG_VERSION="5.0.11.p7.4-hfp"
+  PKG_SHA256="252b2a8badbc74ca91916490782225affba3908813374baaa7d6267f1de9dae6"
 else
   exit 0
 fi
@@ -32,12 +34,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="imx-gpu-viv: OpenGL-ES and VIVANTE driver for imx6q"
 PKG_LONGDESC="imx-gpu-viv: OpenGL-ES and VIVANTE driver for imx6q"
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-make_target() {
- : # nothing to make
-}
+PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/include

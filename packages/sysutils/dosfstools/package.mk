@@ -18,6 +18,7 @@
 
 PKG_NAME="dosfstools"
 PKG_VERSION="3.0.28"
+PKG_SHA256="ee95913044ecf2719b63ea11212917649709a6e53209a72d622135aaa8517ee2"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/dosfstools/dosfstools"
@@ -27,9 +28,6 @@ PKG_DEPENDS_INIT="toolchain dosfstools"
 PKG_SECTION="tools"
 PKG_SHORTDESC="dosfstools: utilities for making and checking MS-DOS FAT filesystems."
 PKG_LONGDESC="dosfstools contains utilities for making and checking MS-DOS FAT filesystems."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 PKG_MAKE_OPTS_TARGET="PREFIX=/usr"
 PKG_MAKEINSTALL_OPTS_TARGET="PREFIX=/usr"

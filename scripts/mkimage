@@ -32,6 +32,12 @@
     exit 1
   fi
 
+  if [ "$BOOTLOADER" = "syslinux" ]; then
+    DISK_LABEL=gpt
+  else
+    DISK_LABEL=msdos
+  fi
+
   STORAGE_SIZE=32 # STORAGE_SIZE must be >= 32 !
 
   DISK_START_PADDING=$(( ($SYSTEM_PART_START + 2048 - 1) / 2048 ))
@@ -64,7 +70,7 @@ trap cleanup SIGINT
   FAT_SERIAL_NUMBER="${UUID_1}${UUID_2}"
   UUID_SYSTEM="${UUID_1}-${UUID_2}"
   FAT_VOLUME_LABEL="LIBREELEC"
-  EXT_VOLUME_LABEL="LIBREELEC_DISK"
+  STORAGE_VOLUME_LABEL="STORAGE"
 
 # create an image
   echo
@@ -72,21 +78,18 @@ trap cleanup SIGINT
   dd if=/dev/zero of="$DISK" bs=1M count="$DISK_SIZE" conv=fsync >"$SAVE_ERROR" 2>&1 || show_error
 
 # write a disklabel
-  echo "image: creating partition table..."
-  if [ "$BOOTLOADER" = "syslinux" ]; then
-    parted -s "$DISK" mklabel gpt
-  else
-    parted -s "$DISK" mklabel msdos
-  fi
+  echo "image: creating $DISK_LABEL partition table..."
+  parted -s "$DISK" mklabel $DISK_LABEL
   sync
 
 # create part1
   echo "image: creating part1..."
   SYSTEM_PART_END=$(( $SYSTEM_PART_START + ($SYSTEM_SIZE * 1024 * 1024 / 512) - 1 ))
-  parted -s "$DISK" -a min unit s mkpart primary fat32 $SYSTEM_PART_START $SYSTEM_PART_END
-  if [ "$BOOTLOADER" = "syslinux" ]; then
+  if [ "$DISK_LABEL" = "gpt" ]; then
+    parted -s "$DISK" -a min unit s mkpart system fat32 $SYSTEM_PART_START $SYSTEM_PART_END
     parted -s "$DISK" set 1 legacy_boot on
   else
+    parted -s "$DISK" -a min unit s mkpart primary fat32 $SYSTEM_PART_START $SYSTEM_PART_END
     parted -s "$DISK" set 1 boot on
   fi
   sync
@@ -95,7 +98,11 @@ trap cleanup SIGINT
   echo "image: creating part2..."
   STORAGE_PART_START=$(( $SYSTEM_PART_END + 1 ))
   STORAGE_PART_END=$(( $STORAGE_PART_START + ($STORAGE_SIZE * 1024 * 1024 / 512) - 1 ))
-  parted -s "$DISK" -a min unit s mkpart primary ext4 $STORAGE_PART_START $STORAGE_PART_END
+  if [ "$DISK_LABEL" = "gpt" ]; then
+    parted -s "$DISK" -a min unit s mkpart storage ext4 $STORAGE_PART_START $STORAGE_PART_END
+  else
+    parted -s "$DISK" -a min unit s mkpart primary ext4 $STORAGE_PART_START $STORAGE_PART_END
+  fi
   sync
 
 if [ "$BOOTLOADER" = "syslinux" ]; then
@@ -119,10 +126,8 @@ fi
   alias mcopy="mcopy -i $DISK@@$OFFSET"
   alias mmd="mmd -i $DISK@@$OFFSET"
 
-  if [ "$BOOTLOADER" = "syslinux" ]; then
+  if [ "$BOOTLOADER" = "syslinux" -o "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
     mformat -v "$FAT_VOLUME_LABEL" -N "$FAT_SERIAL_NUMBER" ::
-  elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
-    mformat -v "$FAT_VOLUME_LABEL" ::
   fi
   sync
 
@@ -148,7 +153,25 @@ LABEL run
   APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE portable quiet
 EOF
 
+    cat << EOF > "$LE_TMP"/grub.cfg
+set timeout="25"
+set default="Installer"
+menuentry "Installer" {
+	search --set -f /KERNEL
+	linux /KERNEL boot=UUID=$UUID_SYSTEM installer quiet tty vga=current
+}
+menuentry "Live" {
+	search --set -f /KERNEL
+	linux /KERNEL boot=UUID=$UUID_SYSTEM grub_live quiet tty vga=current
+}
+menuentry "Run" {
+	search --set -f /KERNEL
+	linux /KERNEL boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE grub_portable quiet
+}
+EOF
+
     mcopy "$LE_TMP/syslinux.cfg" ::
+    mcopy "$LE_TMP/grub.cfg" ::
 
   # install extlinux
     echo "image: installing extlinux to part1..."
@@ -164,12 +187,14 @@ EOF
     mmd EFI EFI/BOOT
     mcopy $TOOLCHAIN/share/syslinux/bootx64.efi ::/EFI/BOOT
     mcopy $TOOLCHAIN/share/syslinux/ldlinux.e64 ::/EFI/BOOT
+    mcopy $TOOLCHAIN/share/grub/bootia32.efi ::/EFI/BOOT
     mcopy "$LE_TMP"/syslinux.cfg ::/EFI/BOOT
+    mcopy "$LE_TMP"/grub.cfg ::/EFI/BOOT
 elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
   # create bootloader configuration
     echo "image: creating bootloader configuration..."
     cat << EOF > "$LE_TMP"/cmdline.txt
-boot=/dev/mmcblk0p1 disk=/dev/mmcblk0p2 quiet $EXTRA_CMDLINE
+boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE quiet $EXTRA_CMDLINE
 EOF
 
     mcopy "$LE_TMP/cmdline.txt" ::
@@ -201,34 +226,35 @@ EOF
       mcopy -s $RELEASE_DIR/3rdparty/bootloader/overlays ::
     fi
 
-elif [ "$BOOTLOADER" = "u-boot" ]; then
+elif [ "$BOOTLOADER" = "u-boot" -a \( -n "$UBOOT_SYSTEM" -o "$UBOOT_VERSION" = "vendor" \) ]; then
   # create bootloader configuration
     echo "image: creating bootloader configuration..."
-    if [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/uEnv-$UBOOT_SYSTEM.txt" ]; then
-      mcopy "$RELEASE_DIR/3rdparty/bootloader/uEnv-$UBOOT_SYSTEM.txt" ::/uEnv.txt
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/uEnv.txt" ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/uEnv.txt ::
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/boot.scr" ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/boot.scr ::
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/boot.ini" ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/boot.ini ::
+
+    if [ "$UBOOT_VERSION" != "vendor" ]; then
+      DTB="$($SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM dtb)"
+
+      if [ -f "$RELEASE_DIR/3rdparty/bootloader/$DTB" ]; then
+        mcopy $RELEASE_DIR/3rdparty/bootloader/$DTB ::
+      fi
+
+      mkdir -p "$LE_TMP"/extlinux
+
+      cat << EOF > "$LE_TMP"/extlinux/extlinux.conf
+LABEL $DISTRO
+  LINUX /$KERNEL_NAME
+  FDT /$DTB
+  APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE quiet $EXTRA_CMDLINE
+EOF
+
+      mcopy -s "$LE_TMP"/extlinux ::
     fi
 
-    echo "image: installing u-boot bootloader..."
-    if [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/SPL-$UBOOT_SYSTEM" ]; then
-      dd if="$RELEASE_DIR/3rdparty/bootloader/SPL-$UBOOT_SYSTEM" of="$DISK" bs=512 seek=2 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/SPL" ]; then
-      dd if="$RELEASE_DIR/3rdparty/bootloader/SPL" of="$DISK" bs=512 seek=2 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
-    elif [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.imx" ]; then
-      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.imx" of="$DISK" bs=512 seek=2 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot.imx" ]; then
-      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot.imx" of="$DISK" bs=512 seek=2 conv=fsync,notrunc >"$SAVE_ERROR" 2>&1 || show_error
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot-fuse" ]; then
-     # allow custom dd script for vendor specific fusing
-      . $RELEASE_DIR/3rdparty/bootloader/u-boot-fuse
-    elif [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
-      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
-      dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
+    if [ -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/mkimage ]; then
+      . $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/mkimage
+    elif [ -f $PROJECT_DIR/$PROJECT/bootloader/mkimage ]; then
+      . $PROJECT_DIR/$PROJECT/bootloader/mkimage
+    else
+      echo "image: skipping u-boot. no mkimage script found"
     fi
 
     echo "image: copying files to part1..."
@@ -237,57 +263,26 @@ elif [ "$BOOTLOADER" = "u-boot" ]; then
     mcopy $RELEASE_DIR/target/KERNEL.md5 "::/$KERNEL_NAME.md5"
     mcopy $RELEASE_DIR/target/SYSTEM.md5 ::/SYSTEM.md5
 
-    if [ -f $TARGET_IMG/$IMAGE_NAME.dtb ]; then
-      echo "image: copying dtb to part1..."
-      mcopy $TARGET_IMG/$IMAGE_NAME.dtb ::/dtb.img
-    fi
-
-    if [ -n "$UBOOT_SYSTEM" -a -f "$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.img" ]; then
-      mcopy "$RELEASE_DIR/3rdparty/bootloader/u-boot-$UBOOT_SYSTEM.img" ::/u-boot.img
-    elif [ -f $RELEASE_DIR/3rdparty/bootloader/u-boot.img ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/u-boot.img ::
-    fi
-
-    if [ -f $RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/boot-logo.bmp.gz ::
-    fi
-
-    for dtb in $RELEASE_DIR/3rdparty/bootloader/*.dtb ; do
-      if [ -f $dtb ] ; then
-        mcopy "$dtb" ::/$(basename "$dtb")
-      fi
-    done
-
-    # copy Amlogic device tree image
-    if [ -f "$RELEASE_DIR/3rdparty/bootloader/dtb.img" ]; then
-      mcopy $RELEASE_DIR/3rdparty/bootloader/dtb.img ::
-    fi
+elif [ "$BOOTLOADER" = "u-boot" ]; then
+  echo "to make an image using u-boot UBOOT_SYSTEM must be set"
+  cleanup
 fi # bootloader
 
-echo "image: make autoscript..."
+echo "image: copy install ..."
 
-if [ "$UBOOT_VERSION" != "hardkernel" ]; then
-  for src in $INSTALL_SRC_DIR/*autoscript*.src ; do
-    if [ -e "$src" ] ; then
-      $MKIMAGE_TOOL_CMD "$src" "$LE_TMP/$(basename $src .src)"
-      mcopy "$LE_TMP/$(basename $src .src)" ::
-    fi
-  done
+if [ -f "$INSTALL_SRC_DIR_BOOT/install.sh" ]; then
+  mcopy "$INSTALL_SRC_DIR_BOOT/install.sh" "::/install.sh"
 fi
 
-if [ -f "$INSTALL_SRC_DIR/install.sh" ]; then
-  mcopy "$INSTALL_SRC_DIR/install.sh" "::/install.sh"
+if [ -f "$INSTALL_SRC_DIR_BOOT/aml_autoscript.zip" ]; then
+  mcopy "$INSTALL_SRC_DIR_BOOT/aml_autoscript.zip" "::/aml_autoscript.zip"
 fi
 
-if [ -f "$INSTALL_SRC_DIR/aml_autoscript.zip" ]; then
-  mcopy "$INSTALL_SRC_DIR/aml_autoscript.zip" "::/aml_autoscript.zip"
+if [ -f "$INSTALL_SRC_DIR_BOOT/minix_boot.scr" ]; then
+  mcopy "$INSTALL_SRC_DIR_BOOT/minix_boot.scr" "::/boot.scr"
 fi
 
-if [ -f "$INSTALL_SRC_DIR/minix_boot.scr" ]; then
-  mcopy "$INSTALL_SRC_DIR/minix_boot.scr" "::/boot.scr"
-fi
-
-for rem_con in $INSTALL_SRC_DIR/remote/remote.conf.* ; do
+for rem_con in $INSTALL_SRC_DIR_BOOT/remote.conf.* ; do
   if [ -f $rem_con ] ; then
     mcopy "$rem_con" ::/$(basename "$rem_con")
   fi
@@ -302,7 +297,7 @@ done
 # create filesystem on part2
   echo "image: creating filesystem on part2..."
   mke2fs -F -q -t ext4 -m 0 "$LE_TMP/part2.ext4"
-  tune2fs -L "$EXT_VOLUME_LABEL" -U $UUID_STORAGE "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
+  tune2fs -L "$STORAGE_VOLUME_LABEL" -U $UUID_STORAGE "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   e2fsck -n "$LE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   sync
 
@@ -334,9 +329,12 @@ done
     # change syslinux default to 'run'
     echo "image: modifying fs on part1 for open virtual appliance..."
     sed -i "/DEFAULT/ s/installer/run/" "$LE_TMP"/syslinux.cfg
+    sed -i "/set default=/s/\"Installer\"/\"Run\"/" "$LE_TMP"/grub.cfg
     # FIXME: an unalias should work here, but it does not; call mcopy directly
     $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/syslinux.cfg ::/EFI/BOOT
     $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/syslinux.cfg ::
+    $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/grub.cfg ::/EFI/BOOT
+    $TOOLCHAIN/bin/mcopy -i $LE_TMP/part1.fat -o "$LE_TMP"/grub.cfg ::
     sync
     # merge modified part1 back to tmp disk image
     echo "image: merging part1 back to open virtual appliance..."

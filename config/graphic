@@ -12,7 +12,7 @@ fi
 
 get_graphicdrivers() {
   if [ "$GRAPHIC_DRIVERS" = "all" ]; then
-    GRAPHIC_DRIVERS="i915 i965 r200 r300 r600 nvidia vmware virtualbox"
+    GRAPHIC_DRIVERS="i915 i965 r200 r300 r600 radeonsi nvidia nvidia-legacy vmware virtio vc4"
   fi
 
   for drv in $GRAPHIC_DRIVERS; do
@@ -60,6 +60,7 @@ get_graphicdrivers() {
       LLVM_SUPPORT="yes"
       COMPOSITE_SUPPORT="yes"
       VDPAU_SUPPORT="yes"
+      VAAPI_SUPPORT="yes"
     fi
 
     if [ "$drv" = "radeonsi" ]; then
@@ -68,13 +69,23 @@ get_graphicdrivers() {
       LLVM_SUPPORT="yes"
       COMPOSITE_SUPPORT="yes"
       VDPAU_SUPPORT="yes"
+      VAAPI_SUPPORT="yes"
     fi
 
     if [ "$drv" = "vmware" ]; then
-      DRI_DRIVERS="$DRI_DRIVERS,swrast"
       GALLIUM_DRIVERS="$GALLIUM_DRIVERS,svga"
       XORG_DRIVERS="$XORG_DRIVERS vmware"
-#      LLVM_SUPPORT="yes"
+      COMPOSITE_SUPPORT="yes"
+    fi
+
+    if [ "$drv" = "virtio" ]; then
+      GALLIUM_DRIVERS="$GALLIUM_DRIVERS,virgl"
+    fi
+
+    if [ "$drv" = "vc4" ]; then
+      GALLIUM_DRIVERS="$GALLIUM_DRIVERS,vc4"
+      VAAPI_SUPPORT="no"
+      VDPAU_SUPPORT="no"
     fi
 
   done

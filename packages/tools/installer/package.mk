@@ -20,23 +20,13 @@ PKG_NAME="installer"
 PKG_VERSION="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="https://libreelec.tv/"
+PKG_SITE="http://libreelec.tv/"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain busybox newt parted e2fsprogs syslinux"
+PKG_DEPENDS_TARGET="toolchain busybox newt parted e2fsprogs syslinux grub"
 PKG_SECTION="tools"
 PKG_SHORTDESC="installer: LibreELEC.tv Install manager"
 PKG_LONGDESC="LibreELEC.tv Install manager to install the system on any disk"
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
-
-make_target() {
-  : # nothing to make here
-}
-
-makeinstall_target() {
-  : # nothing to install here
-}
+PKG_TOOLCHAIN="manual"
 
 post_install() {
   mkdir -p $INSTALL/usr/bin
@@ -45,11 +35,8 @@ post_install() {
         -i  $INSTALL/usr/bin/installer
 
   mkdir -p $INSTALL/etc
-    if [ -f $PROJECT_DIR/$PROJECT/installer/installer.conf ]; then
-      cp $PROJECT_DIR/$PROJECT/installer/installer.conf $INSTALL/etc
-    else
-      cp $PKG_DIR/config/installer.conf $INSTALL/etc
-    fi
+    find_file_path config/installer.conf
+    cp ${FOUND_PATH} $INSTALL/etc
     sed -e "s/@SYSTEM_SIZE@/$SYSTEM_SIZE/g" \
         -e "s/@SYSTEM_PART_START@/$SYSTEM_PART_START/g" \
         -e "s/@EXTLINUX_PARAMETERS@/$EXTLINUX_PARAMETERS/g" \

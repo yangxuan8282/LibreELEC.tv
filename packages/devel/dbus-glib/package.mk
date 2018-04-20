@@ -18,6 +18,7 @@
 
 PKG_NAME="dbus-glib"
 PKG_VERSION="0.108"
+PKG_SHA256="9f340c7e2352e9cdf113893ca77ca9075d9f8d5e81476bf2bf361099383c602c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://freedesktop.org/wiki/Software/dbus"
@@ -26,9 +27,8 @@ PKG_DEPENDS_TARGET="toolchain dbus glib expat"
 PKG_SECTION="devel"
 PKG_SHORTDESC="dbus-glib: A message bus system"
 PKG_LONGDESC="D-BUS is a message bus, used for sending messages between applications. Conceptually, it fits somewhere in between raw sockets and CORBA in terms of complexity."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_TOOLCHAIN="autotools"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_have_abstract_sockets=yes \
                            ac_cv_func_posix_getpwnam_r=yes \
@@ -38,10 +38,6 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_have_abstract_sockets=yes \
                            --disable-tests \
                            --disable-bash-completion \
                            --enable-asserts=no"
-
-pre_configure_target() {
-  CFLAGS="$CFLAGS -fPIC -DPIC"
-}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin/dbus-binding-tool

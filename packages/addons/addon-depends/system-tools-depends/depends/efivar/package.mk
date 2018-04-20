@@ -1,6 +1,6 @@
 ################################################################################
-#      This file is part of LibreELEC - http://www.libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2016-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@
 ################################################################################
 
 PKG_NAME="efivar"
-PKG_VERSION="70e63d4" # 0.15 # Todo: later versions with buildproblems
+PKG_VERSION="70e63d4"
+# 0.15 # Todo: later versions with buildproblems
+PKG_SHA256="2638f1faa22e67bf99b4c537f7c21c336a5851a8c91c8dc09555da946a1b84c9"
 PKG_ARCH="x86_64"
 PKG_LICENSE="LGPL"
 PKG_SITE="https://github.com/vathpela/efivar"
@@ -27,14 +29,13 @@ PKG_DEPENDS_TARGET="toolchain efivar:host"
 PKG_SECTION="tools"
 PKG_SHORTDESC="evivar: maniulate EFI Variables"
 PKG_LONGDESC="Tools and library to manipulate EFI variables."
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="-lto"
 
 make_host() {
   make -C src/ makeguids
 }
 
 make_target() {
-  strip_lto
   make -C src/ libefivar.a efivar-guids.h efivar.h
 }
 
@@ -50,4 +51,3 @@ makeinstall_target() {
     cp -P src/efivar.h $SYSROOT_PREFIX/usr/include/efivar
     cp -P src/efivar-guids.h $SYSROOT_PREFIX/usr/include/efivar
 }
-

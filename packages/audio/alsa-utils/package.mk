@@ -17,18 +17,16 @@
 ################################################################################
 
 PKG_NAME="alsa-utils"
-PKG_VERSION="1.1.4"
+PKG_VERSION="1.1.5"
+PKG_SHA256="320bd285e91db6e7fd7db3c9ec6f55b02f35449ff273c7844780ac6a5a3de2e8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.alsa-project.org/"
 PKG_URL="ftp://ftp.alsa-project.org/pub/utils/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain alsa-lib netbsd-curses"
+PKG_DEPENDS_TARGET="toolchain alsa-lib ncurses"
 PKG_SECTION="audio"
 PKG_SHORTDESC="alsa-utils: Advanced Linux Sound Architecture utilities"
 PKG_LONGDESC="This package includes the utilities for ALSA, like alsamixer, aplay, arecord, alsactl, iecset and speaker-test."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
 
 # package specific configure options
 PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
@@ -37,8 +35,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-dependency-tracking \
                            --disable-alsaloop \
                            --enable-alsatest \
                            --disable-bat \
-                           --disable-nls"
-
+                           --disable-nls \
+                           --disable-rst2man"
 
 post_makeinstall_target() {
   rm -rf $INSTALL/lib $INSTALL/var

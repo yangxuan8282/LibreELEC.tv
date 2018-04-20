@@ -18,6 +18,7 @@
 
 PKG_NAME="jasper"
 PKG_VERSION="1.900.1"
+PKG_SHA256="6e9a959bf4f8cb02f77f42d1b9880b8e85d021ac51f43d8787b5438fd2b7a1c5"
 PKG_ARCH="any"
 PKG_LICENSE="OpenSource"
 PKG_SITE="http://www.ece.uvic.ca/~mdadams/jasper/"
@@ -26,15 +27,9 @@ PKG_DEPENDS_TARGET="toolchain libjpeg-turbo"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="jasper: JPEG-2000 Part-1 standard (i.e., ISO/IEC 15444-1) implementation"
 PKG_LONGDESC="This distribution contains the public release of the an open-source implementation of the ISO/IEC 15444-1 also known as JPEG-2000 standard for image compression."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-shared --enable-static"
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC -DPIC"
-}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin

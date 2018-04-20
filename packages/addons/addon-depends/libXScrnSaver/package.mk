@@ -18,16 +18,14 @@
 
 PKG_NAME="libXScrnSaver"
 PKG_VERSION="1.2.2"
+PKG_SHA256="8ff1efa7341c7f34bcf9b17c89648d6325ddaae22e3904e091794e0b4426ce1d"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://xorg.freedesktop.org/"
 PKG_URL="http://xorg.freedesktop.org/releases/individual/lib/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain scrnsaverproto"
 PKG_SECTION="x11/lib"
-PKG_SHORTDESC=""
-PKG_LONGDESC=""
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_SHORTDESC="X11 Screen Saver extension client library"
+PKG_LONGDESC="X11 Screen Saver extension client library"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --enable-malloc0returnsnull"

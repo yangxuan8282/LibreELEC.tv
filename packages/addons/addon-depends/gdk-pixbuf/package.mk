@@ -20,6 +20,7 @@
 
 PKG_NAME="gdk-pixbuf"
 PKG_VERSION="2.34.0"
+PKG_SHA256="d55e5b383ee219bd0e23bf6ed4427d56a7db5379729a6e3e0a0e0eba9a8d8879"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.gtk.org/"
@@ -28,8 +29,7 @@ PKG_DEPENDS_TARGET="toolchain glib libjpeg-turbo libpng jasper tiff"
 PKG_SECTION="x11/toolkits"
 PKG_SHORTDESC="gdk-pixbuf: a GNOME library for image loading and manipulation."
 PKG_LONGDESC="gdk-pixbuf (GdkPixbuf) is a GNOME library for image loading and manipulation. The GdkPixbuf documentation contains both the programmer's guide and the API reference."
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="gio_can_sniff=yes \
                            --disable-gtk-doc \
@@ -39,4 +39,5 @@ PKG_CONFIGURE_OPTS_TARGET="gio_can_sniff=yes \
                            --with-libpng \
                            --with-libjpeg \
                            --with-libtiff \
+                           --enable-introspection=no \
                            --with-libjasper"

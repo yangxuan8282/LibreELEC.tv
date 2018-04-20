@@ -18,6 +18,7 @@
 
 PKG_NAME="unrar"
 PKG_VERSION="5.5.5"
+PKG_SHA256="a4553839cb2f025d0d9c5633816a83a723e3938209f17620c8c15da06ed061ef"
 PKG_ARCH="any"
 PKG_LICENSE="free"
 PKG_SITE="http://www.rarlab.com"
@@ -27,7 +28,7 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
 PKG_SHORTDESC="unrar: Extract, test and view RAR archives"
 PKG_LONGDESC="Unrar is a package to handle files compressed in the RAR format. Due to strange licensing issues this package can only view, test and extract files in a given archive, but not pack files. But since we have far more advanced open-source compression utils it should be enough to extract the content when you get a RAR archive."
-PKG_AUTORECONF="no"
+PKG_TOOLCHAIN="manual"
 
 make_target() {
   make CXX="$CXX" \
@@ -36,8 +37,4 @@ make_target() {
      AR="$AR" \
      STRIP="$STRIP" \
      -f makefile
-}
-
-makeinstall_target() {
-  : # nop
 }

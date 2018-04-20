@@ -18,6 +18,7 @@
 
 PKG_NAME="libXrender"
 PKG_VERSION="0.9.10"
+PKG_SHA256="c06d5979f86e64cabbde57c223938db0b939dff49fdb5a793a1d3d0396650949"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
@@ -26,12 +27,6 @@ PKG_DEPENDS_TARGET="toolchain util-macros renderproto libX11"
 PKG_SECTION="x11/lib"
 PKG_SHORTDESC="libxrender: X Rendering Extension client library"
 PKG_LONGDESC="The X Rendering Extension (Render) introduces digital image composition as the foundation of a new rendering model within the X Window System. Rendering geometric figures is accomplished by client-side tesselation into either triangles or trapezoids."
-
-PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_BUILD_FLAGS="+pic"
 
 PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared --enable-malloc0returnsnull"
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC"
-}

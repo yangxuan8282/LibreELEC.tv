@@ -19,11 +19,13 @@
 
 PKG_NAME="hyperion"
 PKG_VERSION="1c21232"
+PKG_SHA256="aea69ba3027c0f967880a65f0c39a2cd7f9cf913947b755ac37a2572a77d51c0"
 PKG_REV="106"
+PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/hyperion-project/hyperion"
 PKG_URL="https://github.com/hyperion-project/hyperion/archive/$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain Python libusb qtbase protobuf rpi_ws281x"
+PKG_DEPENDS_TARGET="toolchain Python2 libusb qtbase protobuf rpi_ws281x"
 PKG_SECTION="service"
 PKG_SHORTDESC="Hyperion: an AmbiLight controller"
 PKG_LONGDESC="Hyperion($PKG_VERSION) is an modern opensource AmbiLight implementation."
@@ -84,6 +86,4 @@ addon() {
 
   cp -PR $PKG_BUILD/assets/webconfig $ADDON_BUILD/$PKG_ADDON_ID
   cp -PR $PKG_BUILD/effects $ADDON_BUILD/$PKG_ADDON_ID
-
-  debug_strip $ADDON_BUILD/$PKG_ADDON_ID/bin
 }
