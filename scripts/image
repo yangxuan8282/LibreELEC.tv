@@ -351,6 +351,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       TARGET_IMG="$TARGET_IMG" \
       IMAGE_NAME="$IMAGE_NAME" \
       INSTALL_SRC_DIR="$INSTALL_SRC_DIR" \
+      INSTALL_SRC_DIR_BOOT="$INSTALL_SRC_DIR_BOOT" \
       BOOTLOADER="$BOOTLOADER" \
       KERNEL_NAME="$KERNEL_NAME" \
       TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
