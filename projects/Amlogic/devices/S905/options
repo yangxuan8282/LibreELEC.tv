@@ -1,4 +1,7 @@
-  # Additional kernel dependencies
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxbb_p201.dtb gxbb_p201_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb"
+
+# Additional kernel dependencies
     KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
 
   # additional drivers to install:

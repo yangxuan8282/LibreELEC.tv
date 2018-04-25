@@ -20,10 +20,15 @@
 
 display_mode=$(cat /sys/class/display/mode)
 
+if [ -z "$display_mode" ]; then
+    display_mode="1080p60hz"
+fi
+
+# Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
-    bootfrom*)
-      bootfromext=1
+    hdmimode=*)
+      display_mode=${arg#*=}
       ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE=${arg#*=}
@@ -34,20 +39,13 @@ for arg in $(cat /proc/cmdline); do
     disk=*)
       disk=${arg#*=}
       ;;
-    hdmimode=*)
-      hdmimode=${arg#*=}
-      ;;
   esac
 done
 
 # Add information where to run LibreELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
-  if [ -n "$bootfromext" ]; then
-    cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=LIBREELEC disk=LABEL=STORAGE"
-  else
-    cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
-  fi
+  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
   echo "$cmdline" > /proc/cmdline
 fi
 
@@ -55,10 +53,10 @@ fi
 #echo 422,8bit > /sys/class/amhdmitx/amhdmitx0/attr
 
 # Enable HDMI output if cable is connected and not already enabled by u-boot
-if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ] && [ "$display_mode" != "$hdmimode" ]; then
-  echo "$hdmimode" > /sys/class/display/mode
-  display_mode="$hdmimode"
-fi
+#if [ "$(cat /sys/class/amhdmitx/amhdmitx0/hpd_state)" != "0" ] && [ "$display_mode" != "$hdmimode" ]; then
+#  echo "$hdmimode" > /sys/class/display/mode
+#  display_mode="$hdmimode"
+#fi
 
 # Set framebuffer geometry to match the resolution
 case $display_mode in
@@ -70,6 +68,7 @@ esac
 
 fbset -fb /dev/fb0 -g $X $Y 1920 2160 32
 fbset -fb /dev/fb1 -g 32 32 32 32 32
+echo $display_mode > /sys/class/display/mode
 echo 0 > /sys/class/graphics/fb0/free_scale
 echo 0 > /sys/class/graphics/fb1/free_scale
 echo 1 > /sys/class/video/disable_video
