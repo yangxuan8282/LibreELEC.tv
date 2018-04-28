@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="samba"
-PKG_VERSION="4.8.0"
-PKG_SHA256="87d9b585dbd8628e79aabb6e621a94bd20a072a00762e78e0899fad22fc18fb7"
+PKG_VERSION="4.8.1"
+PKG_SHA256="8ef7367507f16b7a5e2f6aed5bcdbd1143feca79aa2a07c9b21292b17d7f789d"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3+"
 PKG_SITE="https://www.samba.org"
@@ -142,6 +142,8 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/samba
     cp $PKG_DIR/scripts/samba-config $INSTALL/usr/lib/samba
+    cp $PKG_DIR/scripts/smbd-config $INSTALL/usr/lib/samba
+    cp $PKG_DIR/scripts/samba-autoshare $INSTALL/usr/lib/samba
 
   if find_file_path config/smb.conf; then
     mkdir -p $INSTALL/etc/samba
@@ -166,10 +168,6 @@ post_makeinstall_target() {
 
     mkdir -p $INSTALL/usr/share/services
       cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
-
-    mkdir -p $INSTALL/usr/lib/samba
-      cp $PKG_DIR/scripts/samba-autoshare $INSTALL/usr/lib/samba
-      cp $PKG_DIR/scripts/smbd-config $INSTALL/usr/lib/samba
   fi
 }
 

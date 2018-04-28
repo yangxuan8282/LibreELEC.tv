@@ -98,11 +98,11 @@ install_to_nand() {
 #      fi
 #   fi
 
-    echo "Copying user data..."
-    mkdir -p /tmp/data
-    mount -o rw /dev/data /tmp/data
-    cp -av /storage/. /tmp/data/
-    echo "done."
+#    echo "Copying user data..."
+#    mkdir -p /tmp/data
+#    mount -o rw /dev/data /tmp/data
+#    cp -av /storage/. /tmp/data/
+#    echo "done."
 
   else
     echo "No LE image found on /flash! Exiting..."
