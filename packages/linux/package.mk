@@ -48,6 +48,13 @@ case "$LINUX" in
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     PKG_BUILD_PERF="no"
     ;;
+  amlogic-mainline)
+    PKG_VERSION="11454943b264b548e714d8edf932ebf306e5f808" # 4.16.1
+    PKG_SHA256="f56bfeeffb56df161abcaac22bedee278831472a5f9d8e877d1dd840d735d080"
+    PKG_URL="https://github.com/torvalds/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*"
+    PKG_PATCH_DIRS="default"
+    ;;
   rockchip-4.4)
     PKG_VERSION="eae92ae2b930999857df47c3057327c1c490454b"
     PKG_SHA256="da453ca6ecefc3719a1165bc7b08fe00fc2b50ab64f6289ef6f3670a9fc1ceca"
@@ -161,8 +168,10 @@ pre_make_target() {
 
   make oldconfig
 
-  # regdb
-  cp $(get_build_dir wireless-regdb)/db.txt $PKG_BUILD/net/wireless/db.txt
+  # regdb (backward compatability with pre-4.15 kernels)
+  if grep -q ^CONFIG_CFG80211_INTERNAL_REGDB= $PKG_BUILD/.config ; then
+    cp $(get_build_dir wireless-regdb)/db.txt $PKG_BUILD/net/wireless/db.txt
+  fi
 }
 
 make_target() {
@@ -300,4 +309,9 @@ post_install() {
 
   # bluez looks in /etc/firmware/
     ln -sf /$(get_full_firmware_dir)/ $INSTALL/etc/firmware
+
+  # regdb and signature is now loaded as firmware by 4.15+
+    if grep -q ^CONFIG_CFG80211_REQUIRE_SIGNED_REGDB= $PKG_BUILD/.config; then
+      cp $(get_build_dir wireless-regdb)/regulatory.db{,.p7s} $INSTALL/$(get_full_firmware_dir)
+    fi
 }
