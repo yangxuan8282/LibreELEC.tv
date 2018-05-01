@@ -1049,50 +1049,6 @@
   # server is known, allow the libc resolver to use it
   grep '^\(nameserver\|domain\) ' /proc/net/pnp | grep -v '^nameserver 0\.0\.0\.0$' > /etc/resolv.conf
 
-  install_internal() {
-    progress "Install Libreelec to internal "
-
-    if [ -f /flash/install.aml ] ; then
-      echo ""
-      echo ""
-      echo "   WARNING !!!!"
-      echo ""
-      echo "   INSTALL LebreELEC to eMMC !!!!"
-      echo ""
-      echo "   WARNING !!!!"
-      echo ""
-      echo "   The installation process will DELETE all data in sections SYSTEM and DATA  !!!!"
-      echo ""
-      echo "To prevent an automatic repair attempt continuing,"
-      echo "press any key or power off your system within the next 20 seconds"
-      echo ""
-      read -t30 -n1
-
-      if [ "$?" -ne "0" -o "$?" -gt "38" ] ; then
-        echo ""
-        echo "Install to internal IN PROGRESS"
-        echo ""
-        echo "Please do not reboot or turn off your @DISTRONAME@ device!"
-        echo ""
-        mount -o remount,rw /flash
-        mv /flash/install.aml /flash/install.sh
-        /flash/install.sh
-        echo "****************************"
-        echo "Sucesful install LebreELEC to internal eMMC"
-        sync
-        sleep 3
-        echo "Poweroff system. "
-        sleep 5
-        poweroff
-      else
-        echo "Stop install to internal"
-        echo "Next start @DISTRONAME@ "
-        sleep 5
-      fi
-    fi
- }
-
-
   if [ "${boot%%=*}" = "FILE" ]; then
     error "check arguments" "boot argument can't be FILE type..."
   fi
@@ -1108,7 +1064,6 @@
       load_splash \
       mount_storage \
       check_update \
-      install_internal \
       prepare_sysroot; do
     $BOOT_STEP
     [ -n "$DEBUG" ] && break_after $BOOT_STEP
