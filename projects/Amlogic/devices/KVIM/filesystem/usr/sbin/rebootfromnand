@@ -1,6 +1,8 @@
+#!/bin/sh
+
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2018-present Team LibreELEC
+#      Copyright (C) 2017-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,19 +18,6 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="autoscript-amlogic"
-PKG_VERSION=""
-PKG_LICENSE="GPL"
-PKG_DEPENDS_TARGET="toolchain"
-PKG_TOOLCHAIN="manual"
-
-make_target() {
-  for src in $PKG_DIR/scripts/*autoscript.src ; do
-    $TOOLCHAIN/bin/mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$src" "$(basename $src .src)" > /dev/null
-  done
-}
-
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-  cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
-}
+if /usr/sbin/fw_printenv whereToBootFrom 2&>1 > /dev/null; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
+/usr/sbin/fw_setenv bootfromnand 1
+#/usr/bin/systemctl reboot

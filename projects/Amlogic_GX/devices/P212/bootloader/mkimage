@@ -65,5 +65,7 @@ LINUX="$(get_build_dir linux)"
 DTB="$($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM dtb)"
 
 cp -a $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/$DTB "$LE_TMP/"
+cp -a $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/$DTB "$LE_TMP/dtb.img"
 
 mcopy -s "$LE_TMP/$DTB" ::
+mcopy -s "$LE_TMP/dtb.img" ::

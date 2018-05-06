@@ -1,8 +1,6 @@
-#!/bin/sh
-
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2017-present Team LibreELEC
+#      Copyright (C) 2018-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,24 +16,19 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-# Parse command line arguments
-for arg in $(cat /proc/cmdline); do
-  case ${arg} in
-    BOOT_IMAGE=*)
-      BOOT_IMAGE=${arg#*=}
-      ;;
-    boot=*)
-      boot=${arg#*=}
-      ;;
-    disk=*)
-      disk=${arg#*=}
-      ;;
-  esac
-done
+PKG_NAME="autoscript-amlogic"
+PKG_VERSION="0.1"
+PKG_LICENSE="GPL"
+PKG_DEPENDS_TARGET="toolchain"
+PKG_TOOLCHAIN="manual"
 
-# Add information where to run LibreELEC from
-if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
-  cmdline=$(cat /proc/cmdline)
-  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
-  echo "$cmdline" > /proc/cmdline
-fi
+make_target() {
+  for src in $PKG_DIR/scripts/*autoscript.src ; do
+    $TOOLCHAIN/bin/mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$src" "$(basename $src .src)" > /dev/null
+  done
+}
+
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/share/bootloader
+  cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
+}
