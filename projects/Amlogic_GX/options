@@ -146,7 +146,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="u-boot-tools-aml amlogic-boot-fip dtc autoscript-amlogic"
+    ADDITIONAL_PACKAGES="u-boot-tools-aml amlogic-boot-fip dtc"
 
   # build and install driver addons (yes / no)
     DRIVER_ADDONS_SUPPORT="yes"
