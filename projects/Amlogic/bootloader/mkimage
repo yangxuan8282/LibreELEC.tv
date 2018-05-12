@@ -39,3 +39,11 @@ fi
 if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
   mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
 fi
+
+if [ -f "$RELEASE_DIR/3rdparty/bootloader/aml_autoscript.zip" ]; then
+  mcopy $RELEASE_DIR/3rdparty/bootloader/aml_autoscript.zip ::
+fi
+
+if [ -f "$RELEASE_DIR/3rdparty/bootloader/install.sh" ]; then
+  mcopy $RELEASE_DIR/3rdparty/bootloader/install.sh ::
+fi
