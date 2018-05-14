@@ -27,9 +27,6 @@ fi
 # Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
-    hdmimode=*)
-      hdmimode=${arg#*=}
-      ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE=${arg#*=}
       ;;
@@ -38,6 +35,9 @@ for arg in $(cat /proc/cmdline); do
       ;;
     disk=*)
       disk=${arg#*=}
+      ;;
+    hdmimode=*)
+      hdmimode=${arg#*=}
       ;;
   esac
 done

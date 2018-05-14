@@ -31,10 +31,10 @@ PKG_LONGDESC="systemd is a system and session manager for Linux, compatible with
 PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Drootprefix=/usr \
                        -Dsplit-usr=false \
+                       -Dsplit-bin=true \
                        -Ddefault-hierarchy=hybrid \
                        -Dtty-gid=5 \
                        -Dtests=false \
-                       -Dsplit-bin=true \
                        -Dseccomp=false \
                        -Dselinux=false \
                        -Dapparmor=false \

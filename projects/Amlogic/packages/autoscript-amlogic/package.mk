@@ -31,6 +31,7 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/bootloader
   cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
-  cp -a $PKG_DIR/instboot/aml_autoscript.zip $INSTALL/usr/share/bootloader/
-  cp -a $PKG_DIR/instboot/install.sh $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.zip $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.sh $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.ini $INSTALL/usr/share/bootloader/
 }
