@@ -1,5 +1,7 @@
-  # Configuration for u-boot
-    UBOOT_SYSTEM="khadas-vim"
-
   # Kernel extra targets to build
     KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxl-s905x-khadas-vim.dtb"
+
+  # additional packages to install:
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
+    ADDITIONAL_PACKAGES+=" autoscript-amlogic"

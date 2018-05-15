@@ -37,7 +37,7 @@
     BOOTLOADER="u-boot"
 
   # u-boot version to use (default)
-    UBOOT_VERSION="default"
+    UBOOT_VERSION="vendor"
 
   # Kernel target
     KERNEL_TARGET="Image.lzo"
