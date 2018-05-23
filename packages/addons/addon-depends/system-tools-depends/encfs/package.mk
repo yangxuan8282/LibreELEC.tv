@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
+#      Copyright (C) 2018-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,17 +16,20 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="strace"
-PKG_VERSION="4.22"
-PKG_SHA256="068cd09264c95e4d591bbcd3ea08f99a693ed8663cd5169b0fdad72eb5bdb39d"
+PKG_NAME="encfs"
+PKG_VERSION="1.9.5"
+PKG_SHA256="4709f05395ccbad6c0a5b40a4619d60aafe3473b1a79bafb3aa700b1f756fd63"
 PKG_ARCH="any"
-PKG_LICENSE="BSD"
-PKG_SITE="https://strace.io/"
-PKG_URL="https://strace.io/files/$PKG_VERSION/strace-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_LICENSE="LGPL"
+PKG_SITE="https://vgough.github.io/encfs/"
+PKG_URL="https://github.com/vgough/encfs/releases/download/v$PKG_VERSION/encfs-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain fuse"
 PKG_SECTION="tools"
-PKG_LONGDESC="strace is a diagnostic, debugging and instructional userspace utility"
-PKG_TOOLCHAIN="autotools"
+PKG_LONGDESC="EncFS is a Encrypted Filesystem for FUSE"
+
+PKG_CMAKE_OPTS_TARGET="-DCMAKE_INSTALL_PREFIX=/usr \
+                       -DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES=$SYSROOT_PREFIX/usr/include \
+                       -DBUILD_UNIT_TESTS=OFF"
 
 makeinstall_target() {
   :

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
+#      Copyright (C) 2018-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,17 +16,24 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="strace"
-PKG_VERSION="4.22"
-PKG_SHA256="068cd09264c95e4d591bbcd3ea08f99a693ed8663cd5169b0fdad72eb5bdb39d"
+PKG_NAME="smartmontools"
+PKG_VERSION="6.6"
+PKG_SHA256="51f43d0fb064fccaf823bbe68cf0d317d0895ff895aa353b3339a3b316a53054"
 PKG_ARCH="any"
-PKG_LICENSE="BSD"
-PKG_SITE="https://strace.io/"
-PKG_URL="https://strace.io/files/$PKG_VERSION/strace-$PKG_VERSION.tar.xz"
+PKG_LICENSE="GPL"
+PKG_SITE="https://www.smartmontools.org"
+PKG_URL="https://github.com/smartmontools/smartmontools/releases/download/RELEASE_${PKG_VERSION//./_}/smartmontools-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="tools"
-PKG_LONGDESC="strace is a diagnostic, debugging and instructional userspace utility"
-PKG_TOOLCHAIN="autotools"
+PKG_LONGDESC="Control and monitor storage systems using S.M.A.R.T."
+
+PKG_CONFIGURE_OPTS_TARGET="--prefix=/usr \
+                           --without-initscriptdir \
+                           --without-nvme-devicescan \
+                           --without-systemdenvfile \
+                           --without-systemdsystemunitdir \
+                           --without-systemdenvfile \
+                           --without-systemdsystemunitdir"
 
 makeinstall_target() {
   :

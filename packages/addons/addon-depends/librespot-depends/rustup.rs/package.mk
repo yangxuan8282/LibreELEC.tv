@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
+#      Copyright (C) 2018-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,18 +16,14 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="strace"
-PKG_VERSION="4.22"
-PKG_SHA256="068cd09264c95e4d591bbcd3ea08f99a693ed8663cd5169b0fdad72eb5bdb39d"
+PKG_NAME="rustup.rs"
+PKG_VERSION="1.3.0"
+PKG_SHA256="c0ca06b70104fed8f1de5a6f5ecfd8478e8bc03f15add8d7896b86b3b15e81e3"
 PKG_ARCH="any"
-PKG_LICENSE="BSD"
-PKG_SITE="https://strace.io/"
-PKG_URL="https://strace.io/files/$PKG_VERSION/strace-$PKG_VERSION.tar.xz"
+PKG_LICENSE="MIT"
+PKG_SITE="https://www.rust-lang.org"
+PKG_URL="https://github.com/rust-lang-nursery/rustup.rs/archive/$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
-PKG_SECTION="tools"
-PKG_LONGDESC="strace is a diagnostic, debugging and instructional userspace utility"
-PKG_TOOLCHAIN="autotools"
-
-makeinstall_target() {
-  :
-}
+PKG_SECTION="devel"
+PKG_LONGDESC="The Rust toolchain installer."
+PKG_TOOLCHAIN="manual"
