@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="autoscript-amlogic"
-PKG_VERSION=""
+PKG_VERSION="0.1"
 PKG_LICENSE="GPL"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_TOOLCHAIN="manual"
@@ -31,4 +31,7 @@ make_target() {
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/bootloader
   cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.zip $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.sh $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.ini $INSTALL/usr/share/bootloader/
 }

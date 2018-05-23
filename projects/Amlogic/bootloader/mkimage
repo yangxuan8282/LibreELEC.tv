@@ -32,10 +32,7 @@ if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
   dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
 fi
 
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/boot.ini" ]; then
-  mcopy $RELEASE_DIR/3rdparty/bootloader/boot.ini ::
-fi
-
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/config.ini" ]; then
-  mcopy $RELEASE_DIR/3rdparty/bootloader/config.ini ::
-fi
+# copy files to part1
+for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip ; do
+  [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
+done
