@@ -81,6 +81,10 @@ if [ -n "$UBOOT_SYSTEM" ]; then
   IMAGE_NAME="$IMAGE_NAME-$UBOOT_SYSTEM"
 fi
 
+if [ -n "$SYSTEM" ]; then
+  IMAGE_NAME="$IMAGE_NAME-$SYSTEM"
+fi
+
 if [ -n "$CUSTOM_IMAGE_NAME" ]; then
    IMAGE_NAME="$CUSTOM_IMAGE_NAME"
 fi

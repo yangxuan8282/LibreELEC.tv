@@ -40,6 +40,13 @@ case "$LINUX" in
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host u-boot-tools-aml:host"
     PKG_BUILD_PERF="no"
     ;;
+  amlogic-s8xx)
+    PKG_VERSION="1be06c2371eb3cc3376b282cf77b4d4dee50f01f"
+    PKG_URL="https://github.com/kszaq/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host u-boot-tools-aml:host"
+    PKG_BUILD_PERF="no"
+    ;;
   amlogic-3.14)
     PKG_VERSION="29941550f05282411c00c437b4c18bb5c6319d63"
     PKG_SHA256="c97da3b9cd3d34432e69aeaa740076afee977b9ed7c0d0a8475f3f019288dd36"
@@ -47,6 +54,13 @@ case "$LINUX" in
     PKG_SOURCE_DIR="linux-amlogic-$PKG_VERSION"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET aml-dtbtools:host"
     PKG_BUILD_PERF="no"
+    ;;
+  amlogic-mainline)
+    PKG_VERSION="11454943b264b548e714d8edf932ebf306e5f808" # 4.16.1
+    PKG_SHA256="f56bfeeffb56df161abcaac22bedee278831472a5f9d8e877d1dd840d735d080"
+    PKG_URL="https://github.com/torvalds/linux/archive/$PKG_VERSION.tar.gz"
+    PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*"
+    PKG_PATCH_DIRS="default"
     ;;
   rockchip-4.4)
     PKG_VERSION="eae92ae2b930999857df47c3057327c1c490454b"
