@@ -1,0 +1,27 @@
+--- a/drivers/media/rc/Kconfig
++++ b/drivers/media/rc/Kconfig
+@@ -206,6 +206,16 @@
+ 	   To compile this driver as a module, choose M here: the
+ 	   module will be called fintek-cir.
+ 
++config IR_MESON
++	tristate "Amlogic Meson IR remote receiver"
++	depends on RC_CORE
++	---help---
++	   Say Y if you want to use the IR remote receiver available
++	   on Amlogic Meson SoCs.
++
++	   To compile this driver as a module, choose M here: the
++	   module will be called meson-ir.
++
+ config IR_NUVOTON
+ 	tristate "Nuvoton w836x7hg Consumer Infrared Transceiver"
+ 	depends on PNP
+@@ -248,7 +258,6 @@
+ 	depends on RC_CORE
+ 	select NEW_LEDS
+ 	select LEDS_CLASS
+-	select LEDS_TRIGGERS
+ 	select BITREVERSE
+ 	---help---
+ 	   Say Y here if you want to use the IR remote functionality found

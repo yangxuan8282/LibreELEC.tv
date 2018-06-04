@@ -1,6 +1,3 @@
-  # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxl_p212_2g_kvim.dtb"
-
   # Additional kernel dependencies
     KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
 

@@ -20,13 +20,11 @@
 
 display_mode=$(cat /sys/class/display/mode)
 
-if [ -z "$display_mode" ]; then
-    display_mode="1080p60hz"
-fi
-
-# Parse command line arguments
 for arg in $(cat /proc/cmdline); do
   case ${arg} in
+    bootfrom*)
+      bootfromext=1
+      ;;
     BOOT_IMAGE=*)
       BOOT_IMAGE=${arg#*=}
       ;;
@@ -45,7 +43,11 @@ done
 # Add information where to run LibreELEC from
 if [ -z "$BOOT_IMAGE" -o -z "$boot" -o -z "$disk" ]; then
   cmdline=$(cat /proc/cmdline)
-  cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
+  if [ -n "$bootfromext" ]; then
+    cmdline="$cmdline BOOT_IMAGE=kernel.img boot=LABEL=LIBREELEC disk=LABEL=STORAGE"
+  else
+    cmdline="$cmdline BOOT_IMAGE=/dev/boot boot=/dev/system disk=/dev/data"
+  fi
   echo "$cmdline" > /proc/cmdline
 fi
 

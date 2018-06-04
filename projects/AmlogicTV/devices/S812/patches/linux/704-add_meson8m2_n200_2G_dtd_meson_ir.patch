@@ -1,0 +1,27 @@
+--- a/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd
++++ b/arch/arm/boot/dts/amlogic/meson8m2_n200_2G.dtd
+@@ -175,7 +175,7 @@
+                 compatible = "amlogic,vdec";
+                 dev_name = "vdec.0";
+                 status = "okay";
+-               reserve-memory = <0x10000000>;
++                reserve-memory = <0x10000000>;
+ 		reserve-iomap = "true";
+         };
+ ///	-	picture decoder
+@@ -1272,6 +1272,15 @@
+ 		pinctrl-0=<&remote_pins>;
+ 	};
+ 
++	meson-ir {
++		compatible = "amlogic,meson-gxbb-ir";
++		status = "disabled";
++		reg = <0x0 0xc8100580 0x0 0x40>;
++		interrupts = <0x0 0xc4 0x1>;
++		pinctrl-names = "default";
++		pinctrl-0 = <0x19>;
++	};
++
+ /// ***************************************************************************************
+ ///	-	Securitykey
+ //$$ MODULE="Securitykey"
