@@ -26,6 +26,11 @@ make_target() {
   for src in $PKG_DIR/scripts/*autoscript.src ; do
     $TOOLCHAIN/bin/mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$src" "$(basename $src .src)" > /dev/null
   done
+  for src in $PKG_DIR/instboot/*.ini ; do
+      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+          -i "$src"
+  done
 }
 
 makeinstall_target() {
