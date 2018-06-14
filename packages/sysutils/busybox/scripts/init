@@ -46,8 +46,8 @@
 
   UPDATE_KERNEL="KERNEL"
   UPDATE_SYSTEM="SYSTEM"
-  IMAGE_KERNEL="/@KERNEL_NAME@"
-  IMAGE_SYSTEM="/SYSTEM"
+  IMAGE_KERNEL="@KERNEL_NAME@"
+  IMAGE_SYSTEM="SYSTEM"
 
   BOOT_STEP="start"
   MD5_FAILED="0"
@@ -479,7 +479,7 @@
     export BOOT_ROOT="/flash"
     export SYSTEM_ROOT="/sysroot"
 
-    mount_part "/flash$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+    mount_part "/flash/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
 
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/update.sh ]; then
       StartProgress spinner "Updating Bootloader... "
@@ -1030,9 +1030,9 @@
     if [ -b /$IMAGE_KERNEL ]; then
       update_partition "Kernel" "$UPDATE_KERNEL" "/$IMAGE_KERNEL"
     else
-      update_file "Kernel" "$UPDATE_KERNEL" "/flash$IMAGE_KERNEL"
+      update_file "Kernel" "$UPDATE_KERNEL" "/flash/$IMAGE_KERNEL"
     fi
-    update_file "System" "$UPDATE_SYSTEM" "/flash$IMAGE_SYSTEM"
+    update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
     update_bootloader
     do_cleanup
     do_reboot
@@ -1042,10 +1042,10 @@
     progress "Preparing system"
 
     if [ "$SYSTEM_TORAM" = "no" -o "$INSTALLED_MEMORY" -lt "$SYSTEM_TORAM_LIMIT" ]; then
-      mount_part "/flash$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+      mount_part "/flash/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
     else
-      cp /flash$IMAGE_SYSTEM /dev$IMAGE_SYSTEM
-      mount_part "/dev$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+      cp /flash/$IMAGE_SYSTEM /dev/$IMAGE_SYSTEM
+      mount_part "/dev/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
     fi
 
     mount --move /flash /sysroot/flash
