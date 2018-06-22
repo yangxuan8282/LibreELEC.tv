@@ -92,11 +92,11 @@
     case $arg in
       BOOT_IMAGE=*)
         IMAGE_KERNEL="${arg#*=}"
-	[ "${IMAGE_KERNEL:0:1}" = "/" ] && IMAGE_KERNEL="${IMAGE_KERNEL:1}"
+        [ "${IMAGE_KERNEL:0:1}" = "/" ] && IMAGE_KERNEL="${IMAGE_KERNEL:1}"
         ;;
       SYSTEM_IMAGE=*)
         IMAGE_SYSTEM="${arg#*=}"
-	[ "${IMAGE_SYSTEM:0:1}" = "/" ] && IMAGE_SYSTEM="${IMAGE_SYSTEM:1}"
+        [ "${IMAGE_SYSTEM:0:1}" = "/" ] && IMAGE_SYSTEM="${IMAGE_SYSTEM:1}"
         ;;
       boot=*)
         boot="${arg#*=}"
@@ -993,7 +993,7 @@
     FLASH_FREE=$(( $FLASH_FREE * 1024 ))
 
     # Disregard kernel size if it's a a block device, which is the case on Amlogic/WeTek devices
-    if [ ! -b /$IMAGE_KERNEL ]; then
+    if [ ! -b "/$IMAGE_KERNEL" ]; then
       OLD_KERNEL=$(stat -t "/flash/$IMAGE_KERNEL" | awk '{print $2}')
     else
       OLD_KERNEL="0"
@@ -1027,7 +1027,7 @@
     fi
 
     # all ok, update
-    if [ -b /$IMAGE_KERNEL ]; then
+    if [ -b "/$IMAGE_KERNEL" ]; then
       update_partition "Kernel" "$UPDATE_KERNEL" "/$IMAGE_KERNEL"
     else
       update_file "Kernel" "$UPDATE_KERNEL" "/flash/$IMAGE_KERNEL"

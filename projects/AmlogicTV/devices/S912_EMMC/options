@@ -28,3 +28,8 @@
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
     ADDITIONAL_PACKAGES+=" autoscript-amlogic-emmc mc"
+
+ # set the addon dirs
+#    ADDON_SERVER_URL="http://balbes150.libreelec.tv/addons"
+    ADDON_PATH="$ADDON_VERSION/S912/$TARGET_ARCH"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
