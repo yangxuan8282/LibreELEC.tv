@@ -33,9 +33,6 @@
         ;;
     esac
 
-  # Use linaro toolchain to build kernel
-#    KERNEL_LINARO_TOOLCHAIN="aarch64-linux-gnu"
-
   # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
     BOOTLOADER="u-boot"
 

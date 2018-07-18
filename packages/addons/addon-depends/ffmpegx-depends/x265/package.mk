@@ -17,12 +17,13 @@
 ################################################################################
 
 PKG_NAME="x265"
-PKG_VERSION="2.7"
-PKG_SHA256="1a731cd6e70ca26a332bb42f089da2eedfc16f606653140bef8ff48c9042a274"
+PKG_VERSION="2.8"
+PKG_SHA256="6e59f9afc0c2b87a46f98e33b5159d56ffb3558a49d8e3d79cb7fdc6b7aaa863"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
-PKG_SITE="https://github.com/videolan/x265"
-PKG_URL="https://github.com/videolan/x265/archive/${PKG_VERSION}.tar.gz"
+PKG_SITE="https://www.videolan.org/developers/x265.html"
+PKG_URL="http://download.videolan.org/pub/videolan/$PKG_NAME/${PKG_NAME}_${PKG_VERSION}.tar.gz"
+PKG_SOURCE_NAME=${PKG_NAME}_${PKG_VERSION}
 PKG_DEPENDS_TARGET="toolchain"
 PKG_SECTION="multimedia"
 PKG_LONGDESC="x265 is a H.265/HEVC video encoder application library"

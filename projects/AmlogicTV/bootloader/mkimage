@@ -33,6 +33,6 @@ if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
 fi
 
 # copy files to part1
-for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip ; do
+for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip $RELEASE_DIR/3rdparty/bootloader/u-boot ; do
   [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
 done
