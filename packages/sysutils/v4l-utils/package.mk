@@ -1,22 +1,21 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2016-present Team LibreELEC
 #
-#  OpenELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  OpenELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-
-# with 1.0.0 repeat delay is broken. test on upgrade
 
 PKG_NAME="v4l-utils"
 PKG_VERSION="1.14.1"
@@ -61,7 +60,7 @@ makeinstall_target() {
   make install DESTDIR=$INSTALL PREFIX=/usr -C utils/v4l2-ctl
 }
 
-create_multi_keymap() {
+create_multimap() {
   local f name protocols
   name="$1"
   protocols="$2"
@@ -99,13 +98,19 @@ post_makeinstall_target() {
     done
   )
 
-  # create multi keymap to support several remotes OOTB
+  # array of local package keymaps to include in the default multimap
+  default_map="cubox_i hp_mce rc6_mce xbox_one xbox_360 zotac_ad10"
 
-  default_multi_maps="rc6_mce xbox_360 zotac_ad10 hp_mce xbox_one cubox_i"
+  # create multimap_default
+  create_multimap multimap_default "RC6 NEC" $default_map
 
-  create_multi_keymap libreelec_multi "RC6 NEC" $default_multi_maps
-  create_multi_keymap libreelec_multi_amlogic "RC6 NEC" $default_multi_maps \
-    odroid wetek_hub wetek_play_2 minix_neo
+  # create multimap_custom
+  if [ -n "$MULTIMAP_CUSTOM" ]; then
+    create_multimap multimap_custom "RC6 NEC" $multimap_default $MULTIMAP_CUSTOM
+  else
+    create_multimap multimap_custom "RC6 NEC" $multimap_default \
+      odroid wetek_hub wetek_play_2 minix_neo
+  fi
 
   # use multi-keymap instead of default one
   sed -i '/^\*\s*rc-rc6-mce\s*rc6_mce/d' $INSTALL/etc/rc_maps.cfg
@@ -113,10 +118,10 @@ post_makeinstall_target() {
 #
 # Custom LibreELEC configuration starts here
 #
-# use combined multi-table on MCE receivers
+# multimap for MCE receivers
 # *		rc-rc6-mce	rc6_mce
-*		rc-rc6-mce	libreelec_multi
-# multi-table for amlogic devices
-meson-ir	*		libreelec_multi_amlogic
+*		rc-rc6-mce	multimap_default
+# multimap for amlogic devices
+meson-ir	*		multimap_custom
 EOF
 }

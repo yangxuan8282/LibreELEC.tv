@@ -2,7 +2,7 @@
 
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2017-present Team LibreELEC
+#      Copyright (C) 2018-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,21 +18,33 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+. config/options $1
+
 # compile and copy amlogic autoscript files to part1
 mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
 
 # copy device trees to part1
-for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
-  [ -e "$dtb" ] && mcopy -s "$dtb" ::
-done
+##for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
+##  [ -e "$dtb" ] && mcopy -s "$dtb" ::
+##done
 
-if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
-  echo "Writing u-boot to $(basename $DISK)"
-  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
-  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
-fi
+##if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
+##  echo "Writing u-boot to $(basename $DISK)"
+##  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
+##  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
+##fi
 
 # copy files to part1
 for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip ; do
   [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
 done
+
+echo "Installing dtb"
+LINUX="$(get_build_dir linux)"
+DTB="$($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM dtb)"
+
+#cp -a $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/$DTB "$LE_TMP/"
+cp -a $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/$DTB "$LE_TMP/dtb.img"
+
+#mcopy -s "$LE_TMP/$DTB" ::
+mcopy -s "$LE_TMP/dtb.img" ::

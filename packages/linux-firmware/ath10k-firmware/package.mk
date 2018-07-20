@@ -18,7 +18,7 @@
 
 PKG_NAME="ath10k-firmware"
 PKG_VERSION="1ac853f"
-PKG_SHA256="f316f691b5db45f92d05b49380153150befc2e5d11ae2e4fe24d16552bee56b5"
+PKG_SHA256=""
 PKG_ARCH="any"
 PKG_LICENSE="other"
 PKG_SITE="https://github.com/chewitt/ath10k-firmware"
@@ -31,12 +31,10 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   FW_TARGET_DIR=$INSTALL/$(get_full_firmware_dir)
 
-  if [ -f ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/firmware/${PKG_NAME}.dat ]; then
-    FW_LISTS="${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/firmware/${PKG_NAME}.dat"
-  elif [ -f ${PROJECT_DIR}/${PROJECT}/firmware/${PKG_NAME}.dat ]; then
-    FW_LISTS="${PROJECT_DIR}/${PROJECT}/firmware/${PKG_NAME}.dat"
+  if find_file_path firmwares/$PKG_NAME.dat; then
+    FW_LISTS="${FOUND_PATH}"
   else
-    FW_LISTS="${PKG_DIR}/firmwares/all.dat"
+    FW_LISTS="${PKG_DIR}/firmwares/any.dat ${PKG_DIR}/firmwares/${TARGET_ARCH}.dat"
   fi
 
   for fwlist in ${FW_LISTS}; do
@@ -48,7 +46,6 @@ makeinstall_target() {
 
       for fwfile in $(cd ${PKG_BUILD} && eval "find ${fwline}"); do
         [ -d ${PKG_BUILD}/${fwfile} ] && continue
-
         if [ -f ${PKG_BUILD}/${fwfile} ]; then
           mkdir -p $(dirname ${FW_TARGET_DIR}/${fwfile})
             cp -Lv ${PKG_BUILD}/${fwfile} ${FW_TARGET_DIR}/${fwfile}

@@ -1,36 +1,36 @@
 ################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
+#      This file is part of LibreELEC - https://libreelec.tv
+#      Copyright (C) 2018-present Team LibreELEC
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 #
-#  OpenELEC is free software: you can redistribute it and/or modify
+#  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  OpenELEC is distributed in the hope that it will be useful,
+#  LibreELEC is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 PKG_NAME="xf86-video-intel"
-PKG_VERSION="26f5406"
-PKG_SHA256="8393ec70f45e9a243de7e6d085b1fa02aa3933c8ac9c72ccd83ce2d890052a5d"
+PKG_VERSION="3d39506"
+PKG_SHA256="cfc7287fcb38028a68ffd7677032db0882c02112ad24038ee936de854761e8b3"
 PKG_ARCH="x86_64"
 PKG_LICENSE="OSS"
 PKG_SITE="http://intellinuxgraphics.org/"
 PKG_URL="https://cgit.freedesktop.org/xorg/driver/xf86-video-intel/snapshot/$PKG_VERSION.tar.xz"
 PKG_SOURCE_DIR="$PKG_VERSION"
-PKG_DEPENDS_TARGET="toolchain libXcomposite util-macros fontsproto systemd xorg-server"
+PKG_DEPENDS_TARGET="toolchain libXcomposite libXxf86vm libXdamage libdrm util-macros systemd xorg-server"
 PKG_SECTION="x11/driver"
 PKG_SHORTDESC="xf86-video-intel: The Xorg driver for Intel video chips"
 PKG_LONGDESC="The Xorg driver for Intel i810, i815, 830M, 845G, 852GM, 855GM, 865G, 915G, 915GM and 965G video chips."
 PKG_TOOLCHAIN="autotools"
 # xf86-video-intel is broken enough. dont link with LTO
-PKG_BUILD_FLAGS="-lto"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-backlight \
                            --disable-backlight-helper \

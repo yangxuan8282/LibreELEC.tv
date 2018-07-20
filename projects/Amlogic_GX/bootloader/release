@@ -18,7 +18,5 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-. config/options $1
-
 mkdir -p $RELEASE_DIR/3rdparty/bootloader
-cp -a $INSTALL/usr/share/bootloader/* $RELEASE_DIR/3rdparty/bootloader
+  cp -a $(get_build_dir linux)/arch/$TARGET_KERNEL_ARCH/boot/dtb.img $RELEASE_DIR/3rdparty/bootloader

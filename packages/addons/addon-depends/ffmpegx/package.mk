@@ -17,18 +17,17 @@
 ################################################################################
 
 PKG_NAME="ffmpegx"
-PKG_VERSION="3.4.2"
-PKG_SHA256="d079c68dc19a0223239a152ffc2b67ef1e9d3144e4d2c2563380dc59dccf33e5"
+PKG_VERSION="4.0.1"
+PKG_SHA256="cbb7c3ed5b7a669962dfe7c58dc495279274ac259e75770cccf2d2b0115ff5fb"
 PKG_ARCH="any"
 PKG_LICENSE="LGPLv2.1+"
 PKG_SITE="https://ffmpeg.org"
 PKG_URL="https://github.com/FFmpeg/FFmpeg/archive/n${PKG_VERSION}.tar.gz"
 PKG_SOURCE_DIR="FFmpeg-n${PKG_VERSION}"
-PKG_DEPENDS_TARGET="toolchain bzip2 fdk-aac libvorbis openssl opus x264 x265 zlib"
+PKG_DEPENDS_TARGET="toolchain aom bzip2 fdk-aac libvorbis openssl opus x264 x265 zlib"
 PKG_SECTION="multimedia"
 PKG_LONGDESC="FFmpegx is an complete FFmpeg build to support encoding and decoding"
-# ffmpeg builds better with these options
-PKG_BUILD_FLAGS="-gold -lto"
+PKG_BUILD_FLAGS="-gold"
 
 # Dependencies
 get_graphicdrivers
@@ -93,9 +92,11 @@ pre_configure_target() {
     --enable-hwaccel=h263_vaapi \
     --enable-hwaccel=h264_vaapi \
     --enable-hwaccel=hevc_vaapi \
+    --enable-hwaccel=mjpeg_vaapi \
     --enable-hwaccel=mpeg2_vaapi \
     --enable-hwaccel=mpeg4_vaapi \
     --enable-hwaccel=vc1_vaapi \
+    --enable-hwaccel=vp8_vaapi \
     --enable-hwaccel=vp9_vaapi \
     --enable-hwaccel=wmv3_vaapi"
   fi
@@ -110,6 +111,8 @@ pre_configure_target() {
     --enable-encoder=x264 \
     --enable-libx265 \
     --enable-encoder=x265 \
+    --enable-libaom \
+    --enable-encoder=libaom_av1 \
     \
     `#Audio encoders` \
     --enable-encoder=ac3 \
@@ -142,7 +145,6 @@ configure_target() {
     --enable-ffmpeg \
     --disable-ffplay \
     --enable-ffprobe \
-    --disable-ffserver \
     \
     `#Static and Shared` \
     --enable-static \
@@ -186,7 +188,6 @@ configure_target() {
     --extra-cflags="$CFLAGS" \
     --extra-ldflags="$LDFLAGS" \
     --extra-libs="$PKG_FFMPEG_LIBS" \
-    --extra-version="x" \
     --enable-pic \
     --enable-openssl \
     \
@@ -197,8 +198,4 @@ configure_target() {
 
 makeinstall_target() {
   make install DESTDIR="$INSTALL/../.INSTALL_PKG"
-}
-
-post_makeinstall_target() {
-  for ff in "$INSTALL/../.INSTALL_PKG/usr/local/bin/"*; do mv "$ff" "${ff}x"; done
 }

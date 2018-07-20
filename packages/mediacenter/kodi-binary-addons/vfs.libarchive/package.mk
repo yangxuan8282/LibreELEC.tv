@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="vfs.libarchive"
-PKG_VERSION="e7d149e"
-PKG_SHA256="dd9604752dcb4fbe38b082455935e95dc7b572a1424a49c935989292038f1b74"
+PKG_VERSION="1bc1517"
+PKG_SHA256="421eee7eca4544ae22736b7594ff15934dbee3b592a5d0e6c576cc6c756f481c"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

@@ -1,0 +1,65 @@
+From 39f146f31ddd2c6e12172922f806a7ed782df783 Mon Sep 17 00:00:00 2001
+From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
+Date: Sun, 15 Apr 2018 05:34:48 +0200
+Subject: [PATCH 34/50] Fix clocks following rebase
+
+---
+ drivers/clk/meson/gxbb.c | 42 ------------------------------------------
+ 1 file changed, 42 deletions(-)
+
+diff --git a/drivers/clk/meson/gxbb.c b/drivers/clk/meson/gxbb.c
+index 4a9c727..2406584 100644
+--- a/drivers/clk/meson/gxbb.c
++++ b/drivers/clk/meson/gxbb.c
+@@ -1626,48 +1626,6 @@ static struct clk_regmap gxbb_vdec_hevc = {
+ 	},
+ };
+ 
+-static struct clk_mux gxbb_vdec_hevc_sel = {
+-	.reg = (void *)HHI_VDEC2_CLK_CNTL,
+-	.mask = 0x3,
+-	.shift = 25,
+-	.lock = &meson_clk_lock,
+-	.table = mux_table_vdec,
+-	.hw.init = &(struct clk_init_data){
+-		.name = "vdec_hevc_sel",
+-		.ops = &clk_mux_ops,
+-		.parent_names = gxbb_vdec_parent_names,
+-		.num_parents = ARRAY_SIZE(gxbb_vdec_parent_names),
+-		.flags = CLK_SET_RATE_NO_REPARENT,
+-	},
+-};
+-
+-static struct clk_divider gxbb_vdec_hevc_div = {
+-	.reg = (void *)HHI_VDEC2_CLK_CNTL,
+-	.shift = 16,
+-	.width = 7,
+-	.lock = &meson_clk_lock,
+-	.hw.init = &(struct clk_init_data){
+-		.name = "vdec_hevc_div",
+-		.ops = &clk_divider_ops,
+-		.parent_names = (const char *[]){ "vdec_hevc_sel" },
+-		.num_parents = 1,
+-		.flags = CLK_SET_RATE_PARENT,
+-	},
+-};
+-
+-static struct clk_gate gxbb_vdec_hevc = {
+-	.reg = (void *)HHI_VDEC2_CLK_CNTL,
+-	.bit_idx = 24,
+-	.lock = &meson_clk_lock,
+-	.hw.init = &(struct clk_init_data) {
+-		.name = "vdec_hevc",
+-		.ops = &clk_gate_ops,
+-		.parent_names = (const char *[]){ "vdec_hevc_div" },
+-		.num_parents = 1,
+-		.flags = CLK_SET_RATE_PARENT | CLK_IGNORE_UNUSED,
+-	},
+-};
+-
+ /* Everything Else (EE) domain gates */
+ static MESON_GATE(gxbb_ddr, HHI_GCLK_MPEG0, 0);
+ static MESON_GATE(gxbb_dos, HHI_GCLK_MPEG0, 1);
+-- 
+2.7.4
+

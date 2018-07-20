@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="connman"
-PKG_VERSION="1.35"
-PKG_SHA256="66d7deb98371545c6e417239a9b3b3e3201c1529d08eedf40afbc859842cf2aa"
+PKG_VERSION="1.36"
+PKG_SHA256="c789db41cc443fa41e661217ea321492ad59a004bebcd1aa013f3bc10a6e0074"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.connman.net"
@@ -31,7 +31,6 @@ PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="WPASUPPLICANT=/usr/bin/wpa_supplicant \
                            --srcdir=.. \
-                           --disable-gtk-doc \
                            --disable-debug \
                            --disable-hh2serial-gps \
                            --disable-openconnect \
@@ -57,6 +56,7 @@ PKG_CONFIGURE_OPTS_TARGET="WPASUPPLICANT=/usr/bin/wpa_supplicant \
                            --disable-neard \
                            --disable-wispr \
                            --disable-tools \
+                           --disable-stats \
                            --enable-client \
                            --enable-datafiles \
                            --with-dbusconfdir=/etc \
@@ -86,6 +86,7 @@ post_makeinstall_target() {
     cp ../src/main.conf $INSTALL/etc/connman
     sed -i $INSTALL/etc/connman/main.conf \
         -e "s|^# BackgroundScanning.*|BackgroundScanning = true|g" \
+        -e "s|^# UseGatewaysAsTimeservers.*|UseGatewaysAsTimeservers = false|g" \
         -e "s|^# FallbackNameservers.*|FallbackNameservers = 8.8.8.8,8.8.4.4|g" \
         -e "s|^# FallbackTimeservers.*|FallbackTimeservers = 0.pool.ntp.org,1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org|g" \
         -e "s|^# PreferredTechnologies.*|PreferredTechnologies = ethernet,wifi,cellular|g" \

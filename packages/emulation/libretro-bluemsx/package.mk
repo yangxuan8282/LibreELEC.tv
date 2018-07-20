@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-bluemsx"
-PKG_VERSION="997643b"
-PKG_SHA256="187bcc77c2f99dbef6b88a0f41d9c45926f39339daa34f511c535b9da0f9f6ab"
+PKG_VERSION="406c985"
+PKG_SHA256="a668945f44b950eb844dc83e8f0b673bda8fd0bab6e4ff74f00a56779cb457c3"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
 PKG_SITE="https://github.com/libretro/blueMSX-libretro"
@@ -28,7 +28,6 @@ PKG_DEPENDS_TARGET="toolchain kodi-platform"
 PKG_SECTION="emulation"
 PKG_SHORTDESC="game.libretro.bluemsx: BlueMSX for Kodi"
 PKG_LONGDESC="game.libretro.bluemsx: BlueMSX for Kodi"
-PKG_BUILD_FLAGS="-lto"
 
 PKG_LIBNAME="bluemsx_libretro.so"
 PKG_LIBPATH="$PKG_LIBNAME"

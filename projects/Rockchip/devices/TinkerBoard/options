@@ -10,6 +10,7 @@
         TARGET_CPU="cortex-a17"
         TARGET_FPU="neon-vfpv4"
         TARGET_FEATURES="32bit"
+        KERNEL_LINARO_TOOLCHAIN="arm-linux-gnueabihf"
         ;;
     esac
 
@@ -24,9 +25,6 @@
 
   # Mali GPU family
     MALI_FAMILY="t760"
-
-  # kernel image name
-    KERNEL_NAME="zImage"
 
   # kernel serial console
     EXTRA_CMDLINE="console=uart8250,mmio32,0xff690000 console=tty0"

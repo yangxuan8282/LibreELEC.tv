@@ -17,8 +17,8 @@
 ################################################################################
 
 PKG_NAME="libretro-scummvm"
-PKG_VERSION="93d1ca12b6"
-PKG_SHA256="5a39e30bda47fe6b71e3f7ef05e91eda20dea001f7ebbe47b5a7579fadaf8178"
+PKG_VERSION="60c47ac"
+PKG_SHA256="d4452b3c66ddc1d928416d4a102823a13cbb2e18b180768fe0ebb372e8bd2f8f"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv3"
 PKG_SITE="https://github.com/libretro/scummvm"
@@ -29,7 +29,6 @@ PKG_SECTION="emulation"
 PKG_SHORTDESC="game.libretro.scummvm: scummvm for Kodi"
 PKG_LONGDESC="game.libretro.scummvm: scummvm for Kodi"
 PKG_TOOLCHAIN="manual"
-PKG_BUILD_FLAGS="-lto"
 
 PKG_LIBNAME="scummvm_libretro.so"
 PKG_LIBPATH="backends/platform/libretro/build/$PKG_LIBNAME"

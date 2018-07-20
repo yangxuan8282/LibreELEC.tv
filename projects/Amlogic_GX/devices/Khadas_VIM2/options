@@ -1,0 +1,32 @@
+  # Configuration for u-boot
+    UBOOT_SYSTEM="Khadas_VIM2"
+
+  # Kernel extra targets to build
+    KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxm-khadas-vim2.dtb"
+
+  # OpenGL(X) implementation to use (no / mesa)
+#    OPENGL="mesa"
+
+  # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
+#    OPENGLES="no"
+
+  # include uvesafb support (yes / no)
+#    UVESAFB_SUPPORT="no"
+
+  # Displayserver to use (x11 / no)
+#    DISPLAYSERVER="weston"
+
+  # Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
+  # Space separated list is supported,
+  # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia nouveau"
+#    GRAPHIC_DRIVERS=""
+
+  # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
+#    KODIPLAYER_DRIVER="default"
+
+  # additional drivers to install:
+  # for a list of additinoal drivers see packages/linux-drivers
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
+#    ADDITIONAL_DRIVERS=""
+
