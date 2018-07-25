@@ -1,24 +1,9 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="rpi_ws281x"
-PKG_VERSION="f580777"
-PKG_SHA256="edc831ff9daac354c54bfab1dad52f282ad44225d5769e6ae2b45160fe21762e"
+PKG_VERSION="6c5ade9"
+PKG_SHA256="e8fb94429edc21cfd894548755a417eb5b2e121329f4b54270cfb3f727696e21"
 PKG_ARCH="any"
 PKG_LICENSE="BSD-3c"
 PKG_SITE="https://github.com/hyperion-project/rpi_ws281x"

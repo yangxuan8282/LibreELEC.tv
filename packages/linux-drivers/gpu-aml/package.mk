@@ -1,20 +1,5 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="gpu-aml"
 PKG_ARCH="arm aarch64"
@@ -48,11 +33,11 @@ pre_make_target() {
 
 make_target() {
   if [ "$MESON_FAMILY" = "gxm" ] ; then
-    LDFLAGS="" make -C $(kernel_path) M=$PKG_MIDGARD_BUILD_DIR \
+    kernel_make -C $(kernel_path) M=$PKG_MIDGARD_BUILD_DIR \
     EXTRA_CFLAGS="-DCONFIG_MALI_PLATFORM_DEVICETREE -DCONFIG_MALI_BACKEND=gpu" \
       CONFIG_MALI_MIDGARD=m CONFIG_MALI_PLATFORM_DEVICETREE=y CONFIG_MALI_BACKEND=gpu modules
   else
-    LDFLAGS="" make -C $(kernel_path) M=$PKG_UTGARD_BUILD_DIR \
+    kernel_make -C $(kernel_path) M=$PKG_UTGARD_BUILD_DIR \
       EXTRA_CFLAGS="-DCONFIG_MALI450=y" \
       CONFIG_MALI400=m CONFIG_MALI450=y
   fi
@@ -60,11 +45,11 @@ make_target() {
 
 makeinstall_target() {
   if [ "$MESON_FAMILY" = "gxm" ] ; then
-    LDFLAGS="" make -C $(kernel_path) M=$PKG_MIDGARD_BUILD_DIR \
+    kernel_make -C $(kernel_path) M=$PKG_MIDGARD_BUILD_DIR \
       INSTALL_MOD_PATH=$INSTALL/$(get_kernel_overlay_dir) INSTALL_MOD_STRIP=1 DEPMOD=: \
     modules_install
   else
-    LDFLAGS="" make -C $(kernel_path) M=$PKG_UTGARD_BUILD_DIR \
+    kernel_make -C $(kernel_path) M=$PKG_UTGARD_BUILD_DIR \
       INSTALL_MOD_PATH=$INSTALL/$(get_kernel_overlay_dir) INSTALL_MOD_STRIP=1 DEPMOD=: \
     modules_install
   fi

@@ -1,25 +1,10 @@
 #!/bin/sh
 
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
-#      Copyright (C) 2010-2011 Roman Weber (roman@openelec.tv)
-#      Copyright (C) 2012 Yann Cézard (eesprit@free.fr)
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2010-2011 Roman Weber (roman@openelec.tv)
+# Copyright (C) 2012 Yann Cézard (eesprit@free.fr)
+# Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
   # create directories
   /usr/bin/busybox mkdir -p /dev
@@ -46,8 +31,8 @@
 
   UPDATE_KERNEL="KERNEL"
   UPDATE_SYSTEM="SYSTEM"
-  IMAGE_KERNEL="/@KERNEL_NAME@"
-  IMAGE_SYSTEM="/SYSTEM"
+  IMAGE_KERNEL="@KERNEL_NAME@"
+  IMAGE_SYSTEM="SYSTEM"
 
   BOOT_STEP="start"
   MD5_FAILED="0"
@@ -92,9 +77,11 @@
     case $arg in
       BOOT_IMAGE=*)
         IMAGE_KERNEL="${arg#*=}"
+        [ "${IMAGE_KERNEL:0:1}" = "/" ] && IMAGE_KERNEL="${IMAGE_KERNEL:1}"
         ;;
       SYSTEM_IMAGE=*)
         IMAGE_SYSTEM="${arg#*=}"
+        [ "${IMAGE_SYSTEM:0:1}" = "/" ] && IMAGE_SYSTEM="${IMAGE_SYSTEM:1}"
         ;;
       boot=*)
         boot="${arg#*=}"
@@ -477,10 +464,10 @@
     export BOOT_ROOT="/flash"
     export SYSTEM_ROOT="/sysroot"
 
-    mount_part "/flash$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+    mount_part "/flash/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
 
     if [ -f $SYSTEM_ROOT/usr/share/bootloader/update.sh ]; then
-      StartProgress spinner "Updating Bootloader... "
+      StartProgress spinner "Updating Boot Files... "
         result="$(sh $SYSTEM_ROOT/usr/share/bootloader/update.sh 2>&1)"
         sync
         StopProgress "done"
@@ -922,7 +909,7 @@
 
     sync
 
-    if [ ! -b "$IMAGE_KERNEL" -a ! -f "/flash$IMAGE_KERNEL" ] || [ ! -f "/flash$IMAGE_SYSTEM" ]; then
+    if [ ! -b "/$IMAGE_KERNEL" -a ! -f "/flash/$IMAGE_KERNEL" ] || [ ! -f "/flash/$IMAGE_SYSTEM" ]; then
       echo "Missing (target) ${IMAGE_KERNEL} or ${IMAGE_SYSTEM}!"
       do_cleanup
       StartProgress countdown "Normal startup in 30s... " 30 "NOW"
@@ -979,7 +966,7 @@
     # Verify that the new upgrade is compatible with the current system - this should avoid creating
     # non-booting systems after (for example) an RPi tar is incorrectly applied to an RPi2 system.
     if [ ! -f "$UPDATE_ROOT/.nocompat" ]; then
-      if ! check_is_compatible "$UPDATE_FILENAME" "/flash$IMAGE_SYSTEM" "$UPDATE_DIR/$UPDATE_SYSTEM"; then
+      if ! check_is_compatible "$UPDATE_FILENAME" "/flash/$IMAGE_SYSTEM" "$UPDATE_DIR/$UPDATE_SYSTEM"; then
         do_cleanup
         StartProgress countdown "Normal startup in 60s... " 60 "NOW"
         return 0
@@ -991,13 +978,13 @@
     FLASH_FREE=$(( $FLASH_FREE * 1024 ))
 
     # Disregard kernel size if it's a a block device, which is the case on Amlogic/WeTek devices
-    if [ ! -b $IMAGE_KERNEL ]; then
-      OLD_KERNEL=$(stat -t "/flash$IMAGE_KERNEL" | awk '{print $2}')
+    if [ ! -b "/$IMAGE_KERNEL" ]; then
+      OLD_KERNEL=$(stat -t "/flash/$IMAGE_KERNEL" | awk '{print $2}')
     else
       OLD_KERNEL="0"
     fi
 
-    OLD_SYSTEM=$(stat -t "/flash$IMAGE_SYSTEM" | awk '{print $2}')
+    OLD_SYSTEM=$(stat -t "/flash/$IMAGE_SYSTEM" | awk '{print $2}')
     NEW_KERNEL=$(stat -t "$UPDATE_DIR/$UPDATE_KERNEL" | awk '{print $2}')
     NEW_SYSTEM=$(stat -t "$UPDATE_DIR/$UPDATE_SYSTEM" | awk '{print $2}')
 
@@ -1025,12 +1012,12 @@
     fi
 
     # all ok, update
-    if [ -b $IMAGE_KERNEL ]; then
-      update_partition "Kernel" "$UPDATE_KERNEL" "$IMAGE_KERNEL"
+    if [ -b "/$IMAGE_KERNEL" ]; then
+      update_partition "Kernel" "$UPDATE_KERNEL" "/$IMAGE_KERNEL"
     else
-      update_file "Kernel" "$UPDATE_KERNEL" "/flash$IMAGE_KERNEL"
+      update_file "Kernel" "$UPDATE_KERNEL" "/flash/$IMAGE_KERNEL"
     fi
-    update_file "System" "$UPDATE_SYSTEM" "/flash$IMAGE_SYSTEM"
+    update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
     update_bootloader
     do_cleanup
     do_reboot
@@ -1040,10 +1027,10 @@
     progress "Preparing system"
 
     if [ "$SYSTEM_TORAM" = "no" -o "$INSTALLED_MEMORY" -lt "$SYSTEM_TORAM_LIMIT" ]; then
-      mount_part "/flash$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+      mount_part "/flash/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
     else
-      cp /flash$IMAGE_SYSTEM /dev$IMAGE_SYSTEM
-      mount_part "/dev$IMAGE_SYSTEM" "/sysroot" "ro,loop"
+      cp /flash/$IMAGE_SYSTEM /dev/$IMAGE_SYSTEM
+      mount_part "/dev/$IMAGE_SYSTEM" "/sysroot" "ro,loop"
     fi
 
     mount --move /flash /sysroot/flash

@@ -1,22 +1,8 @@
 #!/bin/bash
 
-################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-#
-#  OpenELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  OpenELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 unset _CACHE_PACKAGE_LOCAL _CACHE_PACKAGE_GLOBAL _DEBUG_DEPENDS_LIST _DEBUG_PACKAGE_LIST
 
@@ -138,6 +124,8 @@ echo -e "BUILD_ID=\"$GIT_HASH\"" >> $INSTALL/etc/os-release
 echo -e "OPENELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
 echo -e "LIBREELEC_ARCH=\"$LIBREELEC_ARCH\"" >> $INSTALL/etc/os-release
 echo -e "LIBREELEC_BUILD=\"$LIBREELEC_BUILD\"" >> $INSTALL/etc/os-release
+[ -n "$BUILDER_NAME" ] && echo -e "BUILDER_NAME=\"$BUILDER_NAME\"" >> $INSTALL/etc/os-release
+[ -n "$BUILDER_VERSION" ] && echo -e "BUILDER_VERSION=\"$BUILDER_VERSION\"" >> $INSTALL/etc/os-release
 
 # create /etc/issue
 echo "$GREETING0" >  $INSTALL/etc/issue
@@ -351,6 +339,8 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
       TARGET_KERNEL_ARCH="$TARGET_KERNEL_ARCH" \
       RELEASE_DIR=$RELEASE_DIR \
       UUID_STORAGE="$(uuidgen)" \
+      DISTRO_BOOTLABEL="$DISTRO_BOOTLABEL" \
+      DISTRO_DISKLABEL="$DISTRO_DISKLABEL" \
       UBOOT_SYSTEM="$UBOOT_SYSTEM" \
       UBOOT_VERSION="$UBOOT_VERSION" \
       EXTRA_CMDLINE="$EXTRA_CMDLINE" \
@@ -535,7 +525,7 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     rm -rf $TARGET_IMG/${IMAGE_NAME}-$1.tar
 
     # create release tarball
-    tar cf $TARGET_IMG/${IMAGE_NAME}-$1.tar -C $TARGET ${IMAGE_NAME}-$1
+    tar cf $TARGET_IMG/${IMAGE_NAME}-$1.tar -C $TARGET_IMG ${IMAGE_NAME}-$1
 
     # create sha256 checksum of tarball
     ( cd $TARGET_IMG

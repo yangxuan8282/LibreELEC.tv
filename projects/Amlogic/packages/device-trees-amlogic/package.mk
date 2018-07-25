@@ -1,20 +1,5 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="device-trees-amlogic"
 PKG_VERSION="30c9d42"
@@ -30,7 +15,11 @@ make_target() {
   pushd $BUILD/linux-$(kernel_version) > /dev/null
 
   # Device trees already present in kernel tree we want to include
-  EXTRA_TREES=(gxbb_p201 gxl_p212_1g gxl_p212_2g gxm_q200_2g gxm_q201_1g gxm_q201_2g gxl_p281_1g gxbb_p200_1G_wetek_hub gxbb_p200_2G_wetek_play_2)
+  EXTRA_TREES=( \
+                gxbb_p201 gxbb_p200_1G_wetek_hub gxbb_p200_2G_wetek_play_2 \
+                gxl_p212_1g gxl_p212_2g gxl_p281_1g gxl_p212_1g_lepotato gxl_p212_2g_lepotato \
+                gxm_q200_2g gxm_q201_1g gxm_q201_2g \
+	      )
 
   # Add trees to the list
   for f in ${EXTRA_TREES[@]}; do
@@ -66,7 +55,7 @@ make_target() {
   esac
 
   # Compile device trees
-  LDFLAGS="" make $DTB_LIST_FILTERED
+  kernel_make $DTB_LIST_FILTERED
   mv arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb $PKG_BUILD
 
   popd > /dev/null

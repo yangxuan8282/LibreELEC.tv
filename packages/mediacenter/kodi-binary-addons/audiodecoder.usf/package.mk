@@ -1,24 +1,9 @@
-################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-#
-#  OpenELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  OpenELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 
 PKG_NAME="audiodecoder.usf"
-PKG_VERSION="cec0fe2"
-PKG_SHA256="1bb0afd2debc806fe72c466de76385043b642a9c5b0e2dc6d15ee3bfa0533f7b"
+PKG_VERSION="ccb1edc"
+PKG_SHA256="d0dc7bc7ad61bc19ec1297da4b04e2291ad27b68e0dc384d378e5106bba87709"
 PKG_REV="2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

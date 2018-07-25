@@ -1,24 +1,9 @@
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016-present Team LibreELEC
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kernel-firmware"
-PKG_VERSION="8c1e439"
-PKG_SHA256="7fc282816b11af92e28f1c2624698d62163c4db259011da454d036c3ff98aa2e"
+PKG_VERSION="7518922"
+PKG_SHA256="5881bca940037eb33af6c5010eb3584173cca04cb8ed8eedeec6feea259c72e9"
 PKG_ARCH="any"
 PKG_LICENSE="other"
 PKG_SITE="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/"
@@ -36,7 +21,7 @@ makeinstall_target() {
   FW_TARGET_DIR=$INSTALL/$(get_full_firmware_dir)
 
   if find_file_path firmwares/kernel-firmware.dat; then
-    FW_LISTS="${FOUND_FILE}"
+    FW_LISTS="${FOUND_PATH}"
   else
     FW_LISTS="${PKG_DIR}/firmwares/any.dat ${PKG_DIR}/firmwares/${TARGET_ARCH}.dat"
   fi

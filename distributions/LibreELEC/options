@@ -205,8 +205,16 @@
   SYSTEM_PART_START=8192
 
 # Configure debug groups (space delimited key=value pairs, with each value comma-delimited) and default group when DEBUG=yes
-  DEBUG_GROUPS="kodi=kodi,kodi-platform,p8-platform,!mesa"
-  DEBUG_GROUP_YES="kodi"
+# Use ! or - prefix to prevent a dependent package from being built with debug. Add + suffix to build dependenencies with debug.
+  DEBUG_GROUPS="kodi+=kodi+,kodi-platform+,p8-platform+,!mesa"
+  DEBUG_GROUP_YES="kodi+"
 
 # Default supported get handlers (archive, git, file etc.)
   GET_HANDLER_SUPPORT="archive"
+
+# Partition labels for USB/SD installation media
+  DISTRO_BOOTLABEL="LIBREELEC"
+  DISTRO_DISKLABEL="STORAGE"
+
+# Settings package name - blank if not required
+  DISTRO_PKG_SETTINGS="LibreELEC-settings"

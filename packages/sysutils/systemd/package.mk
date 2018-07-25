@@ -1,24 +1,9 @@
-################################################################################
-#      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
-#
-#  OpenELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  OpenELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 
 PKG_NAME="systemd"
-PKG_VERSION="238"
-PKG_SHA256="bbc8599bab2e3c4273886dfab12464e488ecdaf20b8284949e50f8858de3e022"
+PKG_VERSION="239"
+PKG_SHA256="8a11b1b07d620f4c06a16e95bba4dd2a97e90efdf2a5ba47ed0a935085787a14"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freedesktop.org/wiki/Software/systemd"
@@ -76,7 +61,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Dmachined=false \
                        -Dnetworkd=false \
                        -Dtimedated=false \
-                       -Dtimesyncd=false \
+                       -Dtimesyncd=true \
                        -Dmyhostname=false \
                        -Dfirstboot=false \
                        -Drandomseed=false \
@@ -105,7 +90,7 @@ PKG_MESON_OPTS_TARGET="--libdir=/usr/lib \
                        -Dumount-path=/usr/bin/umount"
 
 pre_configure_target() {
-  export CFLAGS="$CFLAGS -fno-schedule-insns -fno-schedule-insns2"
+  export CFLAGS="$CFLAGS -fno-schedule-insns -fno-schedule-insns2 -Wno-format-truncation"
   export LC_ALL=en_US.UTF-8
 }
 
@@ -246,6 +231,9 @@ post_makeinstall_target() {
 
 post_install() {
   add_group systemd-journal 190
+
+  add_group systemd-timesync 191
+  add_user systemd-timesync x 191 191 "systemd-timesync" "/" "/bin/false"
 
   add_group systemd-network 193
   add_user systemd-network x 193 193 "systemd-network" "/" "/bin/sh"
