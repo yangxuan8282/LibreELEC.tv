@@ -18,105 +18,64 @@
 ################################################################################
 
 IMAGE_KERNEL="/flash/kernel.img"
+#IMAGE_KERNEL="/flash/Image"
 IMAGE_SYSTEM="/flash/SYSTEM"
 IMAGE_DTB="/flash/dtb.img"
-#REMOTE_CONF="/tmp/remote.conf"
+SCRIPT_EMMC="/flash/emmc_autoscript"
+SCRIPT_ENV="/flash/emmc_uEnv.ini"
 
-install_to_nand() {
-  if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM ] ; then
+install_to_emmc() {
+  if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM -a -f $SCRIPT_EMMC ] ; then
+
+	echo "Unmounting SYSTEM partiton."
+	umount -f /dev/system
+        mkdir -p /tmp/system
+        mount -o rw /dev/system /tmp/system
 
     if grep -q /dev/system /proc/mounts ; then
-      echo "Unmounting SYSTEM partiton."
-      umount -f /dev/system
+
+        echo -n "Cppying kernel image..."
+        cp $IMAGE_KERNEL /tmp/system && sync
+        echo "done."
+
+        echo -n "Copying SYSTEM files..."
+        cp $IMAGE_SYSTEM /tmp/system && sync
+        echo "done."
+
+        echo -n "Writing script eMMC..."
+        cp $SCRIPT_EMMC /tmp/system && sync
+        echo "done."
+
+        if [ -f $IMAGE_DTB ] ; then
+          echo -n "Writing device tree image..."
+          cp $IMAGE_DTB /tmp/system && sync
+          echo "done."
+        fi
+
+        if [ -f $SCRIPT_ENV ] ; then
+          echo -n "Writing init ENV..."
+          cp $SCRIPT_ENV /tmp/system && sync
+          echo "done."
+        fi
+
+        umount /tmp/system
+
+    else
+      echo "No /dev/system  partiton."
+      sleep 10
     fi
-    mkdir -p /tmp/system
-
-    mount -o rw,remount /flash
-    if [ -e /dev/dtb ] ; then
-      echo -n "Backing up device tree..."
-      dd if="/dev/dtb" of="/flash/dtb.img.backup" status=none && sync
-      echo "done."
-    fi
-
-    if [ -e /dev/recovery ] ; then
-      echo -n "Backing up recovery partition..."
-      dd if="/dev/recovery" of="/flash/recovery.img.backup" bs=64K status=none && sync
-      echo "done."
-    fi
-
-#    if [ ! -f $REMOTE_CONF ] ; then
-#      echo -n "Backing up remote.conf..."
-#      mount -o ro /dev/system /tmp/system
-#      if [ -f /tmp/system/remote.conf ]; then
-#        cp /tmp/system/remote.conf /tmp/remote.conf
-#      elif [ -f /tmp/system/etc/remote.conf ]; then
-#        cp -PR /tmp/system/etc/remote.conf /tmp/remote.conf
-#      fi
-#      umount /tmp/system
-#      echo "done."
-#    fi
-
-    echo -n "Writing kernel image..."
-    dd if="$IMAGE_KERNEL" of="/dev/boot" bs=64K status=none && sync
-    echo "done."
-
-    echo -n "Formatting SYSTEM partition..."
-    mke2fs -F -q -t ext4 -m 0 /dev/system > /dev/null
-    e2fsck -n /dev/system &> /dev/null
-    echo "done."
-
-    echo -n "Copying SYSTEM files..."
-    mount -o rw /dev/system /tmp/system
-    cp $IMAGE_SYSTEM /tmp/system && sync
-    umount /tmp/system
-    echo "done."
-
-    if [ -f $IMAGE_DTB ] ; then
-      echo -n "Writing device tree image..."
-      dd if="$IMAGE_DTB" of="/dev/dtb" bs=262144 status=none && sync
-      echo "done."
-    fi
-
-    echo -n "Formatting DATA partition..."
-    mke2fs -F -q -t ext4 -m 0 /dev/data > /dev/null
-    e2fsck -n /dev/data &> /dev/null
-    echo "done."
-
-#    if [ -f /flash/remote.conf ] ; then
-#      echo -n "Restoring remote.conf in /flash ..."
-#      mount -o rw /dev/system /tmp/system
-#      cp /flash/remote.conf /tmp/system/remote.conf
-#      umount /tmp/system
-#      echo "done."
-#    else
-#      if [ -f $REMOTE_CONF ] ; then
-#        echo -n "Restoring remote.conf in /tmp ..."
-#        mount -o rw /dev/system /tmp/system
-#        cp $REMOTE_CONF /tmp/system/remote.conf
-#        umount /tmp/system
-#        echo "done."
-#      fi
-#   fi
-
-#    echo "Copying user data..."
-#    mkdir -p /tmp/data
-#    mount -o rw /dev/data /tmp/data
-#    cp -av /storage/. /tmp/data/
-#    echo "done."
 
   else
     echo "No LE image found on /flash! Exiting..."
+    sleep 10
   fi
 }
 
-echo "This script will erase BOOT, SYSTEM, DATA and DTB on your device"
-echo "and install LE that you booted from SD card/USB drive."
-echo ""
-echo "It will create a backup of device tree and recovery partition on your boot media."
+echo "This script install LE that you booted from SD card/USB drive."
 echo ""
 echo "The script does not have any safeguards!"
 echo ""
 
-install_to_nand
+install_to_emmc
 
-sleep 20
+sleep 10

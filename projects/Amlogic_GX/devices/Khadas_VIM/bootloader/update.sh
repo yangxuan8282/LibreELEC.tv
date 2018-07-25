@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2018-present Team LibreELEC
@@ -45,6 +43,12 @@ fi
   if [ -f $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript ]; then
     echo "Updating aml_autoscript"
     cp -p $SYSTEM_ROOT/usr/share/bootloader/aml_autoscript $BOOT_ROOT
+  fi
+
+# update s905_autoscript
+  if [ -f $SYSTEM_ROOT/usr/share/bootloader/s905_autoscript ]; then
+    echo "Updating aml_autoscript"
+    cp -p $SYSTEM_ROOT/usr/share/bootloader/s905_autoscript $BOOT_ROOT
   fi
 
 # mount $BOOT_ROOT r/o

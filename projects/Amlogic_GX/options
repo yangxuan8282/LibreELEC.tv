@@ -140,7 +140,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="dtc u-boot-tools-aml mc autoscript-amlogic amlogic-boot-fip"
+    ADDITIONAL_PACKAGES="dtc"
 
   # use the kernel CEC framework for libcec (yes / no)
     CEC_FRAMEWORK_SUPPORT="yes"

@@ -21,3 +21,4 @@
 mkdir -p $RELEASE_DIR/3rdparty/bootloader
   cp -a $(get_build_dir linux)/arch/$TARGET_KERNEL_ARCH/boot/dtb.img $RELEASE_DIR/3rdparty/bootloader
   cp -a $(get_build_dir aml_autoscript)/aml_autoscript $RELEASE_DIR/3rdparty/bootloader
+  cp -a $(get_build_dir aml_autoscript)/s905_autoscript $RELEASE_DIR/3rdparty/bootloader

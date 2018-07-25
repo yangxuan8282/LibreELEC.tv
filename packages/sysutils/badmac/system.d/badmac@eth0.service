@@ -4,7 +4,7 @@ Wants=network-pre.target
 Before=network-pre.target
 BindsTo=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
-After=cpumac.service
+After=badmac-config.service
 
 [Service]
 Type=oneshot

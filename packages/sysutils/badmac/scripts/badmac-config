@@ -71,6 +71,6 @@ if [ "$BADMAC" = "true" ]; then
 fi
 
 # write MAC to /run
-echo "$MAC" > /run/libreelec/badmac-eth0
+echo "MAC=$MAC" > /run/libreelec/badmac-eth0
 
 exit

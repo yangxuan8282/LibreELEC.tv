@@ -5,7 +5,7 @@ Before=network-pre.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "/usr/bin/badmac-config eth0"
+ExecStart=/bin/sh -c "/usr/bin/badmac-config"
 
 [Install]
 WantedBy=multi-user.target

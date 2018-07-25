@@ -17,4 +17,3 @@
 ################################################################################
 
 mcopy "$RELEASE_DIR/3rdparty/bootloader/dtb.img" ::
-mcopy "$RELEASE_DIR/3rdparty/bootloader/aml_autoscript" ::

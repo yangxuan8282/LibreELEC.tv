@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
 #      Copyright (C) 2018-present Team LibreELEC
@@ -20,3 +18,4 @@
 
 mkdir -p $RELEASE_DIR/3rdparty/bootloader
   cp -a $(get_build_dir linux)/arch/$TARGET_KERNEL_ARCH/boot/dtb.img $RELEASE_DIR/3rdparty/bootloader
+  cp -a $(get_build_dir autoscript-amlogic)/* $RELEASE_DIR/3rdparty/bootloader

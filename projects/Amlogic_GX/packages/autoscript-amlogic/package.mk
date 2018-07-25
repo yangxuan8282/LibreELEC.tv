@@ -30,8 +30,11 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/share/bootloader
-  cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
-  cp -a $PKG_DIR/instboot/*.zip $INSTALL/usr/share/bootloader/
-  cp -a $PKG_DIR/instboot/*.sh $INSTALL/usr/share/bootloader/
-  cp -a $PKG_DIR/instboot/*.ini $INSTALL/usr/share/bootloader/
+#  cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
+#  cp -a $PKG_DIR/instboot/*.zip $INSTALL/usr/share/bootloader/
+#  cp -a $PKG_DIR/instboot/*.sh $INSTALL/usr/share/bootloader/
+#  cp -a $PKG_DIR/instboot/*.ini $INSTALL/usr/share/bootloader/
+  cp -a $PKG_DIR/instboot/*.zip $PKG_BUILD
+  cp -a $PKG_DIR/instboot/*.sh $PKG_BUILD
+  cp -a $PKG_DIR/instboot/*.ini $PKG_BUILD/
 }

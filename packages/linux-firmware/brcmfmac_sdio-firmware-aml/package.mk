@@ -18,8 +18,8 @@
 ################################################################################
 
 PKG_NAME="brcmfmac_sdio-firmware-aml"
-PKG_VERSION="17e554b"
-PKG_SHA256="b41fb280791c9bb8940ad6c6be441e664093f1fd5ed69718f7fd9f7170e23e2a"
+PKG_VERSION="734777e"
+PKG_SHA256=""
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/chewitt/brcmfmac_sdio-firmware-aml"
