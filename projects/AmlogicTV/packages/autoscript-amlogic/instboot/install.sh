@@ -20,7 +20,6 @@
 IMAGE_KERNEL="/flash/kernel.img"
 IMAGE_SYSTEM="/flash/SYSTEM"
 IMAGE_DTB="/flash/dtb.img"
-#REMOTE_CONF="/tmp/remote.conf"
 
 install_to_nand() {
   if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM ] ; then
@@ -43,18 +42,6 @@ install_to_nand() {
       dd if="/dev/recovery" of="/flash/recovery.img.backup" bs=64K status=none && sync
       echo "done."
     fi
-
-#    if [ ! -f $REMOTE_CONF ] ; then
-#      echo -n "Backing up remote.conf..."
-#      mount -o ro /dev/system /tmp/system
-#      if [ -f /tmp/system/remote.conf ]; then
-#        cp /tmp/system/remote.conf /tmp/remote.conf
-#      elif [ -f /tmp/system/etc/remote.conf ]; then
-#        cp -PR /tmp/system/etc/remote.conf /tmp/remote.conf
-#      fi
-#      umount /tmp/system
-#      echo "done."
-#    fi
 
     echo -n "Writing kernel image..."
     dd if="$IMAGE_KERNEL" of="/dev/boot" bs=64K status=none && sync
@@ -82,28 +69,6 @@ install_to_nand() {
     e2fsck -n /dev/data &> /dev/null
     echo "done."
 
-#    if [ -f /flash/remote.conf ] ; then
-#      echo -n "Restoring remote.conf in /flash ..."
-#      mount -o rw /dev/system /tmp/system
-#      cp /flash/remote.conf /tmp/system/remote.conf
-#      umount /tmp/system
-#      echo "done."
-#    else
-#      if [ -f $REMOTE_CONF ] ; then
-#        echo -n "Restoring remote.conf in /tmp ..."
-#        mount -o rw /dev/system /tmp/system
-#        cp $REMOTE_CONF /tmp/system/remote.conf
-#        umount /tmp/system
-#        echo "done."
-#      fi
-#   fi
-
-#    echo "Copying user data..."
-#    mkdir -p /tmp/data
-#    mount -o rw /dev/data /tmp/data
-#    cp -av /storage/. /tmp/data/
-#    echo "done."
-
   else
     echo "No LE image found on /flash! Exiting..."
   fi
@@ -119,4 +84,4 @@ echo ""
 
 install_to_nand
 
-sleep 20
+sleep 10

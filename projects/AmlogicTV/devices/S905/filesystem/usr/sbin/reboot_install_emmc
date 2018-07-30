@@ -22,5 +22,3 @@ if [ -f /flash/install.sh ]; then
     mount -o rw,remount /flash
     mv /flash/install.sh /flash/install.aml
 fi
-
-#/usr/sbin/reboot switch_system

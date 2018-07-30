@@ -19,5 +19,5 @@
 ################################################################################
 
 if /usr/sbin/fw_printenv whereToBootFrom 2&>1 > /dev/null; then /usr/sbin/fw_setenv whereToBootFrom internal; fi
-/usr/sbin/fw_setenv bootfromnand 1
+/usr/sbin/fw_setenv bls android
 #/usr/bin/systemctl reboot
