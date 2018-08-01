@@ -35,8 +35,8 @@ case "$LINUX" in
     PKG_BUILD_PERF="no"
     ;;
   amlogic-mainline)
-    PKG_VERSION="9d3cce1e8b8561fed5f383d22a4d6949db4eadbe" # 4.18-rc5
-    PKG_SHA256="e8aa02aa71d7bf0eb1b04869d392c41d31ca7e7a999d5f2e775b238a4a7d1447"
+    PKG_VERSION="acb1872577b346bd15ab3a3f8dff780d6cca4b70" # 4.18-rc7
+    PKG_SHA256="4be006d10bb12c70e13ac2f41c7472de10c15d28bae2741ca5b3a84aad2bf50e"
     PKG_URL="https://github.com/torvalds/linux/archive/$PKG_VERSION.tar.gz"
     PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET u-boot-tools-aml:host"
@@ -87,16 +87,6 @@ post_patch() {
   if [ ! "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
     sed -i -e "s|^CONFIG_INITRAMFS_SOURCE=.*$|CONFIG_INITRAMFS_SOURCE=\"$BUILD/image/initramfs.cpio\"|" $PKG_BUILD/.config
     sed -i -e '/^CONFIG_INITRAMFS_SOURCE=*./ a CONFIG_INITRAMFS_ROOT_UID=0\nCONFIG_INITRAMFS_ROOT_GID=0' $PKG_BUILD/.config
-  fi
-
-  # set kernel boot args from options
-  if [ -n "$KERNEL_CMDLINE" ]; then
-    sed -i -e "s|^CONFIG_CMDLINE=.*$|CONFIG_CMDLINE=\"$KERNEL_CMDLINE\"|g" $PKG_BUILD/.config
-  fi
-
-  # set kernel boot args from options
-  if [ ! "$KERNEL_FORCE" = yes ]; then
-    sed -i -e "s|^CONFIG_CMDLINE_FORCE=.*$|# CONFIG_CMDLINE_FORCE is not set|" $PKG_BUILD/.config
   fi
 
   # set default hostname based on $DISTRONAME

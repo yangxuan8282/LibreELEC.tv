@@ -16,12 +16,6 @@
   # kernel image name
     KERNEL_NAME="kernel.img"
 
-  # kernel boot args
-    KERNEL_CMDLINE="BOOT_IMAGE=kernel.img boot=/dev/mmcblk0p1 disk=/dev/mmcblk0p2 console=ttyAML0,115200n8 console=tty0 systemd.show_status=auto"
-
-  # kernel boot args forced
-    KERNEL_FORCE="yes"
-
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
@@ -34,4 +28,4 @@
 
   # remote control maps to configure in v4l-utils
   # Space separated list is supported.
-    KEYMAP+=" amlogic_multimap"
+    KEYMAP+=" philips-rc242 amlogic_multimap"

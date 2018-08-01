@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
@@ -8,10 +6,7 @@ echo "Run mkimage"
 . config/options $1
 
 # compile and copy amlogic autoscript files to part1
-mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
-mcopy $RELEASE_DIR/3rdparty/bootloader/*.ini :: 2>&1 > /dev/null || true
-mcopy $RELEASE_DIR/3rdparty/bootloader/*.sh :: 2>&1 > /dev/null || true
-mcopy $RELEASE_DIR/3rdparty/bootloader/*.zip :: 2>&1 > /dev/null || true
+mcopy $RELEASE_DIR/3rdparty/bootloader/* :: 2>&1 > /dev/null || true
 
 echo "Installing dtb"
 LINUX="$(get_build_dir linux)"
