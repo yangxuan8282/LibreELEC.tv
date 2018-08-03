@@ -1,7 +1,8 @@
-From c7affb6cf75877ab850b2b6183df0dd021411b0b Mon Sep 17 00:00:00 2001
+From 5cae0d652161d6c917a402e59b9b67c671783af5 Mon Sep 17 00:00:00 2001
 From: Neil Armstrong <narmstrong@baylibre.com>
-Date: Fri, 6 Apr 2018 15:19:59 +0200
-Subject: [PATCH] [WIP] drm/meson: Support Overlay plane for video rendering
+Date: Thu, 2 Aug 2018 10:00:01 +0200
+Subject: [PATCH 5/5] [WIP] drm/meson: Support Overlay plane for video
+ rendering
 
 The Amlogic Meson GX SoCs support an Overlay plane behind the primary
 plan for video rendering.
@@ -9,78 +10,32 @@ This Overlay plane support various YUV layouts and a non-alpha RGB32
 layout.
 ---
  drivers/gpu/drm/meson/Makefile          |   2 +-
- drivers/gpu/drm/meson/meson_canvas.c    |   5 +-
- drivers/gpu/drm/meson/meson_canvas.h    |   5 +-
- drivers/gpu/drm/meson/meson_crtc.c      | 181 +++++++++-
- drivers/gpu/drm/meson/meson_drv.c       |   5 +
- drivers/gpu/drm/meson/meson_drv.h       |  49 +++
- drivers/gpu/drm/meson/meson_overlay.c   | 574 ++++++++++++++++++++++++++++++++
+ drivers/gpu/drm/meson/meson_crtc.c      | 172 ++++++++-
+ drivers/gpu/drm/meson/meson_drv.c       |  14 +
+ drivers/gpu/drm/meson/meson_drv.h       |  52 +++
+ drivers/gpu/drm/meson/meson_overlay.c   | 595 ++++++++++++++++++++++++++++++++
  drivers/gpu/drm/meson/meson_overlay.h   |  14 +
  drivers/gpu/drm/meson/meson_registers.h |   3 +
  drivers/gpu/drm/meson/meson_viu.c       |  15 +
  drivers/gpu/drm/meson/meson_vpp.c       |  44 ++-
  drivers/soc/amlogic/meson-gx-pwrc-vpu.c |   8 +-
- 12 files changed, 894 insertions(+), 11 deletions(-)
+ 10 files changed, 912 insertions(+), 7 deletions(-)
  create mode 100644 drivers/gpu/drm/meson/meson_overlay.c
  create mode 100644 drivers/gpu/drm/meson/meson_overlay.h
 
 diff --git a/drivers/gpu/drm/meson/Makefile b/drivers/gpu/drm/meson/Makefile
-index c5c4cc3..e0ba295 100644
+index bd67429..d4ea82f 100644
 --- a/drivers/gpu/drm/meson/Makefile
 +++ b/drivers/gpu/drm/meson/Makefile
-@@ -1,4 +1,4 @@
--meson-drm-y := meson_drv.o meson_plane.o meson_crtc.o meson_venc_cvbs.o
-+meson-drm-y := meson_drv.o meson_plane.o meson_crtc.o meson_venc_cvbs.o meson_overlay.o
- meson-drm-y += meson_viu.o meson_vpp.o meson_venc.o meson_vclk.o meson_canvas.o
+@@ -1,5 +1,5 @@
+ meson-drm-y := meson_drv.o meson_plane.o meson_crtc.o meson_venc_cvbs.o
+-meson-drm-y += meson_viu.o meson_vpp.o meson_venc.o meson_vclk.o
++meson-drm-y += meson_viu.o meson_vpp.o meson_venc.o meson_vclk.o meson_overlay.o
  
  obj-$(CONFIG_DRM_MESON) += meson-drm.o
-diff --git a/drivers/gpu/drm/meson/meson_canvas.c b/drivers/gpu/drm/meson/meson_canvas.c
-index 08f6073..8a17667 100644
---- a/drivers/gpu/drm/meson/meson_canvas.c
-+++ b/drivers/gpu/drm/meson/meson_canvas.c
-@@ -47,7 +47,7 @@ void meson_canvas_setup(struct meson_drm *priv,
- 			uint32_t canvas_index, uint32_t addr,
- 			uint32_t stride, uint32_t height,
- 			unsigned int wrap,
--			unsigned int blkmode)
-+			unsigned int blkmode, bool endian_switch)
- {
- 	unsigned int val;
- 
-@@ -60,7 +60,8 @@ void meson_canvas_setup(struct meson_drm *priv,
- 						CANVAS_WIDTH_HBIT) |
- 		(height << CANVAS_HEIGHT_BIT) |
- 		(wrap << 22) |
--		(blkmode << CANVAS_BLKMODE_BIT));
-+		(blkmode << CANVAS_BLKMODE_BIT) |
-+		(endian_switch ? 7 << 26 : 0));
- 
- 	regmap_write(priv->dmc, DMC_CAV_LUT_ADDR,
- 			CANVAS_LUT_WR_EN | canvas_index);
-diff --git a/drivers/gpu/drm/meson/meson_canvas.h b/drivers/gpu/drm/meson/meson_canvas.h
-index af1759d..78c71ea 100644
---- a/drivers/gpu/drm/meson/meson_canvas.h
-+++ b/drivers/gpu/drm/meson/meson_canvas.h
-@@ -23,6 +23,9 @@
- #define __MESON_CANVAS_H
- 
- #define MESON_CANVAS_ID_OSD1	0x4e
-+#define MESON_CANVAS_ID_VD1_0	0x10
-+#define MESON_CANVAS_ID_VD1_1	0x11
-+#define MESON_CANVAS_ID_VD1_2	0x12
- 
- /* Canvas configuration. */
- #define MESON_CANVAS_WRAP_NONE	0x00
-@@ -37,6 +40,6 @@ void meson_canvas_setup(struct meson_drm *priv,
- 			uint32_t canvas_index, uint32_t addr,
- 			uint32_t stride, uint32_t height,
- 			unsigned int wrap,
--			unsigned int blkmode);
-+			unsigned int blkmode, bool endian_switch);
- 
- #endif /* __MESON_CANVAS_H */
+ obj-$(CONFIG_DRM_MESON_DW_HDMI) += meson_dw_hdmi.o
 diff --git a/drivers/gpu/drm/meson/meson_crtc.c b/drivers/gpu/drm/meson/meson_crtc.c
-index 0552020..e0903480 100644
+index 506b361..a686de8 100644
 --- a/drivers/gpu/drm/meson/meson_crtc.c
 +++ b/drivers/gpu/drm/meson/meson_crtc.c
 @@ -25,6 +25,7 @@
@@ -91,23 +46,18 @@ index 0552020..e0903480 100644
  #include <drm/drmP.h>
  #include <drm/drm_atomic.h>
  #include <drm/drm_atomic_helper.h>
-@@ -98,6 +99,15 @@ static void meson_crtc_atomic_enable(struct drm_crtc *crtc,
+@@ -97,6 +98,10 @@ static void meson_crtc_atomic_enable(struct drm_crtc *crtc,
  	writel(crtc_state->mode.hdisplay,
  	       priv->io_base + _REG(VPP_POSTBLEND_H_SIZE));
  
 +	/* VD1 Preblend vertical start/end */
-+	/*if (crtc_state->mode.hdisplay > 1080)
-+		writel(FIELD_PREP(GENMASK(11, 0),
-+				  crtc_state->mode.hdisplay - 1),
-+		       priv->io_base + _REG(VPP_PREBLEND_VD1_V_START_END));
-+	else*/
-+		writel(FIELD_PREP(GENMASK(11, 0), 2303),
-+		       priv->io_base + _REG(VPP_PREBLEND_VD1_V_START_END));
++	writel(FIELD_PREP(GENMASK(11, 0), 2303),
++			priv->io_base + _REG(VPP_PREBLEND_VD1_V_START_END));
 +
  	writel_bits_relaxed(VPP_POSTBLEND_ENABLE, VPP_POSTBLEND_ENABLE,
  			    priv->io_base + _REG(VPP_MISC));
  
-@@ -110,11 +120,17 @@ static void meson_crtc_atomic_disable(struct drm_crtc *crtc,
+@@ -109,11 +114,17 @@ static void meson_crtc_atomic_disable(struct drm_crtc *crtc,
  	struct meson_crtc *meson_crtc = to_meson_crtc(crtc);
  	struct meson_drm *priv = meson_crtc->priv;
  
@@ -126,7 +76,7 @@ index 0552020..e0903480 100644
  			    priv->io_base + _REG(VPP_MISC));
  
  	if (crtc->state->event && !crtc->state->active) {
-@@ -149,6 +165,7 @@ static void meson_crtc_atomic_flush(struct drm_crtc *crtc,
+@@ -148,6 +159,7 @@ static void meson_crtc_atomic_flush(struct drm_crtc *crtc,
  	struct meson_drm *priv = meson_crtc->priv;
  
  	priv->viu.osd1_commit = true;
@@ -134,16 +84,7 @@ index 0552020..e0903480 100644
  }
  
  static const struct drm_crtc_helper_funcs meson_crtc_helper_funcs = {
-@@ -196,7 +213,7 @@ void meson_crtc_irq(struct meson_drm *priv)
- 		meson_canvas_setup(priv, MESON_CANVAS_ID_OSD1,
- 			   priv->viu.osd1_addr, priv->viu.osd1_stride,
- 			   priv->viu.osd1_height, MESON_CANVAS_WRAP_NONE,
--			   MESON_CANVAS_BLKMODE_LINEAR);
-+			   MESON_CANVAS_BLKMODE_LINEAR, false);
- 
- 		/* Enable OSD1 */
- 		writel_bits_relaxed(VPP_OSD1_POSTBLEND, VPP_OSD1_POSTBLEND,
-@@ -205,6 +222,166 @@ void meson_crtc_irq(struct meson_drm *priv)
+@@ -204,6 +216,164 @@ void meson_crtc_irq(struct meson_drm *priv)
  		priv->viu.osd1_commit = false;
  	}
  
@@ -152,20 +93,20 @@ index 0552020..e0903480 100644
 +
 +		switch (priv->viu.vd1_planes) {
 +		case 3:
-+			meson_canvas_setup(priv, MESON_CANVAS_ID_VD1_2,
++			priv->canvas_ops->setup(priv->canvas_id_vd1_2,
 +				   priv->viu.vd1_addr2, priv->viu.vd1_stride2,
 +				   priv->viu.vd1_height2, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, true);
++				   MESON_CANVAS_BLKMODE_LINEAR, 7);
 +		case 2:
-+			meson_canvas_setup(priv, MESON_CANVAS_ID_VD1_1,
++			priv->canvas_ops->setup(priv->canvas_id_vd1_1,
 +				   priv->viu.vd1_addr1, priv->viu.vd1_stride1,
 +				   priv->viu.vd1_height1, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, true);
++				   MESON_CANVAS_BLKMODE_LINEAR, 7);
 +		case 1:
-+			meson_canvas_setup(priv, MESON_CANVAS_ID_VD1_0,
++			priv->canvas_ops->setup(priv->canvas_id_vd1_0,
 +				   priv->viu.vd1_addr0, priv->viu.vd1_stride0,
 +				   priv->viu.vd1_height0, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, true);
++				   MESON_CANVAS_BLKMODE_LINEAR, 7);
 +		};
 +
 +		writel_relaxed(priv->viu.vd1_if0_gen_reg,
@@ -222,7 +163,7 @@ index 0552020..e0903480 100644
 +				priv->io_base + _REG(VD2_IF0_CHROMA_Y0));
 +		writel_relaxed(priv->viu.vd1_if0_chroma_y0,
 +				priv->io_base + _REG(VD2_IF0_CHROMA_Y1));
-+		/*writel_relaxed(priv->viu.vd1_if0_repeat_loop,
++		writel_relaxed(priv->viu.vd1_if0_repeat_loop,
 +				priv->io_base + _REG(VD1_IF0_RPT_LOOP));
 +		writel_relaxed(priv->viu.vd1_if0_repeat_loop,
 +				priv->io_base + _REG(VD2_IF0_RPT_LOOP));
@@ -251,7 +192,7 @@ index 0552020..e0903480 100644
 +		writel_relaxed(priv->viu.vd1_range_map_cb,
 +				priv->io_base + _REG(VD1_IF0_RANGE_MAP_CB));
 +		writel_relaxed(priv->viu.vd1_range_map_cr,
-+				priv->io_base + _REG(VD1_IF0_RANGE_MAP_CR));*/
++				priv->io_base + _REG(VD1_IF0_RANGE_MAP_CR));
 +		writel_relaxed(0x78404,
 +				priv->io_base + _REG(VPP_SC_MISC));
 +		writel_relaxed(priv->viu.vpp_pic_in_height,
@@ -302,8 +243,6 @@ index 0552020..e0903480 100644
 +				    VPP_VD1_PREBLEND | VPP_VD1_POSTBLEND | VPP_COLOR_MNG_ENABLE,
 +				    priv->io_base + _REG(VPP_MISC));
 +
-+		DRM_INFO("VD1 update\n");
-+
 +		priv->viu.vd1_commit = false;
 +	}
 +
@@ -311,10 +250,10 @@ index 0552020..e0903480 100644
  
  	spin_lock_irqsave(&priv->drm->event_lock, flags);
 diff --git a/drivers/gpu/drm/meson/meson_drv.c b/drivers/gpu/drm/meson/meson_drv.c
-index d344312..a046dcd 100644
+index de46833..2a002cc 100644
 --- a/drivers/gpu/drm/meson/meson_drv.c
 +++ b/drivers/gpu/drm/meson/meson_drv.c
-@@ -41,6 +41,7 @@
+@@ -42,6 +42,7 @@
  
  #include "meson_drv.h"
  #include "meson_plane.h"
@@ -322,7 +261,23 @@ index d344312..a046dcd 100644
  #include "meson_crtc.h"
  #include "meson_venc_cvbs.h"
  
-@@ -272,6 +273,10 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+@@ -241,6 +242,15 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+ 	ret = priv->canvas_ops->alloc(&priv->canvas_id_osd1);
+ 	if (ret)
+ 		goto free_drm;
++	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_0);
++	if (ret)
++		goto free_drm;
++	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_1);
++	if (ret)
++		goto free_drm;
++	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_2);
++	if (ret)
++		goto free_drm;
+ 
+ 	priv->vsync_irq = platform_get_irq(pdev, 0);
+ 
+@@ -278,6 +288,10 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
  	if (ret)
  		goto free_drm;
  
@@ -334,10 +289,18 @@ index d344312..a046dcd 100644
  	if (ret)
  		goto free_drm;
 diff --git a/drivers/gpu/drm/meson/meson_drv.h b/drivers/gpu/drm/meson/meson_drv.h
-index 8450d6ac..bc47aa5 100644
+index dfea959..e9305d7 100644
 --- a/drivers/gpu/drm/meson/meson_drv.h
 +++ b/drivers/gpu/drm/meson/meson_drv.h
-@@ -35,6 +35,7 @@ struct meson_drm {
+@@ -33,11 +33,15 @@ struct meson_drm {
+ 
+ 	struct meson_canvas_platform_data *canvas_ops;
+ 	uint8_t canvas_id_osd1;
++	uint8_t canvas_id_vd1_0;
++	uint8_t canvas_id_vd1_1;
++	uint8_t canvas_id_vd1_2;
+ 
+ 	struct drm_device *drm;
  	struct drm_crtc *crtc;
  	struct drm_fbdev_cma *fbdev;
  	struct drm_plane *primary_plane;
@@ -345,7 +308,7 @@ index 8450d6ac..bc47aa5 100644
  
  	/* Components Data */
  	struct {
-@@ -46,6 +47,54 @@ struct meson_drm {
+@@ -49,6 +53,54 @@ struct meson_drm {
  		uint32_t osd1_addr;
  		uint32_t osd1_stride;
  		uint32_t osd1_height;
@@ -402,10 +365,10 @@ index 8450d6ac..bc47aa5 100644
  	struct {
 diff --git a/drivers/gpu/drm/meson/meson_overlay.c b/drivers/gpu/drm/meson/meson_overlay.c
 new file mode 100644
-index 0000000..2e8fc44
+index 0000000..ea7261a
 --- /dev/null
 +++ b/drivers/gpu/drm/meson/meson_overlay.c
-@@ -0,0 +1,574 @@
+@@ -0,0 +1,595 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
@@ -429,7 +392,6 @@ index 0000000..2e8fc44
 +#include "meson_overlay.h"
 +#include "meson_vpp.h"
 +#include "meson_viu.h"
-+#include "meson_canvas.h"
 +#include "meson_registers.h"
 +
 +/* VD1_IF0_GEN_REG */
@@ -500,20 +462,13 @@ index 0000000..2e8fc44
 +{
 +	struct drm_crtc_state *crtc_state;
 +
-+	DRM_DEBUG_DRIVER("\n");
-+
 +	if (!state->crtc)
 +		return 0;
-+
-+	DRM_DEBUG_DRIVER("\n");
 +
 +	crtc_state = drm_atomic_get_crtc_state(state->state, state->crtc);
 +	if (IS_ERR(crtc_state))
 +		return PTR_ERR(crtc_state);
 +
-+	DRM_DEBUG_DRIVER("\n");
-+
-+	/* TOFIX can_position could be true */
 +	return drm_atomic_helper_check_plane_state(state, crtc_state,
 +						   FRAC_16_16(1, 5),
 +						   FRAC_16_16(5, 1),
@@ -526,17 +481,18 @@ index 0000000..2e8fc44
 +	return value >> 16;
 +}
 +
-+static const uint8_t skip_tab[6] = { 0x24, 0x04, 0x68, 0x48, 0x28, 0x08 };
++static const uint8_t skip_tab[6] = {0x24, 0x04, 0x68, 0x48, 0x28, 0x08};
 +
 +static void meson_overlay_get_vertical_phase(unsigned ratio_y,
 +					     int *phase,
-+					     int *repeat)
++					     int *repeat,
++					     bool interlace)
 +{
 +	int offset_in = 0;
 +	int offset_out = 0;
 +	int repeat_skip = 0;
 +
-+	if (ratio_y > (1 << 18)) {
++	if (!interlace && ratio_y > (1 << 18)) {
 +		offset_out = (1 * ratio_y) >> 10;
 +	}
 +
@@ -559,11 +515,13 @@ index 0000000..2e8fc44
 +}
 +
 +static void meson_overlay_setup_scaler_params(struct meson_drm *priv,
-+					     struct drm_plane *plane)
++					      struct drm_plane *plane,
++					      bool interlace_mode)
 +{
 +	struct drm_plane_state *state = plane->state;
 +	struct drm_crtc_state *crtc_state = priv->crtc->state;
 +	int video_top, video_left, video_width, video_height;
++	unsigned int crop_top, crop_left;
 +	unsigned int crtc_height, crtc_width;
 +	unsigned int vd_start_lines, vd_end_lines;
 +	unsigned int hd_start_lines, hd_end_lines;
@@ -583,31 +541,37 @@ index 0000000..2e8fc44
 +	crtc_height = crtc_state->mode.vdisplay;
 +	crtc_width = crtc_state->mode.hdisplay;
 +
-+	/* TODO Handl input cropping */
 +	w_in = fixed16_to_int(state->src_w);
 +	h_in = fixed16_to_int(state->src_h);
++	crop_top = fixed16_to_int(state->src_x);
++	crop_left = fixed16_to_int(state->src_x);
 +
-+	/* TOFIX negative crtc_y & crtc_x */
 +	video_top = state->crtc_y;
 +	video_left = state->crtc_x;
 +	video_width = state->crtc_w;
 +	video_height = state->crtc_h;
 +
++	DRM_DEBUG("crtc_width %d crtc_height %d interlace %d\n",
++	         crtc_width, crtc_height, interlace_mode);
++	DRM_DEBUG("w_in %d h_in %d crop_top %d crop_left %d\n",
++	         w_in, h_in, crop_top, crop_left);
++	DRM_DEBUG("video top %d left %d width %d height %d\n",
++		 video_top, video_left, video_width, video_height);
++
 +	ratio_x = (w_in << 18) / video_width;
 +	ratio_y = (h_in << 18) / video_height;
++
++	/* TOFIX Interlace output */
++	if (interlace_mode)
++		ratio_y <<= 1;
 +
 +	if (ratio_x * video_width < (w_in << 18))
 +		ratio_x++;
 +
-+	DRM_DEBUG("w_in %d h_in %d\n", w_in, h_in);
-+	DRM_DEBUG("video top %d left %d width %d height %d\n",
-+		 video_top, video_left, video_width, video_height);
 +	DRM_DEBUG("ratio x 0x%x y 0x%x\n", ratio_x, ratio_y);
 +
-+
-+	/* TODO Interlace output */
-+
-+	meson_overlay_get_vertical_phase(ratio_y, &vphase, &vphase_repeat_skip);
++	meson_overlay_get_vertical_phase(ratio_y, &vphase, &vphase_repeat_skip,
++					 interlace_mode);
 +
 +	DRM_DEBUG("vphase 0x%x skip %d\n", vphase, vphase_repeat_skip);
 +
@@ -616,63 +580,71 @@ index 0000000..2e8fc44
 +	start = video_top + video_height / 2 - ((h_in << 17) / ratio_x);
 +	end = (h_in << 18) / ratio_y + start - 1;
 +
-+	if (video_top < 0 && start < 0) {
++	if (video_top < 0 && start < 0)
 +		vd_start_lines = (-(start) * ratio_y) >> 18;
-+	} else if (start < video_top) {
++	else if (start < video_top)
 +		vd_start_lines = ((video_top - start) * ratio_y) >> 18;
-+	} else	{
++	else
 +		vd_start_lines = 0;
-+	}
 +
-+	if (video_top < 0) {
++	if (video_top < 0)
 +		temp_height = min_t(unsigned int, (video_top + video_height - 1),
 +				    (crtc_height - 1));
-+	} else {
++	else
 +		temp_height = min_t(unsigned int, (video_top + video_height - 1),
 +				    (crtc_height - 1)) - video_top + 1;
-+	}
++
 +	temp = vd_start_lines + (temp_height * ratio_y >> 18);
 +	vd_end_lines = (temp <= (h_in - 1)) ? temp : (h_in - 1);
 +
-+	vsc_startp = max_t(unsigned int, start,
-+			   max_t(unsigned int, 0, video_top));
-+	vsc_endp = min_t(unsigned int, end,
++	vd_start_lines += crop_left;
++	vd_end_lines += crop_left;
++
++	if (interlace_mode) {
++		start >>= 1;
++		end >>= 1;
++	}
++
++	vsc_startp = max_t(int, start,
++			   max_t(int, 0, video_top));
++	vsc_endp = min_t(int, end,
 +			 min_t(int, crtc_height - 1,
 +			       video_top + video_height - 1));
 +
 +	DRM_DEBUG("vsc startp %d endp %d start_lines %d end_lines %d\n",
 +		 vsc_startp, vsc_endp, vd_start_lines, vd_end_lines);
 +
-+
 +	/* Horizontal */
 +
 +	start = video_left + video_width / 2 - ((w_in << 17) / ratio_x);
 +	end = (w_in << 18) / ratio_x + start - 1;
 +
-+	if (video_left < 0 && start < 0) {
++	if (video_left < 0 && start < 0)
 +		hd_start_lines = (-(start) * ratio_x) >> 18;
-+	} else if (start < video_left) {
++	else if (start < video_left)
 +		hd_start_lines = ((video_left - start) * ratio_x) >> 18;
-+	} else {
++	else
 +		hd_start_lines = 0;
-+	}
 +
-+	if (video_left < 0) {
++	if (video_left < 0)
 +		temp_width = min_t(unsigned int, (video_left + video_width - 1),
 +				   (crtc_width - 1));
-+	} else {
++	else
 +		temp_width = min_t(unsigned int, (video_left + video_width - 1),
 +				   (crtc_width - 1)) - video_left + 1;
-+	}
++
 +	temp = hd_start_lines + (temp_width * ratio_x >> 18);
 +	hd_end_lines = (temp <= (w_in - 1)) ? temp : (w_in - 1);
 +
 +	priv->viu.vpp_line_in_length = hd_end_lines - hd_start_lines + 1;
-+	hsc_startp = max_t(unsigned int, start,
-+			   max_t(unsigned int, 0, video_left));
-+	hsc_endp = min_t(unsigned int, end,
++	hsc_startp = max_t(int, start,
++			   max_t(int, 0, video_left));
++	hsc_endp = min_t(int, end,
 +			 min_t(int, crtc_width - 1,
 +			       video_left + video_width - 1));
++
++	hd_start_lines += crop_top;
++	hd_end_lines += crop_top;
 +
 +	DRM_DEBUG("hsc startp %d endp %d start_lines %d end_lines %d\n",
 +		 hsc_startp, hsc_endp, hd_start_lines, hd_end_lines);
@@ -739,8 +711,11 @@ index 0000000..2e8fc44
 +	struct meson_drm *priv = meson_overlay->priv;
 +	struct drm_gem_cma_object *gem;
 +	unsigned long flags;
++	bool interlace_mode;
 +
 +	DRM_DEBUG_DRIVER("\n");
++
++	interlace_mode = state->crtc->mode.flags & DRM_MODE_FLAG_INTERLACE;
 +
 +	/*
 +	 * Update Coordinates
@@ -757,14 +732,14 @@ index 0000000..2e8fc44
 +				    VD_ENABLE;
 +
 +	/* Setup scaler params */
-+	meson_overlay_setup_scaler_params(priv, plane);
++	meson_overlay_setup_scaler_params(priv, plane, interlace_mode);
 +
 +	//VD1_IF0_CANVAS1=0
 +	//VD1_IF0_CHROMA_X1=0
 +	//VD1_IF0_CHROMA_Y1=0
 +	priv->viu.vd1_if0_repeat_loop = 0;
-+	priv->viu.vd1_if0_luma0_rpt_pat = 0;
-+	priv->viu.vd1_if0_chroma0_rpt_pat = 0;
++	priv->viu.vd1_if0_luma0_rpt_pat = interlace_mode ? 8 : 0;
++	priv->viu.vd1_if0_chroma0_rpt_pat = interlace_mode ? 8 : 0;
 +	//VD1_IF0_LUMA1_RPT_PAT=0
 +	//VD1_IF0_CHROMA1_RPT_PAT=0
 +	//VD1_IF0_LUMA_PSEL=0
@@ -774,23 +749,26 @@ index 0000000..2e8fc44
 +	priv->viu.vd1_range_map_cb = 0;
 +	priv->viu.vd1_range_map_cr = 0;
 +
++	/* Default values for RGB888/YUV444 */
++	priv->viu.vd1_if0_gen_reg2 = 0;
++	priv->viu.viu_vd1_fmt_ctrl = 0;
++
 +	switch (fb->format->format) {
 +	case DRM_FORMAT_RGB888:
 +		/* TOFIX enable RGB2YUV somewhere ! */
 +		priv->viu.vd1_if0_gen_reg |= VD_DEMUX_MODE_RGB |
 +					     VD_BYTES_PER_PIXEL(2);
-+		priv->viu.vd1_if0_gen_reg2 = 0;
-+		priv->viu.vd1_if0_canvas0 = CANVAS_ADDR2(MESON_CANVAS_ID_VD1_0) |
-+					    CANVAS_ADDR1(MESON_CANVAS_ID_VD1_0) |
-+					    CANVAS_ADDR0(MESON_CANVAS_ID_VD1_0);
-+		priv->viu.viu_vd1_fmt_ctrl = 0;
++		priv->viu.vd1_if0_canvas0 =
++					CANVAS_ADDR2(priv->canvas_id_vd1_0) |
++					CANVAS_ADDR1(priv->canvas_id_vd1_0) |
++					CANVAS_ADDR0(priv->canvas_id_vd1_0);
 +		break;
 +	case DRM_FORMAT_YUYV:
 +		priv->viu.vd1_if0_gen_reg |= VD_BYTES_PER_PIXEL(1);
-+		priv->viu.vd1_if0_gen_reg2 = 0;
-+		priv->viu.vd1_if0_canvas0 = CANVAS_ADDR2(MESON_CANVAS_ID_VD1_0) |
-+					    CANVAS_ADDR1(MESON_CANVAS_ID_VD1_0) |
-+					    CANVAS_ADDR0(MESON_CANVAS_ID_VD1_0);
++		priv->viu.vd1_if0_canvas0 =
++					CANVAS_ADDR2(priv->canvas_id_vd1_0) |
++					CANVAS_ADDR1(priv->canvas_id_vd1_0) |
++					CANVAS_ADDR0(priv->canvas_id_vd1_0);
 +		priv->viu.viu_vd1_fmt_ctrl = VD_HORZ_Y_C_RATIO(1) | /* /2 */
 +					     VD_HORZ_FMT_EN |
 +					     VD_VERT_RPT_LINE0 |
@@ -801,9 +779,10 @@ index 0000000..2e8fc44
 +	case DRM_FORMAT_NV12:
 +	case DRM_FORMAT_NV21:
 +		priv->viu.vd1_if0_gen_reg |= VD_SEPARATE_EN;
-+		priv->viu.vd1_if0_canvas0 = CANVAS_ADDR2(MESON_CANVAS_ID_VD1_1) |
-+					    CANVAS_ADDR1(MESON_CANVAS_ID_VD1_1) |
-+					    CANVAS_ADDR0(MESON_CANVAS_ID_VD1_0);
++		priv->viu.vd1_if0_canvas0 =
++					CANVAS_ADDR2(priv->canvas_id_vd1_1) |
++					CANVAS_ADDR1(priv->canvas_id_vd1_1) |
++					CANVAS_ADDR0(priv->canvas_id_vd1_0);
 +		if (fb->format->format == DRM_FORMAT_NV12)
 +			priv->viu.vd1_if0_gen_reg2 = VD_COLOR_MAP(1);
 +		else
@@ -821,45 +800,50 @@ index 0000000..2e8fc44
 +	case DRM_FORMAT_YUV411:
 +	case DRM_FORMAT_YUV410:
 +		priv->viu.vd1_if0_gen_reg |= VD_SEPARATE_EN;
-+		priv->viu.vd1_if0_gen_reg2 = 0;
-+		priv->viu.vd1_if0_canvas0 = CANVAS_ADDR2(MESON_CANVAS_ID_VD1_2) |
-+					    CANVAS_ADDR1(MESON_CANVAS_ID_VD1_1) |
-+					    CANVAS_ADDR0(MESON_CANVAS_ID_VD1_0);
-+		if (fb->format->format == DRM_FORMAT_YUV444)
-+			priv->viu.viu_vd1_fmt_ctrl = 0;
-+		else if (fb->format->format == DRM_FORMAT_YUV422) {
-+			priv->viu.viu_vd1_fmt_ctrl = VD_HORZ_Y_C_RATIO(1) | /* /2 */
-+						     VD_HORZ_FMT_EN |
-+						     VD_VERT_RPT_LINE0 |
-+						     VD_VERT_INITIAL_PHASE(12) |
-+						     VD_VERT_PHASE_STEP(16) | /* /2 */
-+						     VD_VERT_FMT_EN;
-+		} else if (fb->format->format == DRM_FORMAT_YUV420) {
-+			priv->viu.viu_vd1_fmt_ctrl = VD_HORZ_Y_C_RATIO(1) | /* /2 */
-+						     VD_HORZ_FMT_EN |
-+						     VD_VERT_RPT_LINE0 |
-+						     VD_VERT_INITIAL_PHASE(12) |
-+						     VD_VERT_PHASE_STEP(8) | /* /4 */
-+						     VD_VERT_FMT_EN;
-+		} else if (fb->format->format == DRM_FORMAT_YUV411) {
-+			priv->viu.viu_vd1_fmt_ctrl = VD_HORZ_Y_C_RATIO(2) | /* /4 */
-+						     VD_HORZ_FMT_EN |
-+						     VD_VERT_RPT_LINE0 |
-+						     VD_VERT_INITIAL_PHASE(12) |
-+						     VD_VERT_PHASE_STEP(16) | /* /2 */
-+						     VD_VERT_FMT_EN;
-+		} else if (fb->format->format == DRM_FORMAT_YUV410) {
-+			priv->viu.viu_vd1_fmt_ctrl = VD_HORZ_Y_C_RATIO(2) | /* /4 */
-+						     VD_HORZ_FMT_EN |
-+						     VD_VERT_RPT_LINE0 |
-+						     VD_VERT_INITIAL_PHASE(12) |
-+						     VD_VERT_PHASE_STEP(8) | /* /4 */
-+						     VD_VERT_FMT_EN;
++		priv->viu.vd1_if0_canvas0 =
++					CANVAS_ADDR2(priv->canvas_id_vd1_2) |
++					CANVAS_ADDR1(priv->canvas_id_vd1_1) |
++					CANVAS_ADDR0(priv->canvas_id_vd1_0);
++		switch (fb->format->format) {
++		case DRM_FORMAT_YUV422:
++			priv->viu.viu_vd1_fmt_ctrl =
++					VD_HORZ_Y_C_RATIO(1) | /* /2 */
++					VD_HORZ_FMT_EN |
++					VD_VERT_RPT_LINE0 |
++					VD_VERT_INITIAL_PHASE(12) |
++					VD_VERT_PHASE_STEP(16) | /* /2 */
++					VD_VERT_FMT_EN;
++			break;
++		case DRM_FORMAT_YUV420:
++			priv->viu.viu_vd1_fmt_ctrl =
++					VD_HORZ_Y_C_RATIO(1) | /* /2 */
++					VD_HORZ_FMT_EN |
++					VD_VERT_RPT_LINE0 |
++					VD_VERT_INITIAL_PHASE(12) |
++					VD_VERT_PHASE_STEP(8) | /* /4 */
++					VD_VERT_FMT_EN;
++			break;
++		case DRM_FORMAT_YUV411:
++			priv->viu.viu_vd1_fmt_ctrl =
++					VD_HORZ_Y_C_RATIO(2) | /* /4 */
++					VD_HORZ_FMT_EN |
++					VD_VERT_RPT_LINE0 |
++					VD_VERT_INITIAL_PHASE(12) |
++					VD_VERT_PHASE_STEP(16) | /* /2 */
++					VD_VERT_FMT_EN;
++			break;
++		case DRM_FORMAT_YUV410:
++			priv->viu.viu_vd1_fmt_ctrl =
++					VD_HORZ_Y_C_RATIO(2) | /* /4 */
++					VD_HORZ_FMT_EN |
++					VD_VERT_RPT_LINE0 |
++					VD_VERT_INITIAL_PHASE(12) |
++					VD_VERT_PHASE_STEP(8) | /* /4 */
++					VD_VERT_FMT_EN;
++			break;
 +		}
 +		break;
 +	}
-+
-+	/* TODO Interlace  */
 +
 +	/* Update Canvas with buffer address */
 +	priv->viu.vd1_planes = drm_format_num_planes(fb->format->format);
@@ -1029,10 +1013,10 @@ index bca8714..5c7e02c 100644
  #define VPP_FIFO_STATUS 0x1d28
  #define VPP_SMOKE_CTRL 0x1d29
 diff --git a/drivers/gpu/drm/meson/meson_viu.c b/drivers/gpu/drm/meson/meson_viu.c
-index 6bcfa52..2dffb98 100644
+index 5b48c4c..a423e7a 100644
 --- a/drivers/gpu/drm/meson/meson_viu.c
 +++ b/drivers/gpu/drm/meson/meson_viu.c
-@@ -329,6 +329,21 @@ void meson_viu_init(struct meson_drm *priv)
+@@ -328,6 +328,21 @@ void meson_viu_init(struct meson_drm *priv)
  			    0xff << OSD_REPLACE_SHIFT,
  			    priv->io_base + _REG(VIU_OSD2_CTRL_STAT2));
  

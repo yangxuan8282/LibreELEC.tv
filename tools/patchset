@@ -8,15 +8,42 @@ else
 fi
 
 do_narmstrong(){
-  # DRM OVERLAY PATCHES
-  rm projects/Amlogic_GX/patches/linux/a-* 2&>/dev/null
+  rm projects/Amlogic_GX/patches/linux/a* 2&>/dev/null
+
+  # DRM OVERLAY
+  local SEQUENCE="aa"
+  rm projects/Amlogic_GX/patches/linux/$SEQUENCE-* 2&>/dev/null
   cd ~/linux.narmstrong
   rm *.patch 2&>/dev/null
-  git checkout amlogic/v4.18/drm-overlay
-  git fetch origin v4.18/drm-overlay
-  git reset --hard origin/v4.18/drm-overlay
-  git format-patch --start-number 0001 7daf201d7fe8334e2d2364d4e8ed3394ec9af819 #4.18-rc2
-  for filename in *.patch; do mv "$filename" "a-$filename"; done;
+  git checkout amlogic/v4.19/drm-overlay
+  git fetch origin amlogic/v4.19/drm-overlay
+  git reset --hard origin/amlogic/v4.19/drm-overlay
+  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+  for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
+  mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
+
+  # VPU-4K
+  local SEQUENCE="ab"
+  rm projects/Amlogic_GX/patches/linux/$SEQUENCE-* 2&>/dev/null
+  cd ~/linux.narmstrong
+  rm *.patch 2&>/dev/null
+  git checkout amlogic/v4.19/vpu-4k
+  git fetch origin amlogic/v4.19/vpu-4k
+  git reset --hard origin/amlogic/v4.19/vpu-4k
+  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+  for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
+  mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
+
+  # VPU-ALT-CLK
+  local SEQUENCE="ac"
+  rm projects/Amlogic_GX/patches/linux/$SEQUENCE-* 2&>/dev/null
+  cd ~/linux.narmstrong
+  rm *.patch 2&>/dev/null
+  git checkout amlogic/v4.19/vpu-alt-clk
+  git fetch origin amlogic/v4.19/vpu-alt-clk
+  git reset --hard origin/amlogic/v4.19/vpu-alt-clk
+  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+  for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
 }
 
@@ -29,19 +56,21 @@ do_upstream(){
   git fetch origin linux-4.18-le-amlogic-gx
   git reset --hard origin/linux-4.18-le-amlogic-gx
   git format-patch --start-number 0001 021c91791a5e7e85c567452f1be3e4c2c6cb6063 #4.18-rc3
+  rm 0001*
+  rm 0003*
   for filename in *.patch; do mv "$filename" "b-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
 }
 
 do_elyotna(){
-  # V4L2 MEM2MEM VDEC PATCHES
+  # VDEC PATCHES
   rm projects/Amlogic_GX/patches/linux/c-* 2&>/dev/null
   cd ~/linux.elyotna
   rm *.patch 2&>/dev/null
   git checkout 4.18/amlogic-v4l2-m2m
-  #git fetch origin 4.18/amlogic-v4l2-m2m
-  #git reset --hard origin/4.18/amlogic-v4l2-m2m
-  git format-patch --start-number 0001 1e4b044d22517cae7047c99038abb444423243ca #4.18-rc4
+  git fetch origin 4.18/amlogic-v4l2-m2m
+  git reset --hard origin/4.18/amlogic-v4l2-m2m
+  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
   for filename in *.patch; do mv "$filename" "c-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
 }

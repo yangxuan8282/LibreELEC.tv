@@ -1,4 +1,4 @@
-From 3017697de34beb69ea3085de13e7c7136c5a9188 Mon Sep 17 00:00:00 2001
+From 358ea8fa3bfcd692470285d513512938bfa56510 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Thu, 26 Jul 2018 21:35:52 +0200
 Subject: [PATCH 1/4] media: meson: add v4l2 m2m video decoder driver
@@ -29,7 +29,7 @@ There is also a hardware bitstream parser (ESPARSER) that is handled here.
  drivers/media/platform/meson/vdec/Makefile        |    7 +
  drivers/media/platform/meson/vdec/canvas.c        |   69 +
  drivers/media/platform/meson/vdec/canvas.h        |   42 +
- drivers/media/platform/meson/vdec/codec_h264.c    |  376 ++++++
+ drivers/media/platform/meson/vdec/codec_h264.c    |  385 ++++++
  drivers/media/platform/meson/vdec/codec_h264.h    |   13 +
  drivers/media/platform/meson/vdec/codec_helpers.c |   45 +
  drivers/media/platform/meson/vdec/codec_helpers.h |    8 +
@@ -41,7 +41,7 @@ There is also a hardware bitstream parser (ESPARSER) that is handled here.
  drivers/media/platform/meson/vdec/codec_mpeg12.h  |   13 +
  drivers/media/platform/meson/vdec/codec_mpeg4.c   |  213 ++++
  drivers/media/platform/meson/vdec/codec_mpeg4.h   |   13 +
- drivers/media/platform/meson/vdec/esparser.c      |  320 +++++
+ drivers/media/platform/meson/vdec/esparser.c      |  322 +++++
  drivers/media/platform/meson/vdec/esparser.h      |   16 +
  drivers/media/platform/meson/vdec/hevc_regs.h     |  742 +++++++++++
  drivers/media/platform/meson/vdec/vdec.c          | 1009 +++++++++++++++
@@ -52,7 +52,7 @@ There is also a hardware bitstream parser (ESPARSER) that is handled here.
  drivers/media/platform/meson/vdec/vdec_hevc.h     |   22 +
  drivers/media/platform/meson/vdec/vdec_platform.c |  273 ++++
  drivers/media/platform/meson/vdec/vdec_platform.h |   29 +
- 28 files changed, 5635 insertions(+)
+ 28 files changed, 5646 insertions(+)
  create mode 100644 drivers/media/platform/meson/vdec/Makefile
  create mode 100644 drivers/media/platform/meson/vdec/canvas.c
  create mode 100644 drivers/media/platform/meson/vdec/canvas.h
@@ -246,10 +246,10 @@ index 0000000..b8b5409
 +#endif /* __MESON_CANVAS_H */
 diff --git a/drivers/media/platform/meson/vdec/codec_h264.c b/drivers/media/platform/meson/vdec/codec_h264.c
 new file mode 100644
-index 0000000..97621cd
+index 0000000..4a56265
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_h264.c
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,385 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -530,14 +530,21 @@ index 0000000..97621cd
 +
 +	codec_helper_set_canvases(sess, core->dos_base + ANC0_CANVAS_ADDR);
 +
-+	if (max_reference_size >= max_dpb_size)
++	if (max_reference_size > max_dpb_size)
 +		max_dpb_size = max_reference_size;
 +
 +	max_reference_size++;
++	dev_dbg(core->dev,
++		"max_ref_size = %u; max_dpb_size = %u; actual_dpb_size = %u\n",
++		max_reference_size, max_dpb_size, actual_dpb_size);
 +
 +	h264->ref_size = mb_total * mb_mv_byte * max_reference_size;
-+	h264->ref_vaddr = dma_alloc_coherent(core->dev, h264->ref_size, &h264->ref_paddr, GFP_ATOMIC);
-+
++	h264->ref_vaddr = dma_alloc_coherent(core->dev, h264->ref_size, &h264->ref_paddr, GFP_KERNEL);
++	if (!h264->ref_vaddr) {
++		dev_err(core->dev, "Failed to allocate memory for refs (%u)\n", h264->ref_size);
++		vdec_abort(sess);
++		return;
++	}
 +	/* Address to store the references' MVs ? */
 +	writel_relaxed(h264->ref_paddr, core->dos_base + AV_SCRATCH_1);
 +
@@ -575,7 +582,7 @@ index 0000000..97621cd
 +		 * Typical reason is a temporarily corrupted bitstream
 +		 */
 +		if (error)
-+			dev_dbg(core->dev, "Buffer %d decode error: %08X\n",
++			dev_info(core->dev, "Buffer %d decode error: %08X\n",
 +				buffer_index, error);
 +
 +		vdec_dst_buf_done_idx(sess, buffer_index);
@@ -590,6 +597,8 @@ index 0000000..97621cd
 +
 +	status = readl_relaxed(core->dos_base + AV_SCRATCH_0);
 +	cmd = status & 0xff;
++
++	dev_dbg(core->dev, "H264 status: %08X\n", status);
 +
 +	if (cmd == 1) {
 +		codec_h264_set_param(sess);
@@ -2802,10 +2811,10 @@ index 0000000..a30ceed
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/esparser.c b/drivers/media/platform/meson/vdec/esparser.c
 new file mode 100644
-index 0000000..400d6d5
+index 0000000..6a3c1f6
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/esparser.c
-@@ -0,0 +1,320 @@
+@@ -0,0 +1,322 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -3001,7 +3010,7 @@ index 0000000..400d6d5
 +	struct vb2_buffer *vb = &vbuf->vb2_buf;
 +	struct vdec_core *core = sess->core;
 +	struct vdec_codec_ops *codec_ops = sess->fmt_out->codec_ops;
-+	u32 num_dst_bufs = v4l2_m2m_num_dst_bufs_ready(sess->m2m_ctx);
++	u32 num_dst_bufs = 0;
 +	u32 payload_size = vb2_get_plane_payload(vb, 0);
 +	dma_addr_t phy = vb2_dma_contig_plane_dma_addr(vb, 0);
 +
@@ -3011,10 +3020,12 @@ index 0000000..400d6d5
 +	}
 +
 +	if (codec_ops->num_pending_bufs)
-+		num_dst_bufs += codec_ops->num_pending_bufs(sess);
++		num_dst_bufs = v4l2_m2m_num_dst_bufs_ready(sess->m2m_ctx) +
++				codec_ops->num_pending_bufs(sess);
 +
 +	if (esparser_vififo_get_free_space(sess) < payload_size ||
-+	    atomic_read(&sess->esparser_queued_bufs) >= num_dst_bufs)
++	    (num_dst_bufs &&
++	     atomic_read(&sess->esparser_queued_bufs) >= num_dst_bufs))
 +		return -EAGAIN;
 +
 +	v4l2_m2m_src_buf_remove_by_buf(sess->m2m_ctx, vbuf);
