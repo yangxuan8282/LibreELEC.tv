@@ -3,8 +3,8 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="kodi"
-PKG_VERSION="269a24c"
-PKG_SHA256="006a4b1ff32af2616f13aba63c86654b32cf9a972516a33e64a032003bb6dd19"
+PKG_VERSION="ed7ecfd"
+PKG_SHA256="f2e224b7f984ccd447d50d9228d7c9c2cddb0ad663ed1eae002243647136a8c8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -181,7 +181,7 @@ if [ ! "$KODIPLAYER_DRIVER" = default ]; then
   if [ "$KODIPLAYER_DRIVER" = bcm2835-driver ]; then
     KODI_PLAYER="-DCORE_PLATFORM_NAME=rbpi"
   elif [ "$KODIPLAYER_DRIVER" = mesa -o "$KODIPLAYER_DRIVER" = rkmpp -o "$KODIPLAYER_DRIVER" = amlogic-meson-mali ]; then
-    KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm"
+    KODI_PLAYER="-DCORE_PLATFORM_NAME=gbm -DGBM_RENDER_SYSTEM=gles"
     CFLAGS="$CFLAGS -DMESA_EGL_NO_X11_HEADERS"
     CXXFLAGS="$CXXFLAGS -DMESA_EGL_NO_X11_HEADERS"
   elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then

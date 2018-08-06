@@ -1,0 +1,134 @@
+From d8b9302114c1ac26cb35857b0ada15b66e8d48ed Mon Sep 17 00:00:00 2001
+From: Wolfgang Haupt <haupt.wolfgang@gmail.com>
+Date: Fri, 3 Aug 2018 20:27:11 +0200
+Subject: [PATCH 1/4] Windowing: GBM/GL - fix log leftover from GLES
+
+---
+ xbmc/windowing/gbm/WinSystemGbmGLContext.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+index 4fc34c91b9ec..e4a3c65a0e07 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmGLContext.cpp
+@@ -59,7 +59,7 @@ bool CWinSystemGbmGLContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res
+   if (res.iWidth != m_nWidth ||
+       res.iHeight != m_nHeight)
+   {
+-    CLog::Log(LOGDEBUG, "CWinSystemGbmGLESContext::%s - resolution changed, creating a new window", __FUNCTION__);
++    CLog::Log(LOGDEBUG, "CWinSystemGbmGLContext::%s - resolution changed, creating a new window", __FUNCTION__);
+     CreateNewWindow("", fullScreen, res);
+   }
+ 
+
+From c3b55c6b9b52c4e38463f35c9dca3c74831019ba Mon Sep 17 00:00:00 2001
+From: Wolfgang Haupt <haupt.wolfgang@gmail.com>
+Date: Fri, 3 Aug 2018 20:28:24 +0200
+Subject: [PATCH 2/4] RetroPlayer: use EGL class instead of GLES class
+
+---
+ xbmc/cores/RetroPlayer/buffers/RenderBufferGBM.cpp | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/cores/RetroPlayer/buffers/RenderBufferGBM.cpp b/xbmc/cores/RetroPlayer/buffers/RenderBufferGBM.cpp
+index 50b3d5977478..798f3ca82929 100644
+--- a/xbmc/cores/RetroPlayer/buffers/RenderBufferGBM.cpp
++++ b/xbmc/cores/RetroPlayer/buffers/RenderBufferGBM.cpp
+@@ -10,8 +10,7 @@
+ #include "ServiceBroker.h"
+ #include "utils/EGLImage.h"
+ #include "utils/GBMBufferObject.h"
+-
+-#include "windowing/gbm/WinSystemGbmGLESContext.h"
++#include "windowing/gbm/WinSystemGbmEGLContext.h"
+ 
+ using namespace KODI;
+ using namespace RETRO;
+@@ -22,7 +21,7 @@ CRenderBufferGBM::CRenderBufferGBM(CRenderContext &context,
+   m_context(context),
+   m_fourcc(fourcc),
+   m_bpp(bpp),
+-  m_egl(new CEGLImage(dynamic_cast<CWinSystemGbmGLESContext*>(CServiceBroker::GetWinSystem())->GetEGLDisplay())),
++  m_egl(new CEGLImage(dynamic_cast<CWinSystemGbmEGLContext*>(CServiceBroker::GetWinSystem())->GetEGLDisplay())),
+   m_bo(new CGBMBufferObject(fourcc))
+ {
+ }
+
+From aedcc71d3ef7a7747f92a914514aa99b6b5bfac4 Mon Sep 17 00:00:00 2001
+From: Wolfgang Haupt <haupt.wolfgang@gmail.com>
+Date: Fri, 3 Aug 2018 20:28:59 +0200
+Subject: [PATCH 3/4] Utils: use EGL instead of GLES in GBMBufferObject
+
+---
+ xbmc/utils/GBMBufferObject.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/utils/GBMBufferObject.cpp b/xbmc/utils/GBMBufferObject.cpp
+index 00a8042cc5c5..2d9484135710 100644
+--- a/xbmc/utils/GBMBufferObject.cpp
++++ b/xbmc/utils/GBMBufferObject.cpp
+@@ -9,14 +9,14 @@
+ #include "GBMBufferObject.h"
+ 
+ #include "ServiceBroker.h"
+-#include "windowing/gbm/WinSystemGbmGLESContext.h"
++#include "windowing/gbm/WinSystemGbmEGLContext.h"
+ 
+ #include <gbm.h>
+ 
+ CGBMBufferObject::CGBMBufferObject(int format) :
+   m_format(format)
+ {
+-  m_device = static_cast<CWinSystemGbmGLESContext*>(CServiceBroker::GetWinSystem())->GetGBMDevice();
++  m_device = static_cast<CWinSystemGbmEGLContext*>(CServiceBroker::GetWinSystem())->GetGBMDevice();
+ }
+ 
+ CGBMBufferObject::~CGBMBufferObject()
+
+From 263a8c6ca234ad018b5ce4e8c756c1eb7d8dd55c Mon Sep 17 00:00:00 2001
+From: Wolfgang Haupt <haupt.wolfgang@gmail.com>
+Date: Fri, 3 Aug 2018 21:41:52 +0200
+Subject: [PATCH 4/4] Windowing: GBM - remove unnecessary includes
+
+---
+ xbmc/windowing/gbm/DRMAtomic.cpp | 1 -
+ xbmc/windowing/gbm/DRMLegacy.cpp | 1 -
+ xbmc/windowing/gbm/DRMUtils.cpp  | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/xbmc/windowing/gbm/DRMAtomic.cpp b/xbmc/windowing/gbm/DRMAtomic.cpp
+index e91a1e3d8aa1..0d5cff98f843 100644
+--- a/xbmc/windowing/gbm/DRMAtomic.cpp
++++ b/xbmc/windowing/gbm/DRMAtomic.cpp
+@@ -18,7 +18,6 @@
+ #include "utils/log.h"
+ 
+ #include "DRMAtomic.h"
+-#include "WinSystemGbmGLESContext.h"
+ 
+ #include <drm_fourcc.h>
+ 
+diff --git a/xbmc/windowing/gbm/DRMLegacy.cpp b/xbmc/windowing/gbm/DRMLegacy.cpp
+index df0b26b568f4..f01c43a341e1 100644
+--- a/xbmc/windowing/gbm/DRMLegacy.cpp
++++ b/xbmc/windowing/gbm/DRMLegacy.cpp
+@@ -17,7 +17,6 @@
+ #include <EGL/egl.h>
+ #include <unistd.h>
+ 
+-#include "WinSystemGbmGLESContext.h"
+ #include "guilib/gui3d.h"
+ #include "utils/log.h"
+ #include "settings/Settings.h"
+diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
+index 9c5a0ed26dc6..0333c22bb016 100644
+--- a/xbmc/windowing/gbm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/DRMUtils.cpp
+@@ -16,7 +16,6 @@
+ #include <EGL/egl.h>
+ #include <unistd.h>
+ 
+-#include "WinSystemGbmGLESContext.h"
+ #include "utils/log.h"
+ #include "utils/StringUtils.h"
+ #include "windowing/GraphicContext.h"

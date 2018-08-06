@@ -20,14 +20,11 @@ PKG_NAME="amlogic-meson-mali"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
-PKG_VERSION="3df5cd6cec292913c81c01860c927766026cfb43"
-PKG_SHA256="3014fefadb4e73d15290accc827ed91f7d868482cb08fdca553b4255b70cb2e4"
+PKG_VERSION="095d722fbe4801578791123edab3a98ba8a59418"
+PKG_SHA256="02f6ad0a852e8962bda2a433670456971c4a4d856fc5074d248357b5bf7eb6e0"
 PKG_URL="https://github.com/superna9999/amlogic-meson-mali/archive/$PKG_VERSION.tar.gz"
 PKG_SOURCE_DIR="amlogic-meson-mali-$PKG_VERSION"
 PKG_DEPENDS_TARGET="libffi libdrm"
-if [ "$TARGET_ARCH" = "arm" ]; then
-  PKG_DEPENDS_TARGET+=" wayland"
-fi
 PKG_SECTION="graphics"
 PKG_SHORTDESC="amlogic-meson-mali: Wayland/GBM OpenGLES libraries for Mali GPUs in Amlogic SoCs"
 PKG_TOOLCHAIN="manual"
@@ -35,10 +32,8 @@ PKG_TOOLCHAIN="manual"
 makeinstall_target() {
   if [ "$TARGET_ARCH" = "arm" ]; then
     LIB_ARCH="eabihf"
-    PLATFORM="wayland/drm"
   else
     LIB_ARCH="arm64"
-    PLATFORM="dummy"
   fi
   mkdir -p $SYSROOT_PREFIX/usr/include
     cp -PR include/EGL $SYSROOT_PREFIX/usr/include/
@@ -49,7 +44,7 @@ makeinstall_target() {
     cp -PR include/KHR $SYSROOT_PREFIX/usr/include/
 
   mkdir -p $SYSROOT_PREFIX/usr/lib
-    cp -PR lib/$LIB_ARCH/m450/r7p0/$PLATFORM/libMali.so $SYSROOT_PREFIX/usr/lib
+    cp -PR lib/$LIB_ARCH/m450/r7p0/dummy/libMali.so $SYSROOT_PREFIX/usr/lib
 
     ln -sf libMali.so $SYSROOT_PREFIX/usr/lib/libEGL.so.1.4
     ln -sf libEGL.so.1.4 $SYSROOT_PREFIX/usr/lib/libEGL.so.1
@@ -66,14 +61,8 @@ makeinstall_target() {
     ln -sf libMali.so $SYSROOT_PREFIX/usr/lib/libgbm.so
     ln -sf libgbm.so $SYSROOT_PREFIX/usr/lib/libgbm.so.1
 
-    if [ $PLATFORM = "wayland" ] ; then
-      ln -sf libMali.so $SYSROOT_PREFIX/usr/lib/libwayland-egl.so
-      ln -sf libwayland-egl.so $SYSROOT_PREFIX/usr/lib/libwayland-egl.so.1
-      ln -sf libwayland-egl.so.1 $SYSROOT_PREFIX/usr/lib/libwayland-egl.so.1.0.0
-    fi
-
   mkdir -p $INSTALL/usr/lib
-    cp -PR lib/$LIB_ARCH/m450/r7p0/$PLATFORM/libMali.so $INSTALL/usr/lib
+    cp -PR lib/$LIB_ARCH/m450/r7p0/dummy/libMali.so $INSTALL/usr/lib
 
     ln -sf libMali.so $INSTALL/usr/lib/libEGL.so.1.4
     ln -sf libEGL.so.1.4 $INSTALL/usr/lib/libEGL.so.1
@@ -89,10 +78,4 @@ makeinstall_target() {
 
     ln -sf libMali.so $INSTALL/usr/lib/libgbm.so
     ln -sf libgbm.so $INSTALL/usr/lib/libgbm.so.1
-
-    if [ $PLATFORM = "wayland" ] ; then
-      ln -sf libMali.so $INSTALL/usr/lib/libwayland-egl.so
-      ln -sf libwayland-egl.so $INSTALL/usr/lib/libwayland-egl.so.1
-      ln -sf libwayland-egl.so.1 $INSTALL/usr/lib/libwayland-egl.so.1.0.0
-    fi
 }

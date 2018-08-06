@@ -1,19 +1,19 @@
-From c19eb69648dc75221220900a1dfa56ef9a4c3e51 Mon Sep 17 00:00:00 2001
+From 655d48f5d7017f95609011a44e114e5a63e46b26 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 27 Jun 2018 21:00:16 +0200
 Subject: [PATCH] windowing/gbm: add option to limit gui size
 
 ---
- .../resource.language.en_gb/resources/strings.po   | 44 +++++++++++++++++++++-
- system/settings/gbm.xml                            | 15 ++++++++
- xbmc/windowing/gbm/DRMUtils.cpp                    | 27 +++++++++++++
+ .../resources/strings.po                      | 44 ++++++++++++++++++-
+ system/settings/gbm.xml                       | 15 +++++++
+ xbmc/windowing/gbm/DRMUtils.cpp               | 27 ++++++++++++
  3 files changed, 85 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index 6f5b6f590430..94b65d4a7c1e 100644
+index efeada41130e..b293ffb4031a 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -7232,7 +7232,49 @@ msgctxt "#13465"
+@@ -7251,7 +7251,49 @@ msgctxt "#13465"
  msgid "EGL"
  msgstr ""
  
@@ -65,10 +65,10 @@ index 6f5b6f590430..94b65d4a7c1e 100644
  #: system/settings/settings.xml
  msgctxt "#13505"
 diff --git a/system/settings/gbm.xml b/system/settings/gbm.xml
-index a4987186795f..153ed802fbd8 100644
+index b33b203c11b6..6351c686bb3d 100644
 --- a/system/settings/gbm.xml
 +++ b/system/settings/gbm.xml
-@@ -34,6 +34,21 @@
+@@ -35,6 +35,21 @@
          <setting id="videoscreen.screen">
            <visible>false</visible>
          </setting>
@@ -91,13 +91,13 @@ index a4987186795f..153ed802fbd8 100644
            <level>3</level>
            <default>false</default>
 diff --git a/xbmc/windowing/gbm/DRMUtils.cpp b/xbmc/windowing/gbm/DRMUtils.cpp
-index 2d915cfbc794..be8b575066b7 100644
+index 94512a308a1b..aaa406a5093e 100644
 --- a/xbmc/windowing/gbm/DRMUtils.cpp
 +++ b/xbmc/windowing/gbm/DRMUtils.cpp
-@@ -29,12 +29,15 @@
+@@ -16,12 +16,15 @@
+ #include <EGL/egl.h>
  #include <unistd.h>
  
- #include "WinSystemGbmGLESContext.h"
 +#include "settings/Settings.h"
  #include "utils/log.h"
  #include "utils/StringUtils.h"
@@ -110,7 +110,7 @@ index 2d915cfbc794..be8b575066b7 100644
  CDRMUtils::CDRMUtils()
    : m_connector(new connector)
    , m_encoder(new encoder)
-@@ -613,6 +616,30 @@ RESOLUTION_INFO CDRMUtils::GetResolutionInfo(drmModeModeInfoPtr mode)
+@@ -672,6 +675,30 @@ RESOLUTION_INFO CDRMUtils::GetResolutionInfo(drmModeModeInfoPtr mode)
    res.iWidth = res.iScreenWidth;
    res.iHeight = res.iScreenHeight;
  

@@ -16,7 +16,7 @@ if [ -f $IMAGE_UBOOT ] ; then
     echo "done."
 
     echo -n "Write new bootloader..."
-    dd if=$IMAGE_UBOOT of=/dev/mmcblk1 bs=1M count=4 conv=fsync 2> /dev/null
+    dd if=$IMAGE_UBOOT of=/dev/mmcblk1 conv=fsync 2> /dev/null
     rm -f $IMAGE_UBOOT
     echo "done."
     exit 0

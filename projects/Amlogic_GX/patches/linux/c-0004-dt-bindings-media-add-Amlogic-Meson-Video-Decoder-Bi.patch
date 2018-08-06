@@ -1,4 +1,4 @@
-From a9b33b1c7d791cd83b9044d77647602587d7c3d2 Mon Sep 17 00:00:00 2001
+From aef7f008c4bbc4025273ecbbfb526cb08a05a5c7 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Thu, 2 Aug 2018 18:16:05 +0200
 Subject: [PATCH 4/4] dt-bindings: media: add Amlogic Meson Video Decoder

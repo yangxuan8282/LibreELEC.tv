@@ -1,4 +1,4 @@
-From 358ea8fa3bfcd692470285d513512938bfa56510 Mon Sep 17 00:00:00 2001
+From d3d20bf579e6825e60a17bbae488e7bd9f9e5326 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Thu, 26 Jul 2018 21:35:52 +0200
 Subject: [PATCH 1/4] media: meson: add v4l2 m2m video decoder driver
@@ -41,18 +41,18 @@ There is also a hardware bitstream parser (ESPARSER) that is handled here.
  drivers/media/platform/meson/vdec/codec_mpeg12.h  |   13 +
  drivers/media/platform/meson/vdec/codec_mpeg4.c   |  213 ++++
  drivers/media/platform/meson/vdec/codec_mpeg4.h   |   13 +
- drivers/media/platform/meson/vdec/esparser.c      |  322 +++++
+ drivers/media/platform/meson/vdec/esparser.c      |  314 +++++
  drivers/media/platform/meson/vdec/esparser.h      |   16 +
  drivers/media/platform/meson/vdec/hevc_regs.h     |  742 +++++++++++
- drivers/media/platform/meson/vdec/vdec.c          | 1009 +++++++++++++++
- drivers/media/platform/meson/vdec/vdec.h          |  152 +++
+ drivers/media/platform/meson/vdec/vdec.c          | 1010 +++++++++++++++
+ drivers/media/platform/meson/vdec/vdec.h          |  151 +++
  drivers/media/platform/meson/vdec/vdec_1.c        |  266 ++++
  drivers/media/platform/meson/vdec/vdec_1.h        |   13 +
  drivers/media/platform/meson/vdec/vdec_hevc.c     |  188 +++
  drivers/media/platform/meson/vdec/vdec_hevc.h     |   22 +
  drivers/media/platform/meson/vdec/vdec_platform.c |  273 ++++
  drivers/media/platform/meson/vdec/vdec_platform.h |   29 +
- 28 files changed, 5646 insertions(+)
+ 28 files changed, 5638 insertions(+)
  create mode 100644 drivers/media/platform/meson/vdec/Makefile
  create mode 100644 drivers/media/platform/meson/vdec/canvas.c
  create mode 100644 drivers/media/platform/meson/vdec/canvas.h
@@ -724,7 +724,7 @@ index 0000000..0a778ba
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/codec_hevc.c b/drivers/media/platform/meson/vdec/codec_hevc.c
 new file mode 100644
-index 0000000..cf3e80a
+index 0000000..7f0a967
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_hevc.c
 @@ -0,0 +1,1383 @@
@@ -1025,25 +1025,9 @@ index 0000000..cf3e80a
 +	u32 tile_start_lcu_y;
 +	u32 tile_width_lcu;
 +	u32 tile_height_lcu;
++
++	int resume_needed;
 +};
-+
-+static u32 codec_hevc_num_pending_bufs(struct vdec_session *sess)
-+{
-+	struct codec_hevc *hevc;
-+	u32 ret;
-+
-+	mutex_lock(&sess->codec_lock);
-+	hevc = sess->priv;
-+	if (!hevc) {
-+		mutex_unlock(&sess->codec_lock);
-+		return 0;
-+	}
-+
-+	ret = hevc->frames_num;
-+	mutex_unlock(&sess->codec_lock);
-+
-+	return ret;
-+}
 +
 +/* Update the L0 and L1 reference lists for a given frame */
 +static void codec_hevc_update_frame_refs(struct vdec_session *sess, struct hevc_frame *frame)
@@ -1227,7 +1211,8 @@ index 0000000..cf3e80a
 +	struct codec_hevc *hevc = sess->priv;
 +
 +	while ((tmp = codec_hevc_get_lowest_poc_frame(hevc))) {
-+		if (tmp->referenced || tmp->num_reorder_pic >= hevc->frames_num)
++		if (hevc->curr_poc &&
++		 (tmp->referenced || tmp->num_reorder_pic >= hevc->frames_num))
 +			break;
 +
 +		dev_dbg(sess->core->dev, "DONE frame poc %u; vbuf %u\n",
@@ -1551,10 +1536,8 @@ index 0000000..cf3e80a
 +	union rpm_param *params = &hevc->rpm_param;
 +
 +	vbuf = v4l2_m2m_dst_buf_remove(sess->m2m_ctx);
-+	if (!vbuf) {
-+		dev_warn(sess->core->dev, "Couldn't remove dst buf\n");
++	if (!vbuf)
 +		return NULL;
-+	}
 +
 +	new_frame = kzalloc(sizeof(*new_frame), GFP_KERNEL);
 +	if (!new_frame)
@@ -1955,11 +1938,10 @@ index 0000000..cf3e80a
 +		hevc->iPrevTid0POC = hevc->curr_poc;
 +}
 +
-+static int codec_hevc_process_segment_header(struct vdec_session *sess)
++static void codec_hevc_process_segment_header(struct vdec_session *sess)
 +{
 +	struct codec_hevc *hevc = sess->priv;
 +	union rpm_param *param = &hevc->rpm_param;
-+	u32 slice_segment_address = param->p.slice_segment_address;
 +
 +	if (param->p.first_slice_segment_in_pic_flag == 0) {
 +		hevc->slice_segment_addr = param->p.slice_segment_address;
@@ -1971,6 +1953,14 @@ index 0000000..cf3e80a
 +	}
 +
 +	codec_hevc_update_pocs(sess);
++}
++
++static void codec_hevc_process_segment(struct vdec_session *sess)
++{
++	struct codec_hevc *hevc = sess->priv;
++	struct vdec_core *core = sess->core;
++	union rpm_param *param = &hevc->rpm_param;
++	u32 slice_segment_address = param->p.slice_segment_address;
 +
 +	/* First slice: new frame */
 +	if (slice_segment_address == 0) {
@@ -1978,10 +1968,10 @@ index 0000000..cf3e80a
 +		codec_hevc_output_frames(sess);
 +
 +		hevc->cur_frame = codec_hevc_prepare_new_frame(sess);
++		/* No dst buffer available -> pause the decoding process */
 +		if (!hevc->cur_frame) {
-+			dev_err(sess->core->dev_dec,
-+				"No destination buffer available\n");
-+			return -1;
++			hevc->resume_needed = 1;
++			return;
 +		}
 +
 +		codec_hevc_update_tiles(sess);
@@ -1989,7 +1979,33 @@ index 0000000..cf3e80a
 +		hevc->cur_frame->cur_slice_idx++;
 +	}
 +
-+	return 0;
++	codec_hevc_update_frame_refs(sess, hevc->cur_frame);
++	codec_hevc_update_col_frame(hevc);
++	codec_hevc_update_ldc_flag(hevc);
++	codec_hevc_set_mc(sess, hevc->cur_frame);
++	codec_hevc_set_mcrcc(sess);
++	codec_hevc_set_mpred(sess, hevc->cur_frame, hevc->col_frame);
++	codec_hevc_set_sao(sess, hevc->cur_frame);
++
++	writel_relaxed(readl_relaxed(core->dos_base + HEVC_WAIT_FLAG) | 2, core->dos_base + HEVC_WAIT_FLAG);
++	writel_relaxed(HEVC_CODED_SLICE_SEGMENT_DAT, core->dos_base + HEVC_DEC_STATUS_REG);
++
++	/* Interrupt the firmware's processor */
++	writel_relaxed(AMRISC_MAIN_REQ, core->dos_base + HEVC_MCPU_INTR_REQ);
++}
++
++/* Called when a dst buffer was queued back in */
++static void
++codec_hevc_resume_if_needed(struct vdec_session *sess, struct vb2_buffer *vb)
++{
++	struct codec_hevc *hevc = sess->priv;
++
++	mutex_lock(&sess->codec_lock);
++	if (hevc->resume_needed) {
++		hevc->resume_needed = 0;
++		codec_hevc_process_segment(sess);
++	}
++	mutex_unlock(&sess->codec_lock);
 +}
 +
 +static int codec_hevc_process_rpm(struct vdec_session *sess)
@@ -2070,24 +2086,8 @@ index 0000000..cf3e80a
 +		goto unlock;
 +	}
 +
-+	if (codec_hevc_process_segment_header(sess)) {
-+		vdec_abort(sess);
-+		goto unlock;
-+	}
-+
-+	codec_hevc_update_frame_refs(sess, hevc->cur_frame);
-+	codec_hevc_update_col_frame(hevc);
-+	codec_hevc_update_ldc_flag(hevc);
-+	codec_hevc_set_mc(sess, hevc->cur_frame);
-+	codec_hevc_set_mcrcc(sess);
-+	codec_hevc_set_mpred(sess, hevc->cur_frame, hevc->col_frame);
-+	codec_hevc_set_sao(sess, hevc->cur_frame);
-+
-+	writel_relaxed(readl_relaxed(core->dos_base + HEVC_WAIT_FLAG) | 2, core->dos_base + HEVC_WAIT_FLAG);
-+	writel_relaxed(HEVC_CODED_SLICE_SEGMENT_DAT, core->dos_base + HEVC_DEC_STATUS_REG);
-+
-+	/* Interrupt the firmware's processor */
-+	writel_relaxed(AMRISC_MAIN_REQ, core->dos_base + HEVC_MCPU_INTR_REQ);
++	codec_hevc_process_segment_header(sess);
++	codec_hevc_process_segment(sess);
 +
 +unlock:
 +	mutex_unlock(&sess->codec_lock);
@@ -2109,7 +2109,7 @@ index 0000000..cf3e80a
 +	.stop = codec_hevc_stop,
 +	.isr = codec_hevc_isr,
 +	.threaded_isr = codec_hevc_threaded_isr,
-+	.num_pending_bufs = codec_hevc_num_pending_bufs,
++	.notify_dst_buffer = codec_hevc_resume_if_needed,
 +};
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/codec_hevc.h b/drivers/media/platform/meson/vdec/codec_hevc.h
@@ -2811,10 +2811,10 @@ index 0000000..a30ceed
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/esparser.c b/drivers/media/platform/meson/vdec/esparser.c
 new file mode 100644
-index 0000000..6a3c1f6
+index 0000000..2982112
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/esparser.c
-@@ -0,0 +1,322 @@
+@@ -0,0 +1,314 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -3009,8 +3009,6 @@ index 0000000..6a3c1f6
 +	int ret;
 +	struct vb2_buffer *vb = &vbuf->vb2_buf;
 +	struct vdec_core *core = sess->core;
-+	struct vdec_codec_ops *codec_ops = sess->fmt_out->codec_ops;
-+	u32 num_dst_bufs = 0;
 +	u32 payload_size = vb2_get_plane_payload(vb, 0);
 +	dma_addr_t phy = vb2_dma_contig_plane_dma_addr(vb, 0);
 +
@@ -3019,13 +3017,7 @@ index 0000000..6a3c1f6
 +		return 0;
 +	}
 +
-+	if (codec_ops->num_pending_bufs)
-+		num_dst_bufs = v4l2_m2m_num_dst_bufs_ready(sess->m2m_ctx) +
-+				codec_ops->num_pending_bufs(sess);
-+
-+	if (esparser_vififo_get_free_space(sess) < payload_size ||
-+	    (num_dst_bufs &&
-+	     atomic_read(&sess->esparser_queued_bufs) >= num_dst_bufs))
++	if (esparser_vififo_get_free_space(sess) < payload_size)
 +		return -EAGAIN;
 +
 +	v4l2_m2m_src_buf_remove_by_buf(sess->m2m_ctx, vbuf);
@@ -3911,10 +3903,10 @@ index 0000000..ae9b38e
 +
 diff --git a/drivers/media/platform/meson/vdec/vdec.c b/drivers/media/platform/meson/vdec/vdec.c
 new file mode 100644
-index 0000000..b8b1edf
+index 0000000..df18d51
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec.c
-@@ -0,0 +1,1009 @@
+@@ -0,0 +1,1010 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -3947,7 +3939,7 @@ index 0000000..b8b1edf
 +
 +void vdec_abort(struct vdec_session *sess)
 +{
-+	printk("Aborting decoding session!\n");
++	dev_info(sess->core->dev, "Aborting decoding session!\n");
 +	vb2_queue_error(&sess->m2m_ctx->cap_q_ctx.q);
 +	vb2_queue_error(&sess->m2m_ctx->out_q_ctx.q);
 +}
@@ -4688,7 +4680,7 @@ index 0000000..b8b1edf
 +	vdec_dst_buf_done(sess, vbuf);
 +}
 +
-+/* Userspace will often queue timestamps that are not
++/* Userspace will queue timestamps that are not
 + * in chronological order. Rearrange them here.
 + */
 +void vdec_add_ts_reorder(struct vdec_session *sess, u64 ts)
@@ -4701,6 +4693,7 @@ index 0000000..b8b1edf
 +	new_buf->index = -1;
 +
 +	spin_lock_irqsave(&sess->bufs_spinlock, flags);
++
 +	if (list_empty(&sess->bufs))
 +		goto add_core;
 +
@@ -4926,10 +4919,10 @@ index 0000000..b8b1edf
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/meson/vdec/vdec.h b/drivers/media/platform/meson/vdec/vdec.h
 new file mode 100644
-index 0000000..b97d6b2
+index 0000000..35c37fa
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec.h
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,151 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -4998,7 +4991,6 @@ index 0000000..b97d6b2
 +	int (*start)(struct vdec_session *sess);
 +	int (*stop)(struct vdec_session *sess);
 +	int (*load_extended_firmware)(struct vdec_session *sess, const u8 *data, u32 len);
-+	u32 (*num_pending_bufs)(struct vdec_session *sess);
 +	void (*notify_dst_buffer)(struct vdec_session *sess, struct vb2_buffer *vb);
 +	irqreturn_t (*isr)(struct vdec_session *sess);
 +	irqreturn_t (*threaded_isr)(struct vdec_session *sess);

@@ -10,6 +10,9 @@
   # Kernel extra targets to build
     KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxl-s905x-khadas-vim.dtb"
 
+  # Additional kernel make parameters (for example to specify the u-boot loadaddress)
+    KERNEL_MAKE_EXTRACMD=" dtbs"
+
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
