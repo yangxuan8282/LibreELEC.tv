@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-#BACKUP_DATE=$(date +%Y%m%d%H%M%S)
-
 IMAGE_KERNEL="/flash/Image"
 IMAGE_SYSTEM="/flash/SYSTEM"
 IMAGE_DTB="/flash/dtb.img"
@@ -12,7 +10,7 @@ SCRIPT_EMMC="/flash/boot.scr"
 SCRIPT_EMMC_AML="/flash/emmc_autoscript"
 SCRIPT_ENV="/flash/emmc_uEnv.ini"
 
-DEV_EMMC=/dev/mmcblk1
+DEV_EMMC="/dev/mmcblk1"
 
 install_to_emmc() {
   if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM -a -f $SCRIPT_EMMC -a -f $SCRIPT_ENV ] ; then
@@ -24,7 +22,7 @@ install_to_emmc() {
         umount -f "${DEV_EMMC}p1"
     fi
     echo -n "Formatting SYSTEM partition..."
-    mkfs.vfat -n "LE_EMMC" "${DEV_EMMC}p1" || exit 1
+    mkfs.vfat -n "LE_EMMC" "${DEV_EMMC}p1"
     echo "done."
 
     mkdir -p /tmp/system
@@ -66,11 +64,12 @@ install_to_emmc() {
 	fi
 	
 	echo -n "Formatting DATA partition..."
-        mke2fs -F -q -t ext4 -m 0 "${DEV_EMMC}p2" || exit 1
-        e2fsck -n "${DEV_EMMC}p2" || exit 1
+        mkfs.ext4 -F -L DATA_EMMC "${DEV_EMMC}p2"
+        e2fsck -n "${DEV_EMMC}p2"
 	echo "done."
 	
         mkdir -p /tmp/data
+        echo "Mount DATA partition..."
         mount -o rw "${DEV_EMMC}p2" /tmp/data
 	echo "" > /tmp/data/.please_resize_me
         umount /tmp/data
