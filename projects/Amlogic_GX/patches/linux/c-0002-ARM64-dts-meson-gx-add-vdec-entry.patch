@@ -1,7 +1,7 @@
-From 43288cae354e31b588f8cf17a508330e163ba7f6 Mon Sep 17 00:00:00 2001
+From dcce00c8d962ca2a8fc595357e7e1c798aff2f77 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Thu, 26 Jul 2018 21:51:54 +0200
-Subject: [PATCH 2/4] ARM64: dts: meson-gx: add vdec entry
+Subject: [PATCH 2/7] ARM64: dts: meson-gx: add vdec entry
 
 Add the video decoder dts entry
 ---

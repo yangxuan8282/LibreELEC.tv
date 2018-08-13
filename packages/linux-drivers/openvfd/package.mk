@@ -2,8 +2,8 @@
 # Copyright (C) 2018 Arthur Liberman (arthur_liberman (at) hotmail.com)
 
 PKG_NAME="openvfd"
-PKG_VERSION="2df5162"
-PKG_SHA256="ad14b276afe51fcfe4e48421941ec7b72f5372ccf69a409695a5f8cd8bd8bd87"
+PKG_VERSION="657a0be"
+PKG_SHA256="c575a03d4877a52933a85dea6fb90f02b01402e4eaaafc84083435b44a66133b"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/arthur-liberman/linux_openvfd"

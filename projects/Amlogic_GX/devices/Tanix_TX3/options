@@ -20,8 +20,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS+=""
-  # openvfd depends on linux/amlogic/aml_gpio_consumer.h and needs porting to mainline
+    ADDITIONAL_DRIVERS+=" openvfd"
   # ssv6501 depends on kernel crypto features removed in 4.6 and manufacturer is out of business
 
   # additional packages to install:
