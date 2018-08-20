@@ -1,7 +1,7 @@
-From 0fa15b0a448cac7e10245aa24518a412ba6c2394 Mon Sep 17 00:00:00 2001
+From 2105db5ad4b0cc7ccf006042fe41c90b2f2a96e4 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Sun, 12 Aug 2018 14:21:25 +0200
-Subject: [PATCH 6/7] Cleanups
+Subject: [PATCH 06/11] Cleanups
 
 ---
  drivers/media/platform/meson/vdec/codec_h264.c   | 83 ++++++++++++------------

@@ -10,6 +10,9 @@
   # Kernel extra targets to build
     KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxm-khadas-vim2.dtb"
 
+  # Additional kernel make parameters (for example to specify the u-boot loadaddress)
+    KERNEL_MAKE_EXTRACMD=" dtbs"
+
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
@@ -20,29 +23,8 @@
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
     FIRMWARE+=" brcmfmac_sdio-firmware-aml"
 
-  # OpenGL(X) implementation to use (no / mesa)
-#    OPENGL="mesa"
-
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
-#    OPENGLES="no"
-
-  # include uvesafb support (yes / no)
-#    UVESAFB_SUPPORT="no"
-
-  # Displayserver to use (x11 / no)
-#    DISPLAYSERVER="weston"
-
-  # Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
-  # Space separated list is supported,
-  # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia nouveau"
-#    GRAPHIC_DRIVERS=""
+    OPENGLES="opengl-meson-gbm"
 
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
-#    KODIPLAYER_DRIVER="default"
-
-  # additional drivers to install:
-  # for a list of additinoal drivers see packages/linux-drivers
-  # Space separated list is supported,
-  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-#    ADDITIONAL_DRIVERS=""
-
+    KODIPLAYER_DRIVER="opengl-meson-gbm"

@@ -1,0 +1,25 @@
+From d0a0d76e2d0ec47eb250cfbcc9fe01b96bbc4991 Mon Sep 17 00:00:00 2001
+From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
+Date: Mon, 13 Aug 2018 14:15:43 +0200
+Subject: [PATCH 09/11] Fix default OUTPUT format
+
+---
+ drivers/media/platform/meson/vdec/vdec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/meson/vdec/vdec.c b/drivers/media/platform/meson/vdec/vdec.c
+index a29ea46..9f0ca5f 100644
+--- a/drivers/media/platform/meson/vdec/vdec.c
++++ b/drivers/media/platform/meson/vdec/vdec.c
+@@ -726,7 +726,7 @@ static int vdec_open(struct file *file)
+ 
+ 	sess->core = core;
+ 	sess->fmt_cap = &formats[0];
+-	sess->fmt_out = &formats[1];
++	sess->fmt_out = &formats[2];
+ 	sess->width = 1280;
+ 	sess->height = 720;
+ 	INIT_LIST_HEAD(&sess->bufs);
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
-From 4e75935796180f524ee7f65fded0cde1d1a81715 Mon Sep 17 00:00:00 2001
+From 6a9877076cef399ebf02ab4c859801e6f4666acb Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Sun, 12 Aug 2018 16:20:31 +0200
-Subject: [PATCH 7/7] Add support for V4L2_PIX_FMT_YUV420M
+Subject: [PATCH 07/11] Add support for V4L2_PIX_FMT_YUV420M
 
 Most codecs can now output 3-plane YUV 4:2:0.
 

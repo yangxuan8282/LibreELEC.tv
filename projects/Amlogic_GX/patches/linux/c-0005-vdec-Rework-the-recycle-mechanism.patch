@@ -1,7 +1,7 @@
-From 90c0c47c865cbb2360a3eab09b74acee6f0dcfba Mon Sep 17 00:00:00 2001
+From 9f974958577400abdd42abf98484d230414f69d0 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Sat, 11 Aug 2018 04:07:48 +0200
-Subject: [PATCH 5/7] vdec: Rework the recycle mechanism
+Subject: [PATCH 05/11] vdec: Rework the recycle mechanism
 
 Now the thread code appears only once in vdec.c.
 Added can_recycle and recycle codec ops.

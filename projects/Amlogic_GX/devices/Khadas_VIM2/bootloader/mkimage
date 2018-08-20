@@ -11,7 +11,7 @@ mcopy $RELEASE_DIR/3rdparty/bootloader/* :: 2>&1 > /dev/null || true
 echo "Installing dtb"
 LINUX="$(get_build_dir linux)"
 
-for dtb in $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/*.dtb ; do
+for dtb in $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/meson-gxm*.dtb ; do
   [ -e "$dtb" ] && mcopy -s "$dtb" ::
 done
 

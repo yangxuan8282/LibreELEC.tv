@@ -1,7 +1,7 @@
-From 95ccaefbeb54a6f29f97e53066b80722af76c94e Mon Sep 17 00:00:00 2001
+From 19654e6b9b018720e1509c497e976d3c310dc8f9 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <maxi.jourdan@wanadoo.fr>
 Date: Thu, 2 Aug 2018 18:16:05 +0200
-Subject: [PATCH 4/7] dt-bindings: media: add Amlogic Meson Video Decoder
+Subject: [PATCH 04/11] dt-bindings: media: add Amlogic Meson Video Decoder
  Bindings
 
 Add documentation for the meson vdec dts node.
