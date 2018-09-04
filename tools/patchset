@@ -18,21 +18,21 @@ do_narmstrong(){
   git checkout amlogic/v4.19/drm-overlay
   git fetch origin amlogic/v4.19/drm-overlay
   git reset --hard origin/amlogic/v4.19/drm-overlay
-  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+  git format-patch --start-number 0001 94710cac0ef4ee177a63b5227664b38c95bbf703 # 4.18.0
   for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
 
   # VPU-4K
-  local SEQUENCE="ab"
-  rm projects/Amlogic_GX/patches/linux/$SEQUENCE-* 2&>/dev/null
-  cd ~/linux.narmstrong
-  rm *.patch 2&>/dev/null
-  git checkout amlogic/v4.19/vpu-4k
-  git fetch origin amlogic/v4.19/vpu-4k
-  git reset --hard origin/amlogic/v4.19/vpu-4k
-  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
-  for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
-  mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
+#  local SEQUENCE="ab"
+#  rm projects/Amlogic_GX/patches/linux/$SEQUENCE-* 2&>/dev/null
+#  cd ~/linux.narmstrong
+#  rm *.patch 2&>/dev/null
+#  git checkout amlogic/v4.19/vpu-4k
+#  git fetch origin amlogic/v4.19/vpu-4k
+#  git reset --hard origin/amlogic/v4.19/vpu-4k
+#  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+#  for filename in *.patch; do mv "$filename" "$SEQUENCE-$filename"; done;
+#  mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
 
   # VPU-ALT-CLK
   local SEQUENCE="ac"
@@ -67,12 +67,14 @@ do_elyotna(){
   rm projects/Amlogic_GX/patches/linux/c-* 2&>/dev/null
   cd ~/linux.elyotna
   rm *.patch 2&>/dev/null
-  git checkout 4.18/amlogic-v4l2-m2m
-  git fetch origin 4.18/amlogic-v4l2-m2m
-  git reset --hard origin/4.18/amlogic-v4l2-m2m
-  git format-patch --start-number 0001 acb1872577b346bd15ab3a3f8dff780d6cca4b70 # 4.18-rc7
+  git checkout 4.18/v4l2-m2m-pr
+  git fetch origin 4.18/v4l2-m2m-pr
+  git reset --hard origin/4.18/v4l2-m2m-pr
+  git format-patch --start-number 0001 665dbad80386dcb9ac78ec6153d8d518da9bb50e # 4.18.0 + canvas
   for filename in *.patch; do mv "$filename" "c-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
+  cd $DIR
+  git checkout projects/Amlogic_GX/patches/linux/c-0004-ARM64-dts-meson-add-vdec-entries.patch
 }
 
 do_kwiboo(){

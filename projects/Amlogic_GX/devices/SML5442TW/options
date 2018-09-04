@@ -25,7 +25,3 @@
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
     FIRMWARE="ath10k-firmware meson-firmware qca-firmware"
-
-  # remote control maps to configure in v4l-utils
-  # Space separated list is supported.
-    KEYMAP+=" philips-rc242 amlogic_multimap"

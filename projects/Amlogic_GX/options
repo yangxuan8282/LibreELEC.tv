@@ -144,5 +144,9 @@
 #    ADDON_SERVER_URL="https://amlgx.libreelec.tv"
 
   # set the addon dirs
-#    ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
-#    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+    ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+
+  # remote control keymaps to use in multimap_custom
+  # Space separated list is supported,
+    MULTIMAP_CUSTOM="default"

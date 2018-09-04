@@ -28,8 +28,8 @@
 +#include <linux/module.h>
 +
 +/*
-+ * This keymap is used with the Oranth Tanix TX3 mini and
-+ * some other Android STB devices.
++ * This keymap is used with the Oranth Tanix TX3 mini
++ * and other Android STB devices.
 + */
 +
 +static struct rc_map_table tanix_tx3mini[] = {
@@ -71,7 +71,7 @@
 +	{ 0x8038, KEY_8 },
 +	{ 0x8039, KEY_9 },
 +
-+	{ 0x8058, KEY_TEXT }, // 1/a
++	{ 0x8058, KEY_SUBTITLE }, // 1/a
 +	{ 0x8030, KEY_0 },
 +	{ 0x8044, KEY_DELETE },
 +};

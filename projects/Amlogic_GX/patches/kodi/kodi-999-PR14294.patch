@@ -1,0 +1,25 @@
+From a8e362812dffe9a626004bd2852ec149b32ddba3 Mon Sep 17 00:00:00 2001
+From: AreaScout <d.mehrwald@gmail.com>
+Date: Mon, 13 Aug 2018 22:41:48 +0200
+Subject: [PATCH] gbm/windowing: fix compile when using older EGL headers +
+ assert message on size difference
+
+---
+ xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp b/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
+index 81330f67d74b..5e0df5bbd248 100644
+--- a/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
++++ b/xbmc/windowing/gbm/WinSystemGbmEGLContext.cpp
+@@ -54,7 +54,9 @@ bool CWinSystemGbmEGLContext::CreateNewWindow(const std::string& name,
+     return false;
+   }
+ 
+-  if (!m_eglContext.CreatePlatformSurface(m_GBM->GetSurface(), m_GBM->GetSurface()))
++  static_assert(sizeof(EGLNativeWindowType) == sizeof(gbm_surface*), "Declaration specifier differs in size");
++
++  if (!m_eglContext.CreatePlatformSurface(m_GBM->GetSurface(), reinterpret_cast<EGLNativeWindowType>(m_GBM->GetSurface())))
+   {
+     return false;
+   }

@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="v4l-utils"
-PKG_VERSION="1.14.1"
-PKG_SHA256="7974e5626447407d8a1ed531da0461c0fe00e599a696cb548a240d17d3519005"
+PKG_VERSION="1.14.2"
+PKG_SHA256="e6b962c4b1253cf852c31da13fd6b5bb7cbe5aa9e182881aec55123bae680692"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://linuxtv.org/"
@@ -88,17 +89,23 @@ post_makeinstall_target() {
   # create multimap_default
   create_multimap multimap_default "RC6 NEC" $default_map
 
-  # create multimap_custom
-  if [ -n "$MULTIMAP_CUSTOM" ]; then
-    create_multimap multimap_custom "RC6 NEC" $multimap_default $MULTIMAP_CUSTOM
-  else
-    create_multimap multimap_custom "RC6 NEC" $multimap_default \
-      odroid wetek_hub wetek_play_2 minix_neo
-  fi
-
   # use multi-keymap instead of default one
   sed -i '/^\*\s*rc-rc6-mce\s*rc6_mce/d' $INSTALL/etc/rc_maps.cfg
-  cat << EOF >> $INSTALL/etc/rc_maps.cfg
+
+  # create multimap_custom
+  if [ -z "$MULTIMAP_CUSTOM" -o "$MULTIMAP_CUSTOM" = "default" ]; then
+    create_multimap multimap_custom "RC6 NEC" $multimap_default
+    cat << EOF >> $INSTALL/etc/rc_maps.cfg
+#
+# Custom LibreELEC configuration starts here
+#
+# multimap for MCE receivers
+# *             rc-rc6-mce      rc6_mce
+*               rc-rc6-mce      multimap_default
+EOF
+  else
+    create_multimap multimap_custom "RC6 NEC" $multimap_default $MULTIMAP_CUSTOM
+    cat << EOF >> $INSTALL/etc/rc_maps.cfg
 #
 # Custom LibreELEC configuration starts here
 #
@@ -108,4 +115,5 @@ post_makeinstall_target() {
 # multimap for amlogic devices
 meson-ir	*		multimap_custom
 EOF
+  fi
 }

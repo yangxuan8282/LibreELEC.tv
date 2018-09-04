@@ -28,4 +28,4 @@
 
   # remote control keymaps to use in multimap_custom
   # Space separated list is supported,
-    MULTIMAP_CUSTOM+="wetek_hub"
+    MULTIMAP_CUSTOM="wetek_hub"

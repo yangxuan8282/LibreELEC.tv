@@ -1,4 +1,4 @@
-From 5cae0d652161d6c917a402e59b9b67c671783af5 Mon Sep 17 00:00:00 2001
+From e7d20033306bbbb66fd83fb98795e573d70d8f7b Mon Sep 17 00:00:00 2001
 From: Neil Armstrong <narmstrong@baylibre.com>
 Date: Thu, 2 Aug 2018 10:00:01 +0200
 Subject: [PATCH 5/5] [WIP] drm/meson: Support Overlay plane for video
@@ -35,7 +35,7 @@ index bd67429..d4ea82f 100644
  obj-$(CONFIG_DRM_MESON) += meson-drm.o
  obj-$(CONFIG_DRM_MESON_DW_HDMI) += meson_dw_hdmi.o
 diff --git a/drivers/gpu/drm/meson/meson_crtc.c b/drivers/gpu/drm/meson/meson_crtc.c
-index 506b361..a686de8 100644
+index 1ca9c6c..a4b9463 100644
 --- a/drivers/gpu/drm/meson/meson_crtc.c
 +++ b/drivers/gpu/drm/meson/meson_crtc.c
 @@ -25,6 +25,7 @@
@@ -93,20 +93,20 @@ index 506b361..a686de8 100644
 +
 +		switch (priv->viu.vd1_planes) {
 +		case 3:
-+			priv->canvas_ops->setup(priv->canvas_id_vd1_2,
++			meson_canvas_config(priv->canvas, priv->canvas_id_vd1_2,
 +				   priv->viu.vd1_addr2, priv->viu.vd1_stride2,
 +				   priv->viu.vd1_height2, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, 7);
++				   MESON_CANVAS_BLKMODE_LINEAR, MESON_CANVAS_ENDIAN_SWAP64);
 +		case 2:
-+			priv->canvas_ops->setup(priv->canvas_id_vd1_1,
++			meson_canvas_config(priv->canvas, priv->canvas_id_vd1_1,
 +				   priv->viu.vd1_addr1, priv->viu.vd1_stride1,
 +				   priv->viu.vd1_height1, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, 7);
++				   MESON_CANVAS_BLKMODE_LINEAR, MESON_CANVAS_ENDIAN_SWAP64);
 +		case 1:
-+			priv->canvas_ops->setup(priv->canvas_id_vd1_0,
++			meson_canvas_config(priv->canvas, priv->canvas_id_vd1_0,
 +				   priv->viu.vd1_addr0, priv->viu.vd1_stride0,
 +				   priv->viu.vd1_height0, MESON_CANVAS_WRAP_NONE,
-+				   MESON_CANVAS_BLKMODE_LINEAR, 7);
++				   MESON_CANVAS_BLKMODE_LINEAR, MESON_CANVAS_ENDIAN_SWAP64);
 +		};
 +
 +		writel_relaxed(priv->viu.vd1_if0_gen_reg,
@@ -250,10 +250,10 @@ index 506b361..a686de8 100644
  
  	spin_lock_irqsave(&priv->drm->event_lock, flags);
 diff --git a/drivers/gpu/drm/meson/meson_drv.c b/drivers/gpu/drm/meson/meson_drv.c
-index de46833..2a002cc 100644
+index fb5b0e3..04b634e 100644
 --- a/drivers/gpu/drm/meson/meson_drv.c
 +++ b/drivers/gpu/drm/meson/meson_drv.c
-@@ -42,6 +42,7 @@
+@@ -41,6 +41,7 @@
  
  #include "meson_drv.h"
  #include "meson_plane.h"
@@ -261,23 +261,23 @@ index de46833..2a002cc 100644
  #include "meson_crtc.h"
  #include "meson_venc_cvbs.h"
  
-@@ -241,6 +242,15 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
- 	ret = priv->canvas_ops->alloc(&priv->canvas_id_osd1);
+@@ -224,6 +225,15 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+ 	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_osd1);
  	if (ret)
  		goto free_drm;
-+	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_0);
++	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_0);
 +	if (ret)
 +		goto free_drm;
-+	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_1);
++	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_1);
 +	if (ret)
 +		goto free_drm;
-+	ret = priv->canvas_ops->alloc(&priv->canvas_id_vd1_2);
++	ret = meson_canvas_alloc(priv->canvas, &priv->canvas_id_vd1_2);
 +	if (ret)
 +		goto free_drm;
  
  	priv->vsync_irq = platform_get_irq(pdev, 0);
  
-@@ -278,6 +288,10 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
+@@ -261,6 +271,10 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
  	if (ret)
  		goto free_drm;
  
@@ -289,16 +289,16 @@ index de46833..2a002cc 100644
  	if (ret)
  		goto free_drm;
 diff --git a/drivers/gpu/drm/meson/meson_drv.h b/drivers/gpu/drm/meson/meson_drv.h
-index dfea959..e9305d7 100644
+index 9e902a6..cc2288c 100644
 --- a/drivers/gpu/drm/meson/meson_drv.h
 +++ b/drivers/gpu/drm/meson/meson_drv.h
 @@ -33,11 +33,15 @@ struct meson_drm {
  
- 	struct meson_canvas_platform_data *canvas_ops;
- 	uint8_t canvas_id_osd1;
-+	uint8_t canvas_id_vd1_0;
-+	uint8_t canvas_id_vd1_1;
-+	uint8_t canvas_id_vd1_2;
+ 	struct meson_canvas *canvas;
+ 	u8 canvas_id_osd1;
++	u8 canvas_id_vd1_0;
++	u8 canvas_id_vd1_1;
++	u8 canvas_id_vd1_2;
  
  	struct drm_device *drm;
  	struct drm_crtc *crtc;

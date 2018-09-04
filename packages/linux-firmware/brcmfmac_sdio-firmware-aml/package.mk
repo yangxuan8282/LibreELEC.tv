@@ -3,8 +3,8 @@
 # Copyright (C) 2016-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="brcmfmac_sdio-firmware-aml"
-PKG_VERSION="734777e"
-PKG_SHA256=""
+PKG_VERSION="2e52544c15f8522eb32a86cfb9ce6c1e880a8db7"
+PKG_SHA256="6cb424fa5e5428693944026beecad094ac56cb819ff5f79528aff61b5928413a"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://github.com/chewitt/brcmfmac_sdio-firmware-aml"

@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="meson-firmware"
-PKG_VERSION="9cb39a4"
+PKG_VERSION="9cb39a43dcb2cc19253816b0fef8f3698e344f4f"
 PKG_SHA256="03fdaec5421fcc125f17d8dcf925aa06580a4c0fc8ee99437bbb041ba95ea600"
 PKG_ARCH="any"
 PKG_LICENSE="GPLv2"
