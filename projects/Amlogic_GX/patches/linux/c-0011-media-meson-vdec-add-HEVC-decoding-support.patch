@@ -1,18 +1,18 @@
-From 3ff8b6ea023464f8de12835ed90211e3f66ed0f4 Mon Sep 17 00:00:00 2001
+From 0e78e836de44fc67594a888e6e91c664914b2b1c Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 18:48:35 +0200
-Subject: [PATCH 10/12] media: meson: vdec: add HEVC decoding support
+Subject: [PATCH 11/11] media: meson: vdec: add HEVC decoding support
 
 Add support for V4L2_PIX_FMT_HEVC
 ---
  drivers/media/platform/meson/vdec/Makefile        |    4 +-
- drivers/media/platform/meson/vdec/codec_hevc.c    | 1517 +++++++++++++++++++++
+ drivers/media/platform/meson/vdec/codec_hevc.c    | 1527 +++++++++++++++++++++
  drivers/media/platform/meson/vdec/codec_hevc.h    |   13 +
- drivers/media/platform/meson/vdec/hevc_regs.h     |  742 ++++++++++
- drivers/media/platform/meson/vdec/vdec_hevc.c     |  191 +++
+ drivers/media/platform/meson/vdec/hevc_regs.h     |  195 +++
+ drivers/media/platform/meson/vdec/vdec_hevc.c     |  197 +++
  drivers/media/platform/meson/vdec/vdec_hevc.h     |   22 +
  drivers/media/platform/meson/vdec/vdec_platform.c |   32 +
- 7 files changed, 2519 insertions(+), 2 deletions(-)
+ 7 files changed, 1988 insertions(+), 2 deletions(-)
  create mode 100644 drivers/media/platform/meson/vdec/codec_hevc.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_hevc.h
  create mode 100644 drivers/media/platform/meson/vdec/hevc_regs.h
@@ -35,10 +35,10 @@ index 20c23f9..f34b7a2 100644
  obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_hevc.c b/drivers/media/platform/meson/vdec/codec_hevc.c
 new file mode 100644
-index 0000000..5e69717
+index 0000000..6a7e667
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_hevc.c
-@@ -0,0 +1,1517 @@
+@@ -0,0 +1,1527 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -83,13 +83,6 @@ index 0000000..5e69717
 +#define HEVC_AUX_ADR		HEVC_ASSIST_SCRATCH_L
 +#define HEVC_AUX_DATA_SIZE	HEVC_ASSIST_SCRATCH_M
 +#define HEVC_DECODE_SIZE	HEVC_ASSIST_SCRATCH_N
-+
-+#define HEVCD_MPP_ANC2AXI_TBL_DATA (0x3464 * 4)
-+
-+#define HEVC_CM_BODY_START_ADDR	(0x3626 * 4)
-+#define HEVC_CM_BODY_LENGTH	(0x3627 * 4)
-+#define HEVC_CM_HEADER_LENGTH	(0x3629 * 4)
-+#define HEVC_CM_HEADER_OFFSET	(0x362b * 4)
 +
 +#define AMRISC_MAIN_REQ		 0x04
 +
@@ -320,7 +313,7 @@ index 0000000..5e69717
 +	u32 width;
 +	u32 height;
 +
-+	u32 iPrevTid0POC;
++	u32 prev_tid0_poc;
 +	u32 slice_segment_addr;
 +	u32 slice_addr;
 +	u32 ldc_flag;
@@ -343,7 +336,7 @@ index 0000000..5e69717
 +	/* In case of downsampling (decoding with FBC but outputting in NV12M),
 +	 * we need to allocate additional buffers for FBC.
 +	 */
-+	 void *fbc_buffer_vaddr[24];
++	 void      *fbc_buffer_vaddr[24];
 +	 dma_addr_t fbc_buffer_paddr[24];
 +};
 +
@@ -560,7 +553,8 @@ index 0000000..5e69717
 +
 +	while ((tmp = codec_hevc_get_lowest_poc_frame(hevc))) {
 +		if (hevc->curr_poc &&
-+		 (tmp->referenced || tmp->num_reorder_pic >= hevc->frames_num))
++		    (tmp->referenced ||
++		     tmp->num_reorder_pic >= hevc->frames_num))
 +			break;
 +
 +		dev_dbg(sess->core->dev, "DONE frame poc %u; vbuf %u\n",
@@ -770,8 +764,9 @@ index 0000000..5e69717
 +{
 +	struct amvdec_core *core = sess->core;
 +	struct codec_hevc *hevc;
-+	int ret;
++	u32 val;
 +	int i;
++	int ret;
 +
 +	hevc = kzalloc(sizeof(*hevc), GFP_KERNEL);
 +	if (!hevc)
@@ -784,17 +779,13 @@ index 0000000..5e69717
 +	if (ret)
 +		goto free_hevc;
 +
-+	amvdec_write_dos(core, HEVC_PARSER_VERSION, 0x5a5a55aa);
-+	amvdec_write_dos(core, DOS_SW_RESET3, BIT(14));
-+	amvdec_write_dos(core, HEVC_CABAC_CONTROL, 0);
-+	amvdec_write_dos(core, HEVC_PARSER_CORE_CONTROL, 0);
-+	amvdec_write_dos(core, HEVC_STREAM_CONTROL, amvdec_read_dos(core, HEVC_STREAM_CONTROL) | 1);
-+	amvdec_write_dos(core, HEVC_SHIFT_STARTCODE, 0x00000100);
-+	amvdec_write_dos(core, HEVC_SHIFT_EMULATECODE, 0x00000300);
-+	writel_relaxed((amvdec_read_dos(core, HEVC_PARSER_INT_CONTROL) & 0x03ffffff) |
-+			(3 << 29) | (2 << 26) | BIT(24) | BIT(22) | BIT(7) | BIT(4) | 1, core->dos_base + HEVC_PARSER_INT_CONTROL);
-+	amvdec_write_dos(core, HEVC_SHIFT_STATUS, amvdec_read_dos(core, HEVC_SHIFT_STATUS) | BIT(1) | 1);
-+	amvdec_write_dos(core, HEVC_SHIFT_CONTROL, (3 << 6) | (2 << 4) | (2 << 1) | 1);
++	amvdec_write_dos_bits(core, HEVC_STREAM_CONTROL, BIT(0));
++
++	val = amvdec_read_dos(core, HEVC_PARSER_INT_CONTROL) & 0x03ffffff;
++	val |= (3 << 29) | BIT(27) | BIT(24) | BIT(22) | BIT(7) | BIT(4) | BIT(0);
++	amvdec_write_dos(core, HEVC_PARSER_INT_CONTROL, val);
++	amvdec_write_dos_bits(core, HEVC_SHIFT_STATUS, BIT(1) | BIT(0));
++	amvdec_write_dos(core, HEVC_SHIFT_CONTROL, (3 << 6) | BIT(5) | BIT(2) | BIT(0));
 +	amvdec_write_dos(core, HEVC_CABAC_CONTROL, 1);
 +	amvdec_write_dos(core, HEVC_PARSER_CORE_CONTROL, 1);
 +	amvdec_write_dos(core, HEVC_DEC_STATUS_REG, 0);
@@ -812,9 +803,9 @@ index 0000000..5e69717
 +	amvdec_write_dos(core, HEVC_PARSER_CMD_SKIP_0, PARSER_CMD_SKIP_CFG_0);
 +	amvdec_write_dos(core, HEVC_PARSER_CMD_SKIP_1, PARSER_CMD_SKIP_CFG_1);
 +	amvdec_write_dos(core, HEVC_PARSER_CMD_SKIP_2, PARSER_CMD_SKIP_CFG_2);
-+	amvdec_write_dos(core, HEVC_PARSER_IF_CONTROL, BIT(5) | BIT(2) | 1);
++	amvdec_write_dos(core, HEVC_PARSER_IF_CONTROL, BIT(5) | BIT(2) | BIT(0));
 +
-+	amvdec_write_dos(core, HEVCD_IPP_TOP_CNTL, 1);
++	amvdec_write_dos(core, HEVCD_IPP_TOP_CNTL, BIT(0));
 +	amvdec_write_dos(core, HEVCD_IPP_TOP_CNTL, BIT(1));
 +
 +	amvdec_write_dos(core, HEVC_WAIT_FLAG, 1);
@@ -1111,43 +1102,20 @@ index 0000000..5e69717
 +		(frame->vbuf->vb2_buf.index * MPRED_MV_BUF_SIZE);
 +}
 +
-+/* Update the necessary information for motion prediction with the current slice */
-+static void codec_hevc_set_mpred(struct amvdec_session *sess, struct hevc_frame *frame, struct hevc_frame *col_frame)
++static void
++codec_hevc_set_mpred_ctrl(struct amvdec_core *core, struct codec_hevc *hevc)
 +{
-+	struct amvdec_core *core = sess->core;
-+	struct codec_hevc *hevc = sess->priv;
 +	union rpm_param *param = &hevc->rpm_param;
-+	u32 *ref_num = frame->ref_num;
-+	u32 *ref_poc_l0 = frame->ref_poc_list[0][frame->cur_slice_idx];
-+	u32 *ref_poc_l1 = frame->ref_poc_list[1][frame->cur_slice_idx];
-+	u32 lcu_size_log2 = ilog2(hevc->lcu_size);
-+	u32 mv_mem_unit = lcu_size_log2 == 6 ? 0x200 : lcu_size_log2 == 5 ? 0x80 : 0x20;
-+	u32 slice_segment_address = param->p.slice_segment_address;
-+	u32 max_num_merge_cand = 5 - param->p.five_minus_max_num_merge_cand;
-+	u32 plevel = param->p.log2_parallel_merge_level;
-+	u32 col_from_l0_flag = param->p.collocated_from_l0_flag;
-+	u32 tmvp_flag = param->p.slice_temporal_mvp_enable_flag;
-+	u32 is_next_slice_segment = param->p.dependent_slice_segment_flag ? 1 : 0;
 +	u32 slice_type = param->p.slice_type;
-+	dma_addr_t col_mv_rd_start_addr, col_mv_rd_ptr, col_mv_rd_end_addr;
-+	dma_addr_t mpred_mv_wr_ptr;
++	u32 is_next_slice_segment = param->p.dependent_slice_segment_flag ? 1 : 0;
++	u32 tmvp_flag = param->p.slice_temporal_mvp_enable_flag;
++	u32 col_from_l0_flag = param->p.collocated_from_l0_flag;
++	u32 lcu_size_log2 = ilog2(hevc->lcu_size);
++	u32 plevel = param->p.log2_parallel_merge_level;
++	u32 max_num_merge_cand = 5 - param->p.five_minus_max_num_merge_cand;
++	u32 slice_segment_address = param->p.slice_segment_address;
 +	u32 mv_rd_en = 1;
 +	u32 val;
-+	int i;
-+
-+	val = amvdec_read_dos(core, HEVC_MPRED_CURR_LCU);
-+
-+	col_mv_rd_start_addr = codec_hevc_get_frame_mv_paddr(hevc, col_frame);
-+	mpred_mv_wr_ptr = codec_hevc_get_frame_mv_paddr(hevc, frame) + (hevc->slice_addr * mv_mem_unit);
-+	col_mv_rd_ptr = col_mv_rd_start_addr + (hevc->slice_addr * mv_mem_unit);
-+	col_mv_rd_end_addr = col_mv_rd_start_addr + ((hevc->lcu_x_num * hevc->lcu_y_num) * mv_mem_unit);
-+
-+	amvdec_write_dos(core, HEVC_MPRED_MV_WR_START_ADDR, codec_hevc_get_frame_mv_paddr(hevc, frame));
-+	amvdec_write_dos(core, HEVC_MPRED_MV_RD_START_ADDR, col_mv_rd_start_addr);
-+
-+	val = ((hevc->lcu_x_num - hevc->tile_width_lcu) * mv_mem_unit);
-+	amvdec_write_dos(core, HEVC_MPRED_MV_WR_ROW_JUMP, val);
-+	amvdec_write_dos(core, HEVC_MPRED_MV_RD_ROW_JUMP, val);
 +
 +	if (slice_type == I_SLICE)
 +		mv_rd_en = 0;
@@ -1163,7 +1131,8 @@ index 0000000..5e69717
 +	      mv_rd_en << 11 |
 +	      BIT(13) |
 +	      lcu_size_log2 << 16 |
-+	      3 << 20 | plevel << 24;
++	      3 << 20 |
++	      plevel << 24;
 +
 +	if (slice_segment_address == 0)
 +		val |= BIT(2); /* new frame */
@@ -1172,6 +1141,62 @@ index 0000000..5e69717
 +
 +	val = max_num_merge_cand | 2 << 4 | 3 << 8 | 5 << 12 | 36 << 16;
 +	amvdec_write_dos(core, HEVC_MPRED_CTRL1, val);
++}
++
++static void codec_hevc_set_mpred_mv(struct amvdec_core *core,
++				    struct codec_hevc *hevc,
++				    struct hevc_frame *frame,
++				    struct hevc_frame *col_frame)
++{
++	union rpm_param *param = &hevc->rpm_param;
++	u32 lcu_size_log2 = ilog2(hevc->lcu_size);
++	u32 mv_mem_unit = lcu_size_log2 == 6 ? 0x200 : lcu_size_log2 == 5 ? 0x80 : 0x20;
++	u32 slice_segment_address = param->p.slice_segment_address;
++	dma_addr_t col_mv_rd_start_addr, col_mv_rd_ptr, col_mv_rd_end_addr;
++	dma_addr_t mpred_mv_wr_ptr;
++	u32 val;
++
++	val = amvdec_read_dos(core, HEVC_MPRED_CURR_LCU);
++
++	col_mv_rd_start_addr = codec_hevc_get_frame_mv_paddr(hevc, col_frame);
++	mpred_mv_wr_ptr = codec_hevc_get_frame_mv_paddr(hevc, frame) + (hevc->slice_addr * mv_mem_unit);
++	col_mv_rd_ptr = col_mv_rd_start_addr + (hevc->slice_addr * mv_mem_unit);
++	col_mv_rd_end_addr = col_mv_rd_start_addr + ((hevc->lcu_x_num * hevc->lcu_y_num) * mv_mem_unit);
++
++	amvdec_write_dos(core, HEVC_MPRED_MV_WR_START_ADDR, codec_hevc_get_frame_mv_paddr(hevc, frame));
++	amvdec_write_dos(core, HEVC_MPRED_MV_RD_START_ADDR, col_mv_rd_start_addr);
++
++	val = ((hevc->lcu_x_num - hevc->tile_width_lcu) * mv_mem_unit);
++	amvdec_write_dos(core, HEVC_MPRED_MV_WR_ROW_JUMP, val);
++	amvdec_write_dos(core, HEVC_MPRED_MV_RD_ROW_JUMP, val);
++
++	if (slice_segment_address == 0) {
++		amvdec_write_dos(core, HEVC_MPRED_ABV_START_ADDR,
++				 hevc->workspace_paddr + MPRED_ABV_OFFSET);
++		amvdec_write_dos(core, HEVC_MPRED_MV_WPTR, mpred_mv_wr_ptr);
++		amvdec_write_dos(core, HEVC_MPRED_MV_RPTR, col_mv_rd_start_addr);
++	} else {
++		amvdec_write_dos(core, HEVC_MPRED_MV_RPTR, col_mv_rd_ptr);
++	}
++
++	amvdec_write_dos(core, HEVC_MPRED_MV_RD_END_ADDR, col_mv_rd_end_addr);
++}
++
++/* Update motion prediction with the current slice */
++static void codec_hevc_set_mpred(struct amvdec_session *sess,
++				 struct hevc_frame *frame,
++				 struct hevc_frame *col_frame)
++{
++	struct amvdec_core *core = sess->core;
++	struct codec_hevc *hevc = sess->priv;
++	u32 *ref_num = frame->ref_num;
++	u32 *ref_poc_l0 = frame->ref_poc_list[0][frame->cur_slice_idx];
++	u32 *ref_poc_l1 = frame->ref_poc_list[1][frame->cur_slice_idx];
++	u32 val;
++	int i;
++
++	codec_hevc_set_mpred_ctrl(core, hevc);
++	codec_hevc_set_mpred_mv(core, hevc, frame, col_frame);
 +
 +	amvdec_write_dos(core, HEVC_MPRED_PIC_SIZE, hevc->width | (hevc->height << 16));
 +
@@ -1193,17 +1218,6 @@ index 0000000..5e69717
 +		amvdec_write_dos(core, HEVC_MPRED_L0_REF00_POC + i * 4, ref_poc_l0[i]);
 +		amvdec_write_dos(core, HEVC_MPRED_L1_REF00_POC + i * 4, ref_poc_l1[i]);
 +	}
-+
-+	if (slice_segment_address == 0) {
-+		amvdec_write_dos(core, HEVC_MPRED_ABV_START_ADDR,
-+				 hevc->workspace_paddr + MPRED_ABV_OFFSET);
-+		amvdec_write_dos(core, HEVC_MPRED_MV_WPTR, mpred_mv_wr_ptr);
-+		amvdec_write_dos(core, HEVC_MPRED_MV_RPTR, col_mv_rd_start_addr);
-+	} else {
-+		amvdec_write_dos(core, HEVC_MPRED_MV_RPTR, col_mv_rd_ptr);
-+	}
-+
-+	amvdec_write_dos(core, HEVC_MPRED_MV_RD_END_ADDR, col_mv_rd_end_addr);
 +}
 +
 +/*  motion compensation reference cache controller */
@@ -1220,11 +1234,7 @@ index 0000000..5e69717
 +		l1_cnt = hevc->cur_frame->ref_num[1];
 +	}
 +
-+	/* reset mcrcc */
-+	amvdec_write_dos(core, HEVCD_MCRCC_CTL1, 0x02);
-+
 +	if (hevc->cur_frame->cur_slice_type == I_SLICE) {
-+		/* remove reset -- disables clock */
 +		amvdec_write_dos(core, HEVCD_MCRCC_CTL1, 0);
 +		return;
 +	}
@@ -1364,13 +1374,13 @@ index 0000000..5e69717
 +	    nal_unit_type == NAL_UNIT_CODED_SLICE_IDR_N_LP) {
 +		hevc->curr_poc = 0;
 +		if ((temporal_id - 1) == 0)
-+			hevc->iPrevTid0POC = hevc->curr_poc;
++			hevc->prev_tid0_poc = hevc->curr_poc;
 +
 +		return;
 +	}
 +
-+	prev_poc_lsb = hevc->iPrevTid0POC % max_poc_lsb;
-+	prev_poc_msb = hevc->iPrevTid0POC - prev_poc_lsb;
++	prev_poc_lsb = hevc->prev_tid0_poc % max_poc_lsb;
++	prev_poc_msb = hevc->prev_tid0_poc - prev_poc_lsb;
 +
 +	if ((poc_lsb < prev_poc_lsb) && ((prev_poc_lsb - poc_lsb) >= (max_poc_lsb / 2)))
 +		poc_msb = prev_poc_msb + max_poc_lsb;
@@ -1386,7 +1396,7 @@ index 0000000..5e69717
 +
 +	hevc->curr_poc = (poc_msb + poc_lsb);
 +	if ((temporal_id - 1) == 0)
-+		hevc->iPrevTid0POC = hevc->curr_poc;
++		hevc->prev_tid0_poc = hevc->curr_poc;
 +}
 +
 +static void codec_hevc_process_segment_header(struct amvdec_session *sess)
@@ -1578,758 +1588,211 @@ index 0000000..5017e874
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/hevc_regs.h b/drivers/media/platform/meson/vdec/hevc_regs.h
 new file mode 100644
-index 0000000..ae9b38e
+index 0000000..6de1f06
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/hevc_regs.h
-@@ -0,0 +1,742 @@
+@@ -0,0 +1,195 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2015 Amlogic, Inc. All rights reserved.
 + */
 +
-+#ifndef HEVC_REGS_HEADERS__
-+#define HEVC_REGS_HEADERS__
-+/*add from M8M2*/
-+#define HEVC_ASSIST_AFIFO_CTRL (0x3001 * 4)
-+#define HEVC_ASSIST_AFIFO_CTRL1 (0x3002 * 4)
-+#define HEVC_ASSIST_GCLK_EN (0x3003 * 4)
-+#define HEVC_ASSIST_SW_RESET (0x3004 * 4)
-+#define HEVC_ASSIST_AMR1_INT0 (0x3025 * 4)
-+#define HEVC_ASSIST_AMR1_INT1 (0x3026 * 4)
-+#define HEVC_ASSIST_AMR1_INT2 (0x3027 * 4)
-+#define HEVC_ASSIST_AMR1_INT3 (0x3028 * 4)
-+#define HEVC_ASSIST_AMR1_INT4 (0x3029 * 4)
-+#define HEVC_ASSIST_AMR1_INT5 (0x302a * 4)
-+#define HEVC_ASSIST_AMR1_INT6 (0x302b * 4)
-+#define HEVC_ASSIST_AMR1_INT7 (0x302c * 4)
-+#define HEVC_ASSIST_AMR1_INT8 (0x302d * 4)
-+#define HEVC_ASSIST_AMR1_INT9 (0x302e * 4)
-+#define HEVC_ASSIST_AMR1_INTA (0x302f * 4)
-+#define HEVC_ASSIST_AMR1_INTB (0x3030 * 4)
-+#define HEVC_ASSIST_AMR1_INTC (0x3031 * 4)
-+#define HEVC_ASSIST_AMR1_INTD (0x3032 * 4)
-+#define HEVC_ASSIST_AMR1_INTE (0x3033 * 4)
-+#define HEVC_ASSIST_AMR1_INTF (0x3034 * 4)
-+#define HEVC_ASSIST_AMR2_INT0 (0x3035 * 4)
-+#define HEVC_ASSIST_AMR2_INT1 (0x3036 * 4)
-+#define HEVC_ASSIST_AMR2_INT2 (0x3037 * 4)
-+#define HEVC_ASSIST_AMR2_INT3 (0x3038 * 4)
-+#define HEVC_ASSIST_AMR2_INT4 (0x3039 * 4)
-+#define HEVC_ASSIST_AMR2_INT5 (0x303a * 4)
-+#define HEVC_ASSIST_AMR2_INT6 (0x303b * 4)
-+#define HEVC_ASSIST_AMR2_INT7 (0x303c * 4)
-+#define HEVC_ASSIST_AMR2_INT8 (0x303d * 4)
-+#define HEVC_ASSIST_AMR2_INT9 (0x303e * 4)
-+#define HEVC_ASSIST_AMR2_INTA (0x303f * 4)
-+#define HEVC_ASSIST_AMR2_INTB (0x3040 * 4)
-+#define HEVC_ASSIST_AMR2_INTC (0x3041 * 4)
-+#define HEVC_ASSIST_AMR2_INTD (0x3042 * 4)
-+#define HEVC_ASSIST_AMR2_INTE (0x3043 * 4)
-+#define HEVC_ASSIST_AMR2_INTF (0x3044 * 4)
-+#define HEVC_ASSIST_MBX_SSEL (0x3045 * 4)
-+#define HEVC_ASSIST_TIMER0_LO (0x3060 * 4)
-+#define HEVC_ASSIST_TIMER0_HI (0x3061 * 4)
-+#define HEVC_ASSIST_TIMER1_LO (0x3062 * 4)
-+#define HEVC_ASSIST_TIMER1_HI (0x3063 * 4)
-+#define HEVC_ASSIST_DMA_INT (0x3064 * 4)
-+#define HEVC_ASSIST_DMA_INT_MSK (0x3065 * 4)
-+#define HEVC_ASSIST_DMA_INT2 (0x3066 * 4)
-+#define HEVC_ASSIST_DMA_INT_MSK2 (0x3067 * 4)
-+#define HEVC_ASSIST_MBOX0_IRQ_REG (0x3070 * 4)
-+#define HEVC_ASSIST_MBOX0_CLR_REG (0x3071 * 4)
-+#define HEVC_ASSIST_MBOX0_MASK (0x3072 * 4)
-+#define HEVC_ASSIST_MBOX0_FIQ_SEL (0x3073 * 4)
-+#define HEVC_ASSIST_MBOX1_IRQ_REG (0x3074 * 4)
-+#define HEVC_ASSIST_MBOX1_CLR_REG (0x3075 * 4)
-+#define HEVC_ASSIST_MBOX1_MASK (0x3076 * 4)
-+#define HEVC_ASSIST_MBOX1_FIQ_SEL (0x3077 * 4)
-+#define HEVC_ASSIST_MBOX2_IRQ_REG (0x3078 * 4)
-+#define HEVC_ASSIST_MBOX2_CLR_REG (0x3079 * 4)
-+#define HEVC_ASSIST_MBOX2_MASK (0x307a * 4)
-+#define HEVC_ASSIST_MBOX2_FIQ_SEL (0x307b * 4)
-+#define HEVC_ASSIST_AXI_CTRL (0x307c * 4)
-+#define HEVC_ASSIST_AXI_STATUS (0x307d * 4)
-+#define HEVC_ASSIST_SCRATCH_0 (0x30c0 * 4)
-+#define HEVC_ASSIST_SCRATCH_1 (0x30c1 * 4)
-+#define HEVC_ASSIST_SCRATCH_2 (0x30c2 * 4)
-+#define HEVC_ASSIST_SCRATCH_3 (0x30c3 * 4)
-+#define HEVC_ASSIST_SCRATCH_4 (0x30c4 * 4)
-+#define HEVC_ASSIST_SCRATCH_5 (0x30c5 * 4)
-+#define HEVC_ASSIST_SCRATCH_6 (0x30c6 * 4)
-+#define HEVC_ASSIST_SCRATCH_7 (0x30c7 * 4)
-+#define HEVC_ASSIST_SCRATCH_8 (0x30c8 * 4)
-+#define HEVC_ASSIST_SCRATCH_9 (0x30c9 * 4)
-+#define HEVC_ASSIST_SCRATCH_A (0x30ca * 4)
-+#define HEVC_ASSIST_SCRATCH_B (0x30cb * 4)
-+#define HEVC_ASSIST_SCRATCH_C (0x30cc * 4)
-+#define HEVC_ASSIST_SCRATCH_D (0x30cd * 4)
-+#define HEVC_ASSIST_SCRATCH_E (0x30ce * 4)
-+#define HEVC_ASSIST_SCRATCH_F (0x30cf * 4)
-+#define HEVC_ASSIST_SCRATCH_G (0x30d0 * 4)
-+#define HEVC_ASSIST_SCRATCH_H (0x30d1 * 4)
-+#define HEVC_ASSIST_SCRATCH_I (0x30d2 * 4)
-+#define HEVC_ASSIST_SCRATCH_J (0x30d3 * 4)
-+#define HEVC_ASSIST_SCRATCH_K (0x30d4 * 4)
-+#define HEVC_ASSIST_SCRATCH_L (0x30d5 * 4)
-+#define HEVC_ASSIST_SCRATCH_M (0x30d6 * 4)
-+#define HEVC_ASSIST_SCRATCH_N (0x30d7 * 4)
-+#define HEVC_PARSER_VERSION (0x3100 * 4)
-+#define HEVC_STREAM_CONTROL (0x3101 * 4)
-+#define HEVC_STREAM_START_ADDR (0x3102 * 4)
-+#define HEVC_STREAM_END_ADDR (0x3103 * 4)
-+#define HEVC_STREAM_WR_PTR (0x3104 * 4)
-+#define HEVC_STREAM_RD_PTR (0x3105 * 4)
-+#define HEVC_STREAM_LEVEL (0x3106 * 4)
-+#define HEVC_STREAM_FIFO_CTL (0x3107 * 4)
-+#define HEVC_SHIFT_CONTROL (0x3108 * 4)
-+#define HEVC_SHIFT_STARTCODE (0x3109 * 4)
-+#define HEVC_SHIFT_EMULATECODE (0x310a * 4)
-+#define HEVC_SHIFT_STATUS (0x310b * 4)
-+#define HEVC_SHIFTED_DATA (0x310c * 4)
-+#define HEVC_SHIFT_BYTE_COUNT (0x310d * 4)
-+#define HEVC_SHIFT_COMMAND (0x310e * 4)
-+#define HEVC_ELEMENT_RESULT (0x310f * 4)
-+#define HEVC_CABAC_CONTROL (0x3110 * 4)
-+#define HEVC_PARSER_SLICE_INFO (0x3111 * 4)
-+#define HEVC_PARSER_CMD_WRITE (0x3112 * 4)
-+#define HEVC_PARSER_CORE_CONTROL (0x3113 * 4)
-+#define HEVC_PARSER_CMD_FETCH (0x3114 * 4)
-+#define HEVC_PARSER_CMD_STATUS (0x3115 * 4)
-+#define HEVC_PARSER_LCU_INFO (0x3116 * 4)
-+#define HEVC_PARSER_HEADER_INFO (0x3117 * 4)
-+#define HEVC_PARSER_RESULT_0 (0x3118 * 4)
-+#define HEVC_PARSER_RESULT_1 (0x3119 * 4)
-+#define HEVC_PARSER_RESULT_2 (0x311a * 4)
-+#define HEVC_PARSER_RESULT_3 (0x311b * 4)
-+#define HEVC_CABAC_TOP_INFO (0x311c * 4)
-+#define HEVC_CABAC_TOP_INFO_2 (0x311d * 4)
-+#define HEVC_CABAC_LEFT_INFO (0x311e * 4)
-+#define HEVC_CABAC_LEFT_INFO_2 (0x311f * 4)
-+#define HEVC_PARSER_INT_CONTROL (0x3120 * 4)
-+#define HEVC_PARSER_INT_STATUS (0x3121 * 4)
-+#define HEVC_PARSER_IF_CONTROL (0x3122 * 4)
-+#define HEVC_PARSER_PICTURE_SIZE (0x3123 * 4)
-+#define HEVC_PARSER_LCU_START (0x3124 * 4)
-+#define HEVC_PARSER_HEADER_INFO2 (0x3125 * 4)
-+#define HEVC_PARSER_QUANT_READ (0x3126 * 4)
-+#define HEVC_PARSER_RESERVED_27 (0x3127 * 4)
-+#define HEVC_PARSER_CMD_SKIP_0 (0x3128 * 4)
-+#define HEVC_PARSER_CMD_SKIP_1 (0x3129 * 4)
-+#define HEVC_PARSER_CMD_SKIP_2 (0x312a * 4)
-+#define HEVC_PARSER_MANUAL_CMD (0x312b * 4)
-+#define HEVC_PARSER_MEM_RD_ADDR (0x312c * 4)
-+#define HEVC_PARSER_MEM_WR_ADDR (0x312d * 4)
-+#define HEVC_PARSER_MEM_RW_DATA (0x312e * 4)
-+#define HEVC_SAO_IF_STATUS (0x3130 * 4)
-+#define HEVC_SAO_IF_DATA_Y (0x3131 * 4)
-+#define HEVC_SAO_IF_DATA_U (0x3132 * 4)
-+#define HEVC_SAO_IF_DATA_V (0x3133 * 4)
-+#define HEVC_STREAM_SWAP_ADDR (0x3134 * 4)
-+#define HEVC_STREAM_SWAP_CTRL (0x3135 * 4)
-+#define HEVC_IQIT_IF_WAIT_CNT (0x3136 * 4)
-+#define HEVC_MPRED_IF_WAIT_CNT (0x3137 * 4)
-+#define HEVC_SAO_IF_WAIT_CNT (0x3138 * 4)
-+#define HEVC_PARSER_DEBUG_IDX (0x313e * 4)
-+#define HEVC_PARSER_DEBUG_DAT (0x313f * 4)
-+#define HEVC_MPRED_VERSION (0x3200 * 4)
-+#define HEVC_MPRED_CTRL0 (0x3201 * 4)
-+#define HEVC_MPRED_CTRL1 (0x3202 * 4)
-+#define HEVC_MPRED_INT_EN (0x3203 * 4)
-+#define HEVC_MPRED_INT_STATUS (0x3204 * 4)
-+#define HEVC_MPRED_PIC_SIZE (0x3205 * 4)
-+#define HEVC_MPRED_PIC_SIZE_LCU (0x3206 * 4)
-+#define HEVC_MPRED_TILE_START (0x3207 * 4)
-+#define HEVC_MPRED_TILE_SIZE_LCU (0x3208 * 4)
-+#define HEVC_MPRED_REF_NUM (0x3209 * 4)
-+#define HEVC_MPRED_LT_REF (0x320a * 4)
-+#define HEVC_MPRED_LT_COLREF (0x320b * 4)
-+#define HEVC_MPRED_REF_EN_L0 (0x320c * 4)
-+#define HEVC_MPRED_REF_EN_L1 (0x320d * 4)
-+#define HEVC_MPRED_COLREF_EN_L0 (0x320e * 4)
-+#define HEVC_MPRED_COLREF_EN_L1 (0x320f * 4)
-+#define HEVC_MPRED_AXI_WCTRL (0x3210 * 4)
-+#define HEVC_MPRED_AXI_RCTRL (0x3211 * 4)
-+#define HEVC_MPRED_ABV_START_ADDR (0x3212 * 4)
-+#define HEVC_MPRED_MV_WR_START_ADDR (0x3213 * 4)
-+#define HEVC_MPRED_MV_RD_START_ADDR (0x3214 * 4)
-+#define HEVC_MPRED_MV_WPTR (0x3215 * 4)
-+#define HEVC_MPRED_MV_RPTR (0x3216 * 4)
-+#define HEVC_MPRED_MV_WR_ROW_JUMP (0x3217 * 4)
-+#define HEVC_MPRED_MV_RD_ROW_JUMP (0x3218 * 4)
-+#define HEVC_MPRED_CURR_LCU (0x3219 * 4)
-+#define HEVC_MPRED_ABV_WPTR (0x321a * 4)
-+#define HEVC_MPRED_ABV_RPTR (0x321b * 4)
-+#define HEVC_MPRED_CTRL2 (0x321c * 4)
-+#define HEVC_MPRED_CTRL3 (0x321d * 4)
-+#define HEVC_MPRED_MV_WLCUY (0x321e * 4)
-+#define HEVC_MPRED_MV_RLCUY (0x321f * 4)
-+#define HEVC_MPRED_L0_REF00_POC (0x3220 * 4)
-+#define HEVC_MPRED_L0_REF01_POC (0x3221 * 4)
-+#define HEVC_MPRED_L0_REF02_POC (0x3222 * 4)
-+#define HEVC_MPRED_L0_REF03_POC (0x3223 * 4)
-+#define HEVC_MPRED_L0_REF04_POC (0x3224 * 4)
-+#define HEVC_MPRED_L0_REF05_POC (0x3225 * 4)
-+#define HEVC_MPRED_L0_REF06_POC (0x3226 * 4)
-+#define HEVC_MPRED_L0_REF07_POC (0x3227 * 4)
-+#define HEVC_MPRED_L0_REF08_POC (0x3228 * 4)
-+#define HEVC_MPRED_L0_REF09_POC (0x3229 * 4)
-+#define HEVC_MPRED_L0_REF10_POC (0x322a * 4)
-+#define HEVC_MPRED_L0_REF11_POC (0x322b * 4)
-+#define HEVC_MPRED_L0_REF12_POC (0x322c * 4)
-+#define HEVC_MPRED_L0_REF13_POC (0x322d * 4)
-+#define HEVC_MPRED_L0_REF14_POC (0x322e * 4)
-+#define HEVC_MPRED_L0_REF15_POC (0x322f * 4)
-+#define HEVC_MPRED_L1_REF00_POC (0x3230 * 4)
-+#define HEVC_MPRED_L1_REF01_POC (0x3231 * 4)
-+#define HEVC_MPRED_L1_REF02_POC (0x3232 * 4)
-+#define HEVC_MPRED_L1_REF03_POC (0x3233 * 4)
-+#define HEVC_MPRED_L1_REF04_POC (0x3234 * 4)
-+#define HEVC_MPRED_L1_REF05_POC (0x3235 * 4)
-+#define HEVC_MPRED_L1_REF06_POC (0x3236 * 4)
-+#define HEVC_MPRED_L1_REF07_POC (0x3237 * 4)
-+#define HEVC_MPRED_L1_REF08_POC (0x3238 * 4)
-+#define HEVC_MPRED_L1_REF09_POC (0x3239 * 4)
-+#define HEVC_MPRED_L1_REF10_POC (0x323a * 4)
-+#define HEVC_MPRED_L1_REF11_POC (0x323b * 4)
-+#define HEVC_MPRED_L1_REF12_POC (0x323c * 4)
-+#define HEVC_MPRED_L1_REF13_POC (0x323d * 4)
-+#define HEVC_MPRED_L1_REF14_POC (0x323e * 4)
-+#define HEVC_MPRED_L1_REF15_POC (0x323f * 4)
-+#define HEVC_MPRED_PIC_SIZE_EXT (0x3240 * 4)
-+#define HEVC_MPRED_DBG_MODE0 (0x3241 * 4)
-+#define HEVC_MPRED_DBG_MODE1 (0x3242 * 4)
-+#define HEVC_MPRED_DBG2_MODE (0x3243 * 4)
-+#define HEVC_MPRED_IMP_CMD0 (0x3244 * 4)
-+#define HEVC_MPRED_IMP_CMD1 (0x3245 * 4)
-+#define HEVC_MPRED_IMP_CMD2 (0x3246 * 4)
-+#define HEVC_MPRED_IMP_CMD3 (0x3247 * 4)
-+#define HEVC_MPRED_DBG2_DATA_0 (0x3248 * 4)
-+#define HEVC_MPRED_DBG2_DATA_1 (0x3249 * 4)
-+#define HEVC_MPRED_DBG2_DATA_2 (0x324a * 4)
-+#define HEVC_MPRED_DBG2_DATA_3 (0x324b * 4)
-+#define HEVC_MPRED_DBG_DATA_0 (0x3250 * 4)
-+#define HEVC_MPRED_DBG_DATA_1 (0x3251 * 4)
-+#define HEVC_MPRED_DBG_DATA_2 (0x3252 * 4)
-+#define HEVC_MPRED_DBG_DATA_3 (0x3253 * 4)
-+#define HEVC_MPRED_DBG_DATA_4 (0x3254 * 4)
-+#define HEVC_MPRED_DBG_DATA_5 (0x3255 * 4)
-+#define HEVC_MPRED_DBG_DATA_6 (0x3256 * 4)
-+#define HEVC_MPRED_DBG_DATA_7 (0x3257 * 4)
-+#define HEVC_MPRED_CUR_POC (0x3260 * 4)
-+#define HEVC_MPRED_COL_POC (0x3261 * 4)
-+#define HEVC_MPRED_MV_RD_END_ADDR (0x3262 * 4)
-+#define HEVCD_IPP_TOP_CNTL (0x3400 * 4)
-+#define HEVCD_IPP_TOP_STATUS (0x3401 * 4)
-+#define HEVCD_IPP_TOP_FRMCONFIG (0x3402 * 4)
-+#define HEVCD_IPP_TOP_TILECONFIG1 (0x3403 * 4)
-+#define HEVCD_IPP_TOP_TILECONFIG2 (0x3404 * 4)
-+#define HEVCD_IPP_TOP_TILECONFIG3 (0x3405 * 4)
-+#define HEVCD_IPP_TOP_LCUCONFIG (0x3406 * 4)
-+#define HEVCD_IPP_TOP_FRMCTL (0x3407 * 4)
-+#define HEVCD_IPP_CONFIG (0x3408 * 4)
-+#define HEVCD_IPP_LINEBUFF_BASE (0x3409 * 4)
-+#define HEVCD_IPP_INTR_MASK (0x340a * 4)
-+#define HEVCD_IPP_AXIIF_CONFIG (0x340b * 4)
-+#define HEVCD_IPP_BITDEPTH_CONFIG (0x340c * 4)
-+#define HEVCD_IPP_SWMPREDIF_CONFIG (0x3410 * 4)
-+#define HEVCD_IPP_SWMPREDIF_STATUS (0x3411 * 4)
-+#define HEVCD_IPP_SWMPREDIF_CTBINFO (0x3412 * 4)
-+#define HEVCD_IPP_SWMPREDIF_PUINFO0 (0x3413 * 4)
-+#define HEVCD_IPP_SWMPREDIF_PUINFO1 (0x3414 * 4)
-+#define HEVCD_IPP_SWMPREDIF_PUINFO2 (0x3415 * 4)
-+#define HEVCD_IPP_SWMPREDIF_PUINFO3 (0x3416 * 4)
-+#define HEVCD_IPP_DYNCLKGATE_CONFIG (0x3420 * 4)
-+#define HEVCD_IPP_DYNCLKGATE_STATUS (0x3421 * 4)
-+#define HEVCD_IPP_DBG_SEL (0x3430 * 4)
-+#define HEVCD_IPP_DBG_DATA (0x3431 * 4)
-+#define HEVCD_MPP_ANC2AXI_TBL_CONF_ADDR (0x3460 * 4)
-+#define HEVCD_MPP_ANC2AXI_TBL_CMD_ADDR (0x3461 * 4)
-+#define HEVCD_MPP_ANC2AXI_TBL_WDATA_ADDR (0x3462 * 4)
-+#define HEVCD_MPP_ANC2AXI_TBL_RDATA_ADDR (0x3463 * 4)
-+#define HEVCD_MPP_WEIGHTPRED_CNTL_ADDR (0x347b * 4)
-+#define HEVCD_MPP_L0_WEIGHT_FLAG_ADDR (0x347c * 4)
-+#define HEVCD_MPP_L1_WEIGHT_FLAG_ADDR (0x347d * 4)
-+#define HEVCD_MPP_YLOG2WGHTDENOM_ADDR (0x347e * 4)
-+#define HEVCD_MPP_DELTACLOG2WGHTDENOM_ADDR (0x347f * 4)
-+#define HEVCD_MPP_WEIGHT_ADDR (0x3480 * 4)
-+#define HEVCD_MPP_WEIGHT_DATA (0x3481 * 4)
-+#define HEVCD_MPP_ANC_CANVAS_ACCCONFIG_ADDR (0x34c0 * 4)
-+#define HEVCD_MPP_ANC_CANVAS_DATA_ADDR (0x34c1 * 4)
-+#define HEVCD_MPP_DECOMP_CTL1 (0x34c2 * 4)
-+#define HEVCD_MPP_DECOMP_CTL2 (0x34c3 * 4)
-+#define HEVCD_MCRCC_CTL1 (0x34f0 * 4)
-+#define HEVCD_MCRCC_CTL2 (0x34f1 * 4)
-+#define HEVCD_MCRCC_CTL3 (0x34f2 * 4)
-+#define HEVCD_MCRCC_PERFMON_CTL (0x34f3 * 4)
-+#define HEVCD_MCRCC_PERFMON_DATA (0x34f4 * 4)
-+#define HEVC_DBLK_CFG0 (0x3500 * 4)
-+#define HEVC_DBLK_CFG1 (0x3501 * 4)
-+#define HEVC_DBLK_CFG2 (0x3502 * 4)
-+#define HEVC_DBLK_CFG3 (0x3503 * 4)
-+#define HEVC_DBLK_CFG4 (0x3504 * 4)
-+#define HEVC_DBLK_CFG5 (0x3505 * 4)
-+#define HEVC_DBLK_CFG6 (0x3506 * 4)
-+#define HEVC_DBLK_CFG7 (0x3507 * 4)
-+#define HEVC_DBLK_CFG8 (0x3508 * 4)
-+#define HEVC_DBLK_CFG9 (0x3509 * 4)
-+#define HEVC_DBLK_CFGA (0x350a * 4)
-+#define HEVC_DBLK_STS0 (0x350b * 4)
-+#define HEVC_DBLK_STS1 (0x350c * 4)
-+#define HEVC_SAO_VERSION (0x3600 * 4)
-+#define HEVC_SAO_CTRL0 (0x3601 * 4)
-+#define HEVC_SAO_CTRL1 (0x3602 * 4)
-+#define HEVC_SAO_INT_EN (0x3603 * 4)
-+#define HEVC_SAO_INT_STATUS (0x3604 * 4)
-+#define HEVC_SAO_PIC_SIZE (0x3605 * 4)
-+#define HEVC_SAO_PIC_SIZE_LCU (0x3606 * 4)
-+#define HEVC_SAO_TILE_START (0x3607 * 4)
-+#define HEVC_SAO_TILE_SIZE_LCU (0x3608 * 4)
-+#define HEVC_SAO_AXI_WCTRL (0x3609 * 4)
-+#define HEVC_SAO_AXI_RCTRL (0x360a * 4)
-+#define HEVC_SAO_Y_START_ADDR (0x360b * 4)
-+#define HEVC_SAO_Y_LENGTH (0x360c * 4)
-+#define HEVC_SAO_C_START_ADDR (0x360d * 4)
-+#define HEVC_SAO_C_LENGTH (0x360e * 4)
-+#define HEVC_SAO_Y_WPTR (0x360f * 4)
-+#define HEVC_SAO_C_WPTR (0x3610 * 4)
-+#define HEVC_SAO_ABV_START_ADDR (0x3611 * 4)
-+#define HEVC_SAO_VB_WR_START_ADDR (0x3612 * 4)
-+#define HEVC_SAO_VB_RD_START_ADDR (0x3613 * 4)
-+#define HEVC_SAO_ABV_WPTR (0x3614 * 4)
-+#define HEVC_SAO_ABV_RPTR (0x3615 * 4)
-+#define HEVC_SAO_VB_WPTR (0x3616 * 4)
-+#define HEVC_SAO_VB_RPTR (0x3617 * 4)
-+#define HEVC_SAO_DBG_MODE0 (0x361e * 4)
-+#define HEVC_SAO_DBG_MODE1 (0x361f * 4)
-+#define HEVC_SAO_CTRL2 (0x3620 * 4)
-+#define HEVC_SAO_CTRL3 (0x3621 * 4)
-+#define HEVC_SAO_CTRL4 (0x3622 * 4)
-+#define HEVC_SAO_CTRL5 (0x3623 * 4)
-+#define HEVC_SAO_CTRL6 (0x3624 * 4)
-+#define HEVC_SAO_CTRL7 (0x3625 * 4)
-+#define HEVC_SAO_DBG_DATA_0 (0x3630 * 4)
-+#define HEVC_SAO_DBG_DATA_1 (0x3631 * 4)
-+#define HEVC_SAO_DBG_DATA_2 (0x3632 * 4)
-+#define HEVC_SAO_DBG_DATA_3 (0x3633 * 4)
-+#define HEVC_SAO_DBG_DATA_4 (0x3634 * 4)
-+#define HEVC_SAO_DBG_DATA_5 (0x3635 * 4)
-+#define HEVC_SAO_DBG_DATA_6 (0x3636 * 4)
-+#define HEVC_SAO_DBG_DATA_7 (0x3637 * 4)
-+#define HEVC_IQIT_CLK_RST_CTRL (0x3700 * 4)
-+#define HEVC_IQIT_DEQUANT_CTRL (0x3701 * 4)
-+#define HEVC_IQIT_SCALELUT_WR_ADDR (0x3702 * 4)
-+#define HEVC_IQIT_SCALELUT_RD_ADDR (0x3703 * 4)
-+#define HEVC_IQIT_SCALELUT_DATA (0x3704 * 4)
-+#define HEVC_IQIT_SCALELUT_IDX_4 (0x3705 * 4)
-+#define HEVC_IQIT_SCALELUT_IDX_8 (0x3706 * 4)
-+#define HEVC_IQIT_SCALELUT_IDX_16_32 (0x3707 * 4)
-+#define HEVC_IQIT_STAT_GEN0 (0x3708 * 4)
-+#define HEVC_QP_WRITE (0x3709 * 4)
-+#define HEVC_IQIT_STAT_GEN1 (0x370a * 4)
-+/**/
++#ifndef __MESON_VDEC_HEVC_REGS_H_
++#define __MESON_VDEC_HEVC_REGS_H_
 +
-+/*add from M8M2*/
-+#define HEVC_MC_CTRL_REG (0x3900 * 4)
-+#define HEVC_MC_MB_INFO (0x3901 * 4)
-+#define HEVC_MC_PIC_INFO (0x3902 * 4)
-+#define HEVC_MC_HALF_PEL_ONE (0x3903 * 4)
-+#define HEVC_MC_HALF_PEL_TWO (0x3904 * 4)
-+#define HEVC_POWER_CTL_MC (0x3905 * 4)
-+#define HEVC_MC_CMD (0x3906 * 4)
-+#define HEVC_MC_CTRL0 (0x3907 * 4)
-+#define HEVC_MC_PIC_W_H (0x3908 * 4)
-+#define HEVC_MC_STATUS0 (0x3909 * 4)
-+#define HEVC_MC_STATUS1 (0x390a * 4)
-+#define HEVC_MC_CTRL1 (0x390b * 4)
-+#define HEVC_MC_MIX_RATIO0 (0x390c * 4)
-+#define HEVC_MC_MIX_RATIO1 (0x390d * 4)
-+#define HEVC_MC_DP_MB_XY (0x390e * 4)
-+#define HEVC_MC_OM_MB_XY (0x390f * 4)
-+#define HEVC_PSCALE_RST (0x3910 * 4)
-+#define HEVC_PSCALE_CTRL (0x3911 * 4)
-+#define HEVC_PSCALE_PICI_W (0x3912 * 4)
-+#define HEVC_PSCALE_PICI_H (0x3913 * 4)
-+#define HEVC_PSCALE_PICO_W (0x3914 * 4)
-+#define HEVC_PSCALE_PICO_H (0x3915 * 4)
-+#define HEVC_PSCALE_PICO_START_X (0x3916 * 4)
-+#define HEVC_PSCALE_PICO_START_Y (0x3917 * 4)
-+#define HEVC_PSCALE_DUMMY (0x3918 * 4)
-+#define HEVC_PSCALE_FILT0_COEF0 (0x3919 * 4)
-+#define HEVC_PSCALE_FILT0_COEF1 (0x391a * 4)
-+#define HEVC_PSCALE_CMD_CTRL (0x391b * 4)
-+#define HEVC_PSCALE_CMD_BLK_X (0x391c * 4)
-+#define HEVC_PSCALE_CMD_BLK_Y (0x391d * 4)
-+#define HEVC_PSCALE_STATUS (0x391e * 4)
-+#define HEVC_PSCALE_BMEM_ADDR (0x391f * 4)
-+#define HEVC_PSCALE_BMEM_DAT (0x3920 * 4)
-+#define HEVC_PSCALE_DRAM_BUF_CTRL (0x3921 * 4)
-+#define HEVC_PSCALE_MCMD_CTRL (0x3922 * 4)
-+#define HEVC_PSCALE_MCMD_XSIZE (0x3923 * 4)
-+#define HEVC_PSCALE_MCMD_YSIZE (0x3924 * 4)
-+#define HEVC_PSCALE_RBUF_START_BLKX (0x3925 * 4)
-+#define HEVC_PSCALE_RBUF_START_BLKY (0x3926 * 4)
-+#define HEVC_PSCALE_PICO_SHIFT_XY (0x3928 * 4)
-+#define HEVC_PSCALE_CTRL1 (0x3929 * 4)
-+#define HEVC_PSCALE_SRCKEY_CTRL0 (0x392a * 4)
-+#define HEVC_PSCALE_SRCKEY_CTRL1 (0x392b * 4)
-+#define HEVC_PSCALE_CANVAS_RD_ADDR (0x392c * 4)
-+#define HEVC_PSCALE_CANVAS_WR_ADDR (0x392d * 4)
-+#define HEVC_PSCALE_CTRL2 (0x392e * 4)
-+#define HEVC_HDEC_MC_OMEM_AUTO (0x3930 * 4)
-+#define HEVC_HDEC_MC_MBRIGHT_IDX (0x3931 * 4)
-+#define HEVC_HDEC_MC_MBRIGHT_RD (0x3932 * 4)
-+#define HEVC_MC_MPORT_CTRL (0x3940 * 4)
-+#define HEVC_MC_MPORT_DAT (0x3941 * 4)
-+#define HEVC_MC_WT_PRED_CTRL (0x3942 * 4)
-+#define HEVC_MC_MBBOT_ST_EVEN_ADDR (0x3944 * 4)
-+#define HEVC_MC_MBBOT_ST_ODD_ADDR (0x3945 * 4)
-+#define HEVC_MC_DPDN_MB_XY (0x3946 * 4)
-+#define HEVC_MC_OMDN_MB_XY (0x3947 * 4)
-+#define HEVC_MC_HCMDBUF_H (0x3948 * 4)
-+#define HEVC_MC_HCMDBUF_L (0x3949 * 4)
-+#define HEVC_MC_HCMD_H (0x394a * 4)
-+#define HEVC_MC_HCMD_L (0x394b * 4)
-+#define HEVC_MC_IDCT_DAT (0x394c * 4)
-+#define HEVC_MC_CTRL_GCLK_CTRL (0x394d * 4)
-+#define HEVC_MC_OTHER_GCLK_CTRL (0x394e * 4)
-+#define HEVC_MC_CTRL2 (0x394f * 4)
-+#define HEVC_MDEC_PIC_DC_CTRL (0x398e * 4)
-+#define HEVC_MDEC_PIC_DC_STATUS (0x398f * 4)
-+#define HEVC_ANC0_CANVAS_ADDR (0x3990 * 4)
-+#define HEVC_ANC1_CANVAS_ADDR (0x3991 * 4)
-+#define HEVC_ANC2_CANVAS_ADDR (0x3992 * 4)
-+#define HEVC_ANC3_CANVAS_ADDR (0x3993 * 4)
-+#define HEVC_ANC4_CANVAS_ADDR (0x3994 * 4)
-+#define HEVC_ANC5_CANVAS_ADDR (0x3995 * 4)
-+#define HEVC_ANC6_CANVAS_ADDR (0x3996 * 4)
-+#define HEVC_ANC7_CANVAS_ADDR (0x3997 * 4)
-+#define HEVC_ANC8_CANVAS_ADDR (0x3998 * 4)
-+#define HEVC_ANC9_CANVAS_ADDR (0x3999 * 4)
-+#define HEVC_ANC10_CANVAS_ADDR (0x399a * 4)
-+#define HEVC_ANC11_CANVAS_ADDR (0x399b * 4)
-+#define HEVC_ANC12_CANVAS_ADDR (0x399c * 4)
-+#define HEVC_ANC13_CANVAS_ADDR (0x399d * 4)
-+#define HEVC_ANC14_CANVAS_ADDR (0x399e * 4)
-+#define HEVC_ANC15_CANVAS_ADDR (0x399f * 4)
-+#define HEVC_ANC16_CANVAS_ADDR (0x39a0 * 4)
-+#define HEVC_ANC17_CANVAS_ADDR (0x39a1 * 4)
-+#define HEVC_ANC18_CANVAS_ADDR (0x39a2 * 4)
-+#define HEVC_ANC19_CANVAS_ADDR (0x39a3 * 4)
-+#define HEVC_ANC20_CANVAS_ADDR (0x39a4 * 4)
-+#define HEVC_ANC21_CANVAS_ADDR (0x39a5 * 4)
-+#define HEVC_ANC22_CANVAS_ADDR (0x39a6 * 4)
-+#define HEVC_ANC23_CANVAS_ADDR (0x39a7 * 4)
-+#define HEVC_ANC24_CANVAS_ADDR (0x39a8 * 4)
-+#define HEVC_ANC25_CANVAS_ADDR (0x39a9 * 4)
-+#define HEVC_ANC26_CANVAS_ADDR (0x39aa * 4)
-+#define HEVC_ANC27_CANVAS_ADDR (0x39ab * 4)
-+#define HEVC_ANC28_CANVAS_ADDR (0x39ac * 4)
-+#define HEVC_ANC29_CANVAS_ADDR (0x39ad * 4)
-+#define HEVC_ANC30_CANVAS_ADDR (0x39ae * 4)
-+#define HEVC_ANC31_CANVAS_ADDR (0x39af * 4)
-+#define HEVC_DBKR_CANVAS_ADDR (0x39b0 * 4)
-+#define HEVC_DBKW_CANVAS_ADDR (0x39b1 * 4)
-+#define HEVC_REC_CANVAS_ADDR (0x39b2 * 4)
-+#define HEVC_CURR_CANVAS_CTRL (0x39b3 * 4)
-+#define HEVC_MDEC_PIC_DC_THRESH (0x39b8 * 4)
-+#define HEVC_MDEC_PICR_BUF_STATUS (0x39b9 * 4)
-+#define HEVC_MDEC_PICW_BUF_STATUS (0x39ba * 4)
-+#define HEVC_MCW_DBLK_WRRSP_CNT (0x39bb * 4)
-+#define HEVC_MC_MBBOT_WRRSP_CNT (0x39bc * 4)
-+#define HEVC_MDEC_PICW_BUF2_STATUS (0x39bd * 4)
-+#define HEVC_WRRSP_FIFO_PICW_DBK (0x39be * 4)
-+#define HEVC_WRRSP_FIFO_PICW_MC (0x39bf * 4)
-+#define HEVC_AV_SCRATCH_0 (0x39c0 * 4)
-+#define HEVC_AV_SCRATCH_1 (0x39c1 * 4)
-+#define HEVC_AV_SCRATCH_2 (0x39c2 * 4)
-+#define HEVC_AV_SCRATCH_3 (0x39c3 * 4)
-+#define HEVC_AV_SCRATCH_4 (0x39c4 * 4)
-+#define HEVC_AV_SCRATCH_5 (0x39c5 * 4)
-+#define HEVC_AV_SCRATCH_6 (0x39c6 * 4)
-+#define HEVC_AV_SCRATCH_7 (0x39c7 * 4)
-+#define HEVC_AV_SCRATCH_8 (0x39c8 * 4)
-+#define HEVC_AV_SCRATCH_9 (0x39c9 * 4)
-+#define HEVC_AV_SCRATCH_A (0x39ca * 4)
-+#define HEVC_AV_SCRATCH_B (0x39cb * 4)
-+#define HEVC_AV_SCRATCH_C (0x39cc * 4)
-+#define HEVC_AV_SCRATCH_D (0x39cd * 4)
-+#define HEVC_AV_SCRATCH_E (0x39ce * 4)
-+#define HEVC_AV_SCRATCH_F (0x39cf * 4)
-+#define HEVC_AV_SCRATCH_G (0x39d0 * 4)
-+#define HEVC_AV_SCRATCH_H (0x39d1 * 4)
-+#define HEVC_AV_SCRATCH_I (0x39d2 * 4)
-+#define HEVC_AV_SCRATCH_J (0x39d3 * 4)
-+#define HEVC_AV_SCRATCH_K (0x39d4 * 4)
-+#define HEVC_AV_SCRATCH_L (0x39d5 * 4)
-+#define HEVC_AV_SCRATCH_M (0x39d6 * 4)
-+#define HEVC_AV_SCRATCH_N (0x39d7 * 4)
-+#define HEVC_WRRSP_CO_MB (0x39d8 * 4)
-+#define HEVC_WRRSP_DCAC (0x39d9 * 4)
-+#define HEVC_WRRSP_VLD (0x39da * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG0 (0x39db * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG1 (0x39dc * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG2 (0x39dd * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG3 (0x39de * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG4 (0x39df * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG5 (0x39e0 * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG6 (0x39e1 * 4)
-+#define HEVC_MDEC_DOUBLEW_CFG7 (0x39e2 * 4)
-+#define HEVC_MDEC_DOUBLEW_STATUS (0x39e3 * 4)
-+#define HEVC_DBLK_RST (0x3950 * 4)
-+#define HEVC_DBLK_CTRL (0x3951 * 4)
-+#define HEVC_DBLK_MB_WID_HEIGHT (0x3952 * 4)
-+#define HEVC_DBLK_STATUS (0x3953 * 4)
-+#define HEVC_DBLK_CMD_CTRL (0x3954 * 4)
-+#define HEVC_DBLK_MB_XY (0x3955 * 4)
-+#define HEVC_DBLK_QP (0x3956 * 4)
-+#define HEVC_DBLK_Y_BHFILT (0x3957 * 4)
-+#define HEVC_DBLK_Y_BHFILT_HIGH (0x3958 * 4)
-+#define HEVC_DBLK_Y_BVFILT (0x3959 * 4)
-+#define HEVC_DBLK_CB_BFILT (0x395a * 4)
-+#define HEVC_DBLK_CR_BFILT (0x395b * 4)
-+#define HEVC_DBLK_Y_HFILT (0x395c * 4)
-+#define HEVC_DBLK_Y_HFILT_HIGH (0x395d * 4)
-+#define HEVC_DBLK_Y_VFILT (0x395e * 4)
-+#define HEVC_DBLK_CB_FILT (0x395f * 4)
-+#define HEVC_DBLK_CR_FILT (0x3960 * 4)
-+#define HEVC_DBLK_BETAX_QP_SEL (0x3961 * 4)
-+#define HEVC_DBLK_CLIP_CTRL0 (0x3962 * 4)
-+#define HEVC_DBLK_CLIP_CTRL1 (0x3963 * 4)
-+#define HEVC_DBLK_CLIP_CTRL2 (0x3964 * 4)
-+#define HEVC_DBLK_CLIP_CTRL3 (0x3965 * 4)
-+#define HEVC_DBLK_CLIP_CTRL4 (0x3966 * 4)
-+#define HEVC_DBLK_CLIP_CTRL5 (0x3967 * 4)
-+#define HEVC_DBLK_CLIP_CTRL6 (0x3968 * 4)
-+#define HEVC_DBLK_CLIP_CTRL7 (0x3969 * 4)
-+#define HEVC_DBLK_CLIP_CTRL8 (0x396a * 4)
-+#define HEVC_DBLK_STATUS1 (0x396b * 4)
-+#define HEVC_DBLK_GCLK_FREE (0x396c * 4)
-+#define HEVC_DBLK_GCLK_OFF (0x396d * 4)
-+#define HEVC_DBLK_AVSFLAGS (0x396e * 4)
-+#define HEVC_DBLK_CBPY (0x3970 * 4)
-+#define HEVC_DBLK_CBPY_ADJ (0x3971 * 4)
-+#define HEVC_DBLK_CBPC (0x3972 * 4)
-+#define HEVC_DBLK_CBPC_ADJ (0x3973 * 4)
-+#define HEVC_DBLK_VHMVD (0x3974 * 4)
-+#define HEVC_DBLK_STRONG (0x3975 * 4)
-+#define HEVC_DBLK_RV8_QUANT (0x3976 * 4)
-+#define HEVC_DBLK_CBUS_HCMD2 (0x3977 * 4)
-+#define HEVC_DBLK_CBUS_HCMD1 (0x3978 * 4)
-+#define HEVC_DBLK_CBUS_HCMD0 (0x3979 * 4)
-+#define HEVC_DBLK_VLD_HCMD2 (0x397a * 4)
-+#define HEVC_DBLK_VLD_HCMD1 (0x397b * 4)
-+#define HEVC_DBLK_VLD_HCMD0 (0x397c * 4)
-+#define HEVC_DBLK_OST_YBASE (0x397d * 4)
-+#define HEVC_DBLK_OST_CBCRDIFF (0x397e * 4)
-+#define HEVC_DBLK_CTRL1 (0x397f * 4)
-+#define HEVC_MCRCC_CTL1 (0x3980 * 4)
-+#define HEVC_MCRCC_CTL2 (0x3981 * 4)
-+#define HEVC_MCRCC_CTL3 (0x3982 * 4)
-+#define HEVC_GCLK_EN (0x3983 * 4)
-+#define HEVC_MDEC_SW_RESET (0x3984 * 4)
++#define HEVC_ASSIST_MBOX1_CLR_REG 0xc1d4
++#define HEVC_ASSIST_MBOX1_MASK 0xc1d8
 +
-+/*add from M8M2*/
-+#define HEVC_VLD_STATUS_CTRL (0x3c00 * 4)
-+#define HEVC_MPEG1_2_REG (0x3c01 * 4)
-+#define HEVC_F_CODE_REG (0x3c02 * 4)
-+#define HEVC_PIC_HEAD_INFO (0x3c03 * 4)
-+#define HEVC_SLICE_VER_POS_PIC_TYPE (0x3c04 * 4)
-+#define HEVC_QP_VALUE_REG (0x3c05 * 4)
-+#define HEVC_MBA_INC (0x3c06 * 4)
-+#define HEVC_MB_MOTION_MODE (0x3c07 * 4)
-+#define HEVC_POWER_CTL_VLD (0x3c08 * 4)
-+#define HEVC_MB_WIDTH (0x3c09 * 4)
-+#define HEVC_SLICE_QP (0x3c0a * 4)
-+#define HEVC_PRE_START_CODE (0x3c0b * 4)
-+#define HEVC_SLICE_START_BYTE_01 (0x3c0c * 4)
-+#define HEVC_SLICE_START_BYTE_23 (0x3c0d * 4)
-+#define HEVC_RESYNC_MARKER_LENGTH (0x3c0e * 4)
-+#define HEVC_DECODER_BUFFER_INFO (0x3c0f * 4)
-+#define HEVC_FST_FOR_MV_X (0x3c10 * 4)
-+#define HEVC_FST_FOR_MV_Y (0x3c11 * 4)
-+#define HEVC_SCD_FOR_MV_X (0x3c12 * 4)
-+#define HEVC_SCD_FOR_MV_Y (0x3c13 * 4)
-+#define HEVC_FST_BAK_MV_X (0x3c14 * 4)
-+#define HEVC_FST_BAK_MV_Y (0x3c15 * 4)
-+#define HEVC_SCD_BAK_MV_X (0x3c16 * 4)
-+#define HEVC_SCD_BAK_MV_Y (0x3c17 * 4)
-+#define HEVC_VLD_DECODE_CONTROL (0x3c18 * 4)
-+#define HEVC_VLD_REVERVED_19 (0x3c19 * 4)
-+#define HEVC_VIFF_BIT_CNT (0x3c1a * 4)
-+#define HEVC_BYTE_ALIGN_PEAK_HI (0x3c1b * 4)
-+#define HEVC_BYTE_ALIGN_PEAK_LO (0x3c1c * 4)
-+#define HEVC_NEXT_ALIGN_PEAK (0x3c1d * 4)
-+#define HEVC_VC1_CONTROL_REG (0x3c1e * 4)
-+#define HEVC_PMV1_X (0x3c20 * 4)
-+#define HEVC_PMV1_Y (0x3c21 * 4)
-+#define HEVC_PMV2_X (0x3c22 * 4)
-+#define HEVC_PMV2_Y (0x3c23 * 4)
-+#define HEVC_PMV3_X (0x3c24 * 4)
-+#define HEVC_PMV3_Y (0x3c25 * 4)
-+#define HEVC_PMV4_X (0x3c26 * 4)
-+#define HEVC_PMV4_Y (0x3c27 * 4)
-+#define HEVC_M4_TABLE_SELECT (0x3c28 * 4)
-+#define HEVC_M4_CONTROL_REG (0x3c29 * 4)
-+#define HEVC_BLOCK_NUM (0x3c2a * 4)
-+#define HEVC_PATTERN_CODE (0x3c2b * 4)
-+#define HEVC_MB_INFO (0x3c2c * 4)
-+#define HEVC_VLD_DC_PRED (0x3c2d * 4)
-+#define HEVC_VLD_ERROR_MASK (0x3c2e * 4)
-+#define HEVC_VLD_DC_PRED_C (0x3c2f * 4)
-+#define HEVC_LAST_SLICE_MV_ADDR (0x3c30 * 4)
-+#define HEVC_LAST_MVX (0x3c31 * 4)
-+#define HEVC_LAST_MVY (0x3c32 * 4)
-+#define HEVC_VLD_C38 (0x3c38 * 4)
-+#define HEVC_VLD_C39 (0x3c39 * 4)
-+#define HEVC_VLD_STATUS (0x3c3a * 4)
-+#define HEVC_VLD_SHIFT_STATUS (0x3c3b * 4)
-+#define HEVC_VOFF_STATUS (0x3c3c * 4)
-+#define HEVC_VLD_C3D (0x3c3d * 4)
-+#define HEVC_VLD_DBG_INDEX (0x3c3e * 4)
-+#define HEVC_VLD_DBG_DATA (0x3c3f * 4)
-+#define HEVC_VLD_MEM_VIFIFO_START_PTR (0x3c40 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_CURR_PTR (0x3c41 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_END_PTR (0x3c42 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_BYTES_AVAIL (0x3c43 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_CONTROL (0x3c44 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_WP (0x3c45 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_RP (0x3c46 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_LEVEL (0x3c47 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_BUF_CNTL (0x3c48 * 4)
-+#define HEVC_VLD_TIME_STAMP_CNTL (0x3c49 * 4)
-+#define HEVC_VLD_TIME_STAMP_SYNC_0 (0x3c4a * 4)
-+#define HEVC_VLD_TIME_STAMP_SYNC_1 (0x3c4b * 4)
-+#define HEVC_VLD_TIME_STAMP_0 (0x3c4c * 4)
-+#define HEVC_VLD_TIME_STAMP_1 (0x3c4d * 4)
-+#define HEVC_VLD_TIME_STAMP_2 (0x3c4e * 4)
-+#define HEVC_VLD_TIME_STAMP_3 (0x3c4f * 4)
-+#define HEVC_VLD_TIME_STAMP_LENGTH (0x3c50 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_WRAP_COUNT (0x3c51 * 4)
-+#define HEVC_VLD_MEM_VIFIFO_MEM_CTL (0x3c52 * 4)
-+#define HEVC_VLD_MEM_VBUF_RD_PTR (0x3c53 * 4)
-+#define HEVC_VLD_MEM_VBUF2_RD_PTR (0x3c54 * 4)
-+#define HEVC_VLD_MEM_SWAP_ADDR (0x3c55 * 4)
-+#define HEVC_VLD_MEM_SWAP_CTL (0x3c56 * 4)
-+/**/
++#define HEVC_ASSIST_SCRATCH_0 0xc300
++#define HEVC_ASSIST_SCRATCH_1 0xc304
++#define HEVC_ASSIST_SCRATCH_2 0xc308
++#define HEVC_ASSIST_SCRATCH_3 0xc30c
++#define HEVC_ASSIST_SCRATCH_4 0xc310
++#define HEVC_ASSIST_SCRATCH_5 0xc314
++#define HEVC_ASSIST_SCRATCH_6 0xc318
++#define HEVC_ASSIST_SCRATCH_7 0xc31c
++#define HEVC_ASSIST_SCRATCH_8 0xc320
++#define HEVC_ASSIST_SCRATCH_9 0xc324
++#define HEVC_ASSIST_SCRATCH_A 0xc328
++#define HEVC_ASSIST_SCRATCH_B 0xc32c
++#define HEVC_ASSIST_SCRATCH_C 0xc330
++#define HEVC_ASSIST_SCRATCH_D 0xc334
++#define HEVC_ASSIST_SCRATCH_E 0xc338
++#define HEVC_ASSIST_SCRATCH_F 0xc33c
++#define HEVC_ASSIST_SCRATCH_G 0xc340
++#define HEVC_ASSIST_SCRATCH_H 0xc344
++#define HEVC_ASSIST_SCRATCH_I 0xc348
++#define HEVC_ASSIST_SCRATCH_J 0xc34c
++#define HEVC_ASSIST_SCRATCH_K 0xc350
++#define HEVC_ASSIST_SCRATCH_L 0xc354
++#define HEVC_ASSIST_SCRATCH_M 0xc358
++#define HEVC_ASSIST_SCRATCH_N 0xc35c
 +
-+/*add from M8M2*/
-+#define HEVC_VCOP_CTRL_REG (0x3e00 * 4)
-+#define HEVC_QP_CTRL_REG (0x3e01 * 4)
-+#define HEVC_INTRA_QUANT_MATRIX (0x3e02 * 4)
-+#define HEVC_NON_I_QUANT_MATRIX (0x3e03 * 4)
-+#define HEVC_DC_SCALER (0x3e04 * 4)
-+#define HEVC_DC_AC_CTRL (0x3e05 * 4)
-+#define HEVC_DC_AC_SCALE_MUL (0x3e06 * 4)
-+#define HEVC_DC_AC_SCALE_DIV (0x3e07 * 4)
-+#define HEVC_POWER_CTL_IQIDCT (0x3e08 * 4)
-+#define HEVC_RV_AI_Y_X (0x3e09 * 4)
-+#define HEVC_RV_AI_U_X (0x3e0a * 4)
-+#define HEVC_RV_AI_V_X (0x3e0b * 4)
-+#define HEVC_RV_AI_MB_COUNT (0x3e0c * 4)
-+#define HEVC_NEXT_INTRA_DMA_ADDRESS (0x3e0d * 4)
-+#define HEVC_IQIDCT_CONTROL (0x3e0e * 4)
-+#define HEVC_IQIDCT_DEBUG_INFO_0 (0x3e0f * 4)
-+#define HEVC_DEBLK_CMD (0x3e10 * 4)
-+#define HEVC_IQIDCT_DEBUG_IDCT (0x3e11 * 4)
-+#define HEVC_DCAC_DMA_CTRL (0x3e12 * 4)
-+#define HEVC_DCAC_DMA_ADDRESS (0x3e13 * 4)
-+#define HEVC_DCAC_CPU_ADDRESS (0x3e14 * 4)
-+#define HEVC_DCAC_CPU_DATA (0x3e15 * 4)
-+#define HEVC_DCAC_MB_COUNT (0x3e16 * 4)
-+#define HEVC_IQ_QUANT (0x3e17 * 4)
-+#define HEVC_VC1_BITPLANE_CTL (0x3e18 * 4)
++#define HEVC_PARSER_VERSION 0xc400
++#define HEVC_STREAM_CONTROL 0xc404
++#define HEVC_STREAM_START_ADDR 0xc408
++#define HEVC_STREAM_END_ADDR 0xc40c
++#define HEVC_STREAM_WR_PTR 0xc410
++#define HEVC_STREAM_RD_PTR 0xc414
++#define HEVC_STREAM_LEVEL 0xc418
++#define HEVC_STREAM_FIFO_CTL 0xc41c
++#define HEVC_SHIFT_CONTROL 0xc420
++#define HEVC_SHIFT_STARTCODE 0xc424
++#define HEVC_SHIFT_EMULATECODE 0xc428
++#define HEVC_SHIFT_STATUS 0xc42c
++#define HEVC_SHIFTED_DATA 0xc430
++#define HEVC_SHIFT_BYTE_COUNT 0xc434
++#define HEVC_SHIFT_COMMAND 0xc438
++#define HEVC_ELEMENT_RESULT 0xc43c
++#define HEVC_CABAC_CONTROL 0xc440
++#define HEVC_PARSER_SLICE_INFO 0xc444
++#define HEVC_PARSER_CMD_WRITE 0xc448
++#define HEVC_PARSER_CORE_CONTROL 0xc44c
++#define HEVC_PARSER_CMD_FETCH 0xc450
++#define HEVC_PARSER_CMD_STATUS 0xc454
++#define HEVC_PARSER_LCU_INFO 0xc458
++#define HEVC_PARSER_HEADER_INFO 0xc45c
++#define HEVC_PARSER_INT_CONTROL 0xc480
++#define HEVC_PARSER_INT_STATUS 0xc484
++#define HEVC_PARSER_IF_CONTROL 0xc488
++#define HEVC_PARSER_PICTURE_SIZE 0xc48c
++#define HEVC_PARSER_LCU_START 0xc490
++#define HEVC_PARSER_HEADER_INFO2 0xc494
++#define HEVC_PARSER_QUANT_READ 0xc498
++#define HEVC_PARSER_RESERVED_27 0xc49c
++#define HEVC_PARSER_CMD_SKIP_0 0xc4a0
++#define HEVC_PARSER_CMD_SKIP_1 0xc4a4
++#define HEVC_PARSER_CMD_SKIP_2 0xc4a8
++#define HEVC_SAO_IF_STATUS 0xc4c0
++#define HEVC_SAO_IF_DATA_Y 0xc4c4
++#define HEVC_SAO_IF_DATA_U 0xc4c8
++#define HEVC_SAO_IF_DATA_V 0xc4cc
++#define HEVC_STREAM_SWAP_ADDR 0xc4d0
++#define HEVC_STREAM_SWAP_CTRL 0xc4d4
++#define HEVC_IQIT_IF_WAIT_CNT 0xc4d8
++#define HEVC_MPRED_IF_WAIT_CNT 0xc4dc
++#define HEVC_SAO_IF_WAIT_CNT 0xc4e0
 +
++#define HEVC_MPRED_VERSION 0xc800
++#define HEVC_MPRED_CTRL0 0xc804
++#define HEVC_MPRED_CTRL1 0xc808
++#define HEVC_MPRED_INT_EN 0xc80c
++#define HEVC_MPRED_INT_STATUS 0xc810
++#define HEVC_MPRED_PIC_SIZE 0xc814
++#define HEVC_MPRED_PIC_SIZE_LCU 0xc818
++#define HEVC_MPRED_TILE_START 0xc81c
++#define HEVC_MPRED_TILE_SIZE_LCU 0xc820
++#define HEVC_MPRED_REF_NUM 0xc824
++#define HEVC_MPRED_REF_EN_L0 0xc830
++#define HEVC_MPRED_REF_EN_L1 0xc834
++#define HEVC_MPRED_COLREF_EN_L0 0xc838
++#define HEVC_MPRED_COLREF_EN_L1 0xc83c
++#define HEVC_MPRED_AXI_WCTRL 0xc840
++#define HEVC_MPRED_AXI_RCTRL 0xc844
++#define HEVC_MPRED_ABV_START_ADDR 0xc848
++#define HEVC_MPRED_MV_WR_START_ADDR 0xc84c
++#define HEVC_MPRED_MV_RD_START_ADDR 0xc850
++#define HEVC_MPRED_MV_WPTR 0xc854
++#define HEVC_MPRED_MV_RPTR 0xc858
++#define HEVC_MPRED_MV_WR_ROW_JUMP 0xc85c
++#define HEVC_MPRED_MV_RD_ROW_JUMP 0xc860
++#define HEVC_MPRED_CURR_LCU 0xc864
++#define HEVC_MPRED_ABV_WPTR 0xc868
++#define HEVC_MPRED_ABV_RPTR 0xc86c
++#define HEVC_MPRED_CTRL2 0xc870
++#define HEVC_MPRED_CTRL3 0xc874
++#define HEVC_MPRED_L0_REF00_POC 0xc880
++#define HEVC_MPRED_L1_REF00_POC 0xc8c0
 +
-+/*add from M8M2*/
-+#define HEVC_MSP (0x3300 * 4)
-+#define HEVC_MPSR (0x3301 * 4)
-+#define HEVC_MINT_VEC_BASE (0x3302 * 4)
-+#define HEVC_MCPU_INTR_GRP (0x3303 * 4)
-+#define HEVC_MCPU_INTR_MSK (0x3304 * 4)
-+#define HEVC_MCPU_INTR_REQ (0x3305 * 4)
-+#define HEVC_MPC_P (0x3306 * 4)
-+#define HEVC_MPC_D (0x3307 * 4)
-+#define HEVC_MPC_E (0x3308 * 4)
-+#define HEVC_MPC_W (0x3309 * 4)
-+#define HEVC_MINDEX0_REG (0x330a * 4)
-+#define HEVC_MINDEX1_REG (0x330b * 4)
-+#define HEVC_MINDEX2_REG (0x330c * 4)
-+#define HEVC_MINDEX3_REG (0x330d * 4)
-+#define HEVC_MINDEX4_REG (0x330e * 4)
-+#define HEVC_MINDEX5_REG (0x330f * 4)
-+#define HEVC_MINDEX6_REG (0x3310 * 4)
-+#define HEVC_MINDEX7_REG (0x3311 * 4)
-+#define HEVC_MMIN_REG (0x3312 * 4)
-+#define HEVC_MMAX_REG (0x3313 * 4)
-+#define HEVC_MBREAK0_REG (0x3314 * 4)
-+#define HEVC_MBREAK1_REG (0x3315 * 4)
-+#define HEVC_MBREAK2_REG (0x3316 * 4)
-+#define HEVC_MBREAK3_REG (0x3317 * 4)
-+#define HEVC_MBREAK_TYPE (0x3318 * 4)
-+#define HEVC_MBREAK_CTRL (0x3319 * 4)
-+#define HEVC_MBREAK_STAUTS (0x331a * 4)
-+#define HEVC_MDB_ADDR_REG (0x331b * 4)
-+#define HEVC_MDB_DATA_REG (0x331c * 4)
-+#define HEVC_MDB_CTRL (0x331d * 4)
-+#define HEVC_MSFTINT0 (0x331e * 4)
-+#define HEVC_MSFTINT1 (0x331f * 4)
-+#define HEVC_CSP (0x3320 * 4)
-+#define HEVC_CPSR (0x3321 * 4)
-+#define HEVC_CINT_VEC_BASE (0x3322 * 4)
-+#define HEVC_CCPU_INTR_GRP (0x3323 * 4)
-+#define HEVC_CCPU_INTR_MSK (0x3324 * 4)
-+#define HEVC_CCPU_INTR_REQ (0x3325 * 4)
-+#define HEVC_CPC_P (0x3326 * 4)
-+#define HEVC_CPC_D (0x3327 * 4)
-+#define HEVC_CPC_E (0x3328 * 4)
-+#define HEVC_CPC_W (0x3329 * 4)
-+#define HEVC_CINDEX0_REG (0x332a * 4)
-+#define HEVC_CINDEX1_REG (0x332b * 4)
-+#define HEVC_CINDEX2_REG (0x332c * 4)
-+#define HEVC_CINDEX3_REG (0x332d * 4)
-+#define HEVC_CINDEX4_REG (0x332e * 4)
-+#define HEVC_CINDEX5_REG (0x332f * 4)
-+#define HEVC_CINDEX6_REG (0x3330 * 4)
-+#define HEVC_CINDEX7_REG (0x3331 * 4)
-+#define HEVC_CMIN_REG (0x3332 * 4)
-+#define HEVC_CMAX_REG (0x3333 * 4)
-+#define HEVC_CBREAK0_REG (0x3334 * 4)
-+#define HEVC_CBREAK1_REG (0x3335 * 4)
-+#define HEVC_CBREAK2_REG (0x3336 * 4)
-+#define HEVC_CBREAK3_REG (0x3337 * 4)
-+#define HEVC_CBREAK_TYPE (0x3338 * 4)
-+#define HEVC_CBREAK_CTRL (0x3339 * 4)
-+#define HEVC_CBREAK_STAUTS (0x333a * 4)
-+#define HEVC_CDB_ADDR_REG (0x333b * 4)
-+#define HEVC_CDB_DATA_REG (0x333c * 4)
-+#define HEVC_CDB_CTRL (0x333d * 4)
-+#define HEVC_CSFTINT0 (0x333e * 4)
-+#define HEVC_CSFTINT1 (0x333f * 4)
-+#define HEVC_IMEM_DMA_CTRL (0x3340 * 4)
-+#define HEVC_IMEM_DMA_ADR (0x3341 * 4)
-+#define HEVC_IMEM_DMA_COUNT (0x3342 * 4)
-+#define HEVC_WRRSP_IMEM (0x3343 * 4)
-+#define HEVC_LMEM_DMA_CTRL (0x3350 * 4)
-+#define HEVC_LMEM_DMA_ADR (0x3351 * 4)
-+#define HEVC_LMEM_DMA_COUNT (0x3352 * 4)
-+#define HEVC_WRRSP_LMEM (0x3353 * 4)
-+#define HEVC_MAC_CTRL1 (0x3360 * 4)
-+#define HEVC_ACC0REG1 (0x3361 * 4)
-+#define HEVC_ACC1REG1 (0x3362 * 4)
-+#define HEVC_MAC_CTRL2 (0x3370 * 4)
-+#define HEVC_ACC0REG2 (0x3371 * 4)
-+#define HEVC_ACC1REG2 (0x3372 * 4)
-+#define HEVC_CPU_TRACE (0x3380 * 4)
-+/**/
++#define HEVC_MPRED_CUR_POC 0xc980
++#define HEVC_MPRED_COL_POC 0xc984
++#define HEVC_MPRED_MV_RD_END_ADDR 0xc988
++
++#define HEVC_MSP 0xcc00
++#define HEVC_MPSR 0xcc04
++#define HEVC_MCPU_INTR_MSK 0xcc10
++#define HEVC_MCPU_INTR_REQ 0xcc14
++#define HEVC_CPSR 0xcc84
++
++#define HEVC_IMEM_DMA_CTRL 0xcd00
++#define HEVC_IMEM_DMA_ADR 0xcd04
++#define HEVC_IMEM_DMA_COUNT 0xcd08
++
++#define HEVCD_IPP_TOP_CNTL 0xd000
++#define HEVCD_IPP_LINEBUFF_BASE 0xd024
++#define HEVCD_IPP_AXIIF_CONFIG 0xd02c
++
++#define HEVCD_MPP_ANC2AXI_TBL_CONF_ADDR 0xd180
++#define HEVCD_MPP_ANC2AXI_TBL_CMD_ADDR 0xd184
++#define HEVCD_MPP_ANC2AXI_TBL_DATA 0xd190
++
++#define HEVCD_MPP_ANC_CANVAS_ACCCONFIG_ADDR 0xd300
++#define HEVCD_MPP_ANC_CANVAS_DATA_ADDR 0xd304
++#define HEVCD_MPP_DECOMP_CTL1 0xd308
++#define HEVCD_MPP_DECOMP_CTL2 0xd30c
++#define HEVCD_MCRCC_CTL1 0xd3c0
++#define HEVCD_MCRCC_CTL2 0xd3c4
++#define HEVCD_MCRCC_CTL3 0xd3c8
++
++#define HEVC_DBLK_CFG0 0xd400
++#define HEVC_DBLK_CFG1 0xd404
++#define HEVC_DBLK_CFG2 0xd408
++#define HEVC_DBLK_CFG3 0xd40c
++#define HEVC_DBLK_CFG4 0xd410
++#define HEVC_DBLK_CFG5 0xd414
++#define HEVC_DBLK_CFG6 0xd418
++#define HEVC_DBLK_CFG7 0xd41c
++#define HEVC_DBLK_CFG8 0xd420
++#define HEVC_DBLK_CFG9 0xd424
++#define HEVC_DBLK_CFGA 0xd428
++#define HEVC_DBLK_STS0 0xd42c
++#define HEVC_DBLK_STS1 0xd430
++
++#define HEVC_SAO_VERSION 0xd800
++#define HEVC_SAO_CTRL0 0xd804
++#define HEVC_SAO_CTRL1 0xd808
++#define HEVC_SAO_PIC_SIZE 0xd814
++#define HEVC_SAO_PIC_SIZE_LCU 0xd818
++#define HEVC_SAO_TILE_START 0xd81c
++#define HEVC_SAO_TILE_SIZE_LCU 0xd820
++#define HEVC_SAO_Y_START_ADDR 0xd82c
++#define HEVC_SAO_Y_LENGTH 0xd830
++#define HEVC_SAO_C_START_ADDR 0xd834
++#define HEVC_SAO_C_LENGTH 0xd838
++#define HEVC_SAO_Y_WPTR 0xd83c
++#define HEVC_SAO_C_WPTR 0xd840
++#define HEVC_SAO_ABV_START_ADDR 0xd844
++#define HEVC_SAO_VB_WR_START_ADDR 0xd848
++#define HEVC_SAO_VB_RD_START_ADDR 0xd84c
++#define HEVC_SAO_ABV_WPTR 0xd850
++#define HEVC_SAO_ABV_RPTR 0xd854
++#define HEVC_SAO_VB_WPTR 0xd858
++#define HEVC_SAO_VB_RPTR 0xd85c
++#define HEVC_SAO_CTRL2 0xd880
++#define HEVC_SAO_CTRL3 0xd884
++#define HEVC_SAO_CTRL4 0xd888
++#define HEVC_SAO_CTRL5 0xd88c
++#define HEVC_SAO_CTRL6 0xd890
++#define HEVC_SAO_CTRL7 0xd894
++#define HEVC_CM_BODY_START_ADDR 0xd898
++#define HEVC_CM_BODY_LENGTH 0xd89c
++#define HEVC_CM_HEADER_LENGTH 0xd8a4
++#define HEVC_CM_HEADER_OFFSET 0xd8ac
++
++#define HEVC_IQIT_CLK_RST_CTRL 0xdc00
++#define HEVC_IQIT_SCALELUT_WR_ADDR 0xdc08
++#define HEVC_IQIT_SCALELUT_RD_ADDR 0xdc0c
++#define HEVC_IQIT_SCALELUT_DATA 0xdc10
++
++#define HEVC_PSCALE_CTRL 0xe444
 +
 +#endif
-+
 diff --git a/drivers/media/platform/meson/vdec/vdec_hevc.c b/drivers/media/platform/meson/vdec/vdec_hevc.c
 new file mode 100644
-index 0000000..8872f58
+index 0000000..c2b1d6d
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec_hevc.c
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,197 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -2515,11 +1978,17 @@ index 0000000..8872f58
 +	return ret;
 +}
 +
++static int vdec_hevc_use_offsets(void)
++{
++	return 0;
++}
++
 +struct amvdec_ops vdec_hevc_ops = {
 +	.start = vdec_hevc_start,
 +	.stop = vdec_hevc_stop,
 +	.conf_esparser = vdec_hevc_conf_esparser,
 +	.vififo_level = vdec_hevc_vififo_level,
++	.use_offsets = vdec_hevc_use_offsets,
 +};
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/vdec_hevc.h b/drivers/media/platform/meson/vdec/vdec_hevc.h
@@ -2552,7 +2021,7 @@ index 0000000..f1ccad7
 +#endif
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/vdec_platform.c b/drivers/media/platform/meson/vdec/vdec_platform.c
-index 1181832..a8d0342 100644
+index a506fa3..b81b30f 100644
 --- a/drivers/media/platform/meson/vdec/vdec_platform.c
 +++ b/drivers/media/platform/meson/vdec/vdec_platform.c
 @@ -8,13 +8,25 @@
@@ -2569,7 +2038,7 @@ index 1181832..a8d0342 100644
  static const struct amvdec_format vdec_formats_gxbb[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_HEVC,
-+		.min_buffers = 16,
++		.min_buffers = 20,
 +		.max_buffers = 24,
 +		.max_width = 3840,
 +		.max_height = 2160,
@@ -2586,7 +2055,7 @@ index 1181832..a8d0342 100644
  static const struct amvdec_format vdec_formats_gxl[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_HEVC,
-+		.min_buffers = 16,
++		.min_buffers = 20,
 +		.max_buffers = 24,
 +		.max_width = 3840,
 +		.max_height = 2160,
@@ -2603,7 +2072,7 @@ index 1181832..a8d0342 100644
  static const struct amvdec_format vdec_formats_gxm[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_HEVC,
-+		.min_buffers = 16,
++		.min_buffers = 20,
 +		.max_buffers = 24,
 +		.max_width = 3840,
 +		.max_height = 2160,

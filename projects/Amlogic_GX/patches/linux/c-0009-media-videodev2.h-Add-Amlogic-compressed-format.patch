@@ -1,7 +1,7 @@
-From 4f40ed63fe484c78d02e3d0583a7f44f815980f3 Mon Sep 17 00:00:00 2001
+From ae66cfcf4d04f4c842ab8d66826141323891dcec Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 18:36:09 +0200
-Subject: [PATCH 08/12] media: videodev2.h; Add Amlogic compressed format
+Subject: [PATCH 09/11] media: videodev2.h; Add Amlogic compressed format
 
 Add V4L2_PIX_FMT_AM21C which is a lossless, compressed framebuffer
 format.

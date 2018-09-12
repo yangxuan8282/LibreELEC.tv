@@ -2,6 +2,8 @@
 # Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
+# with 1.0.0 repeat delay is broken. test on upgrade
+
 PKG_NAME="v4l-utils"
 PKG_VERSION="1.14.2"
 PKG_SHA256="e6b962c4b1253cf852c31da13fd6b5bb7cbe5aa9e182881aec55123bae680692"
@@ -45,7 +47,7 @@ makeinstall_target() {
   make install DESTDIR=$INSTALL PREFIX=/usr -C utils/v4l2-ctl
 }
 
-create_multimap() {
+create_multi_keymap() {
   local f name protocols
   name="$1"
   protocols="$2"
@@ -60,7 +62,7 @@ create_multimap() {
 }
 
 post_makeinstall_target() {
-  local default_multi_maps f keymap
+  local f keymap
 
   rm -rf $INSTALL/etc/rc_keymaps
     ln -sf /storage/.config/rc_keymaps $INSTALL/etc/rc_keymaps
@@ -83,37 +85,23 @@ post_makeinstall_target() {
     done
   )
 
-  # array of local package keymaps to include in the default multimap
-  default_map="cubox_i hp_mce rc6_mce xbox_one xbox_360 zotac_ad10"
+  # create multi keymap to support several remotes OOTB
+  if [ -n "$IR_REMOTE_PROTOCOLS" -a -n "$IR_REMOTE_KEYMAPS" ]; then
+    create_multi_keymap libreelec_multi "$IR_REMOTE_PROTOCOLS" $IR_REMOTE_KEYMAPS
 
-  # create multimap_default
-  create_multimap multimap_default "RC6 NEC" $default_map
+    # use multi-keymap instead of default one
+    sed -i '/^\*\s*rc-rc6-mce\s*rc6_mce/d' $INSTALL/etc/rc_maps.cfg
 
-  # use multi-keymap instead of default one
-  sed -i '/^\*\s*rc-rc6-mce\s*rc6_mce/d' $INSTALL/etc/rc_maps.cfg
-
-  # create multimap_custom
-  if [ -z "$MULTIMAP_CUSTOM" -o "$MULTIMAP_CUSTOM" = "default" ]; then
-    create_multimap multimap_custom "RC6 NEC" $multimap_default
     cat << EOF >> $INSTALL/etc/rc_maps.cfg
 #
 # Custom LibreELEC configuration starts here
 #
-# multimap for MCE receivers
-# *             rc-rc6-mce      rc6_mce
-*               rc-rc6-mce      multimap_default
-EOF
-  else
-    create_multimap multimap_custom "RC6 NEC" $multimap_default $MULTIMAP_CUSTOM
-    cat << EOF >> $INSTALL/etc/rc_maps.cfg
-#
-# Custom LibreELEC configuration starts here
-#
-# multimap for MCE receivers
+# use combined multi-table on MCE receivers
 # *		rc-rc6-mce	rc6_mce
-*		rc-rc6-mce	multimap_default
-# multimap for amlogic devices
-meson-ir	*		multimap_custom
+*		rc-rc6-mce	libreelec_multi
+# multi-table for amlogic devices
+meson-ir	*		libreelec_multi
 EOF
+
   fi
 }

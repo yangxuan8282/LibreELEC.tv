@@ -1,15 +1,15 @@
-From 920fefae2df25f616552de3c842965f671dd9bae Mon Sep 17 00:00:00 2001
+From 0d3bdd851331565f6c3f6a33392547de056986b6 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 16:05:28 +0200
-Subject: [PATCH 07/12] media: meson: vdec: add MJPEG decoding support
+Subject: [PATCH 08/11] media: meson: vdec: add MJPEG decoding support
 
 Add support for V4L2_PIX_FMT_MJPEG
 ---
  drivers/media/platform/meson/vdec/Makefile        |   2 +-
- drivers/media/platform/meson/vdec/codec_mjpeg.c   | 137 ++++++++++++++++++++++
+ drivers/media/platform/meson/vdec/codec_mjpeg.c   | 140 ++++++++++++++++++++++
  drivers/media/platform/meson/vdec/codec_mjpeg.h   |  13 ++
  drivers/media/platform/meson/vdec/vdec_platform.c |  31 +++++
- 4 files changed, 182 insertions(+), 1 deletion(-)
+ 4 files changed, 185 insertions(+), 1 deletion(-)
  create mode 100644 drivers/media/platform/meson/vdec/codec_mjpeg.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_mjpeg.h
 
@@ -27,10 +27,10 @@ index f167a61..20c23f9 100644
  obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_mjpeg.c b/drivers/media/platform/meson/vdec/codec_mjpeg.c
 new file mode 100644
-index 0000000..f632c51
+index 0000000..c3ec2e9
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_mjpeg.c
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,140 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -46,6 +46,7 @@ index 0000000..f632c51
 +#define MREG_DECODE_PARAM	AV_SCRATCH_2
 +#define MREG_TO_AMRISC		AV_SCRATCH_8
 +#define MREG_FROM_AMRISC	AV_SCRATCH_9
++#define MREG_FRAME_OFFSET	AV_SCRATCH_A
 +
 +static int codec_mjpeg_can_recycle(struct amvdec_core *core)
 +{
@@ -144,9 +145,10 @@ index 0000000..f632c51
 +
 +static irqreturn_t codec_mjpeg_isr(struct amvdec_session *sess)
 +{
++	struct amvdec_core *core = sess->core;
 +	u32 reg;
 +	u32 buffer_index;
-+	struct amvdec_core *core = sess->core;
++	s32 offset;
 +
 +	amvdec_write_dos(core, ASSIST_MBOX1_CLR_REG, 1);
 +
@@ -155,7 +157,8 @@ index 0000000..f632c51
 +		return IRQ_HANDLED;
 +
 +	buffer_index = ((reg & 0x7) - 1) & 3;
-+	amvdec_dst_buf_done_idx(sess, buffer_index, V4L2_FIELD_NONE);
++	offset = amvdec_read_dos(core, MREG_FRAME_OFFSET);
++	amvdec_dst_buf_done_idx(sess, buffer_index, offset, V4L2_FIELD_NONE);
 +
 +	amvdec_write_dos(core, MREG_FROM_AMRISC, 0);
 +	return IRQ_HANDLED;
@@ -189,7 +192,7 @@ index 0000000..cc1cf73
 +#endif
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/vdec_platform.c b/drivers/media/platform/meson/vdec/vdec_platform.c
-index 135d756..1181832 100644
+index f6fe5a9..a506fa3 100644
 --- a/drivers/media/platform/meson/vdec/vdec_platform.c
 +++ b/drivers/media/platform/meson/vdec/vdec_platform.c
 @@ -11,9 +11,20 @@

@@ -1,20 +1,20 @@
-From b73062fd0c0c9630ad00ec5c0e9880798a994875 Mon Sep 17 00:00:00 2001
+From 0ea63cf85da2f57d348521e0146f8731a1144729 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 15:24:02 +0200
-Subject: [PATCH 03/12] ARM64: dts: meson-gx: add vdec entry
+Subject: [PATCH 04/11] arm64: dts: meson-gx: add vdec entry
 
 Add the video decoder dts entry
 
 Signed-off-by: Maxime Jourdan <mjourdan@baylibre.com>
 ---
- arch/arm64/boot/dts/amlogic/meson-gx.dtsi | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/boot/dts/amlogic/meson-gx.dtsi | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
-index 737b741..d9e0fea 100644
+index 737b741..c10f0b9 100644
 --- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
 +++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
-@@ -410,6 +410,19 @@
+@@ -410,6 +410,20 @@
  			};
  		};
  
@@ -26,6 +26,7 @@ index 737b741..d9e0fea 100644
 +
 +			interrupts = <GIC_SPI 44 IRQ_TYPE_EDGE_RISING>,
 +				     <GIC_SPI 32 IRQ_TYPE_EDGE_RISING>;
++			interrupt-names = "vdec", "esparser";
 +
 +			amlogic,ao-sysctrl = <&sysctrl_AO>;
 +			amlogic,canvas = <&canvas>;

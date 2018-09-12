@@ -74,7 +74,7 @@ do_elyotna(){
   for filename in *.patch; do mv "$filename" "c-$filename"; done;
   mv *.patch $DIR/projects/Amlogic_GX/patches/linux/
   cd $DIR
-  git checkout projects/Amlogic_GX/patches/linux/c-0004-ARM64-dts-meson-add-vdec-entries.patch
+  git checkout projects/Amlogic_GX/patches/linux/c-0005-arm64-dts-meson-add-vdec-entries.patch
 }
 
 do_kwiboo(){

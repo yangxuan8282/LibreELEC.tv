@@ -26,6 +26,5 @@
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
     FIRMWARE="brcmfmac_sdio-firmware-aml meson-firmware"
 
-  # remote control keymaps to use in multimap_custom
-  # Space separated list is supported,
-    MULTIMAP_CUSTOM="wetek_hub"
+  # add OOTB support for IR remote
+    IR_REMOTE_KEYMAPS+=" wetek_hub"

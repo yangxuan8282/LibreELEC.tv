@@ -1,16 +1,16 @@
-From 4e628eee07aed9d006a4c4b4a75d41f05924b4c8 Mon Sep 17 00:00:00 2001
+From b257695d241f5a95ff6a401b29784b9ed565a102 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 16:01:55 +0200
-Subject: [PATCH 06/12] media: meson: vdec: add MPEG4 decoding support
+Subject: [PATCH 07/11] media: meson: vdec: add MPEG4 decoding support
 
 Add support for V4L2_PIX_FMT_MPEG4, V4L2_PIX_FMT_XVID and
 V4L2_PIX_FMT_H.263
 ---
  drivers/media/platform/meson/vdec/Makefile        |   2 +-
- drivers/media/platform/meson/vdec/codec_mpeg4.c   | 131 ++++++++++++++++++++++
- drivers/media/platform/meson/vdec/codec_mpeg4.h   |  13 +++
- drivers/media/platform/meson/vdec/vdec_platform.c |  91 +++++++++++++++
- 4 files changed, 236 insertions(+), 1 deletion(-)
+ drivers/media/platform/meson/vdec/codec_mpeg4.c   | 139 ++++++++++++++++++++++
+ drivers/media/platform/meson/vdec/codec_mpeg4.h   |  13 ++
+ drivers/media/platform/meson/vdec/vdec_platform.c |  91 ++++++++++++++
+ 4 files changed, 244 insertions(+), 1 deletion(-)
  create mode 100644 drivers/media/platform/meson/vdec/codec_mpeg4.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_mpeg4.h
 
@@ -28,10 +28,10 @@ index 711d990..f167a61 100644
  obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_mpeg4.c b/drivers/media/platform/meson/vdec/codec_mpeg4.c
 new file mode 100644
-index 0000000..c6db264
+index 0000000..1d574e5
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_mpeg4.c
-@@ -0,0 +1,131 @@
+@@ -0,0 +1,139 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -47,18 +47,17 @@ index 0000000..c6db264
 +/* Offset added by firmware, to substract from workspace paddr */
 +#define DCAC_BUFF_START_IP	0x02b00000
 +
-+/* map FW registers to known MPEG4 functions */
-+#define MP4_PIC_RATIO       AV_SCRATCH_5
-+#define MP4_ERR_COUNT       AV_SCRATCH_6
-+#define MP4_PIC_WH          AV_SCRATCH_7
-+#define MREG_BUFFERIN       AV_SCRATCH_8
-+#define MREG_BUFFEROUT      AV_SCRATCH_9
-+#define MP4_NOT_CODED_CNT   AV_SCRATCH_A
-+#define MP4_VOP_TIME_INC    AV_SCRATCH_B
-+#define MP4_OFFSET_REG      AV_SCRATCH_C
-+#define MP4_SYS_RATE        AV_SCRATCH_E
-+#define MEM_OFFSET_REG      AV_SCRATCH_F
-+#define MREG_FATAL_ERROR    AV_SCRATCH_L
++/* map firmware registers to known MPEG4 functions */
++#define MREG_BUFFERIN		AV_SCRATCH_8
++#define MREG_BUFFEROUT		AV_SCRATCH_9
++#define MP4_NOT_CODED_CNT	AV_SCRATCH_A
++#define MP4_OFFSET_REG		AV_SCRATCH_C
++#define MEM_OFFSET_REG		AV_SCRATCH_F
++#define MREG_FATAL_ERROR	AV_SCRATCH_L
++
++#define BUF_IDX_MASK		GENMASK(2, 0)
++#define INTERLACE_FLAG		BIT(7)
++#define TOP_FIELD_FIRST_FLAG	BIT(6)
 +
 +struct codec_mpeg4 {
 +	/* Buffer for the MPEG4 Workspace */
@@ -73,7 +72,7 @@ index 0000000..c6db264
 +
 +static void codec_mpeg4_recycle(struct amvdec_core *core, u32 buf_idx)
 +{
-+	amvdec_write_dos(core, MREG_BUFFERIN, ~(1 << buf_idx));
++	amvdec_write_dos(core, MREG_BUFFERIN, ~BIT(buf_idx));
 +}
 +
 +static int codec_mpeg4_start(struct amvdec_session *sess) {
@@ -85,8 +84,6 @@ index 0000000..c6db264
 +	if (!mpeg4)
 +		return -ENOMEM;
 +
-+	sess->priv = mpeg4;
-+
 +	/* Allocate some memory for the MPEG4 decoder's state */
 +	mpeg4->workspace_vaddr = dma_alloc_coherent(core->dev, SIZE_WORKSPACE,
 +						    &mpeg4->workspace_paddr,
@@ -97,6 +94,7 @@ index 0000000..c6db264
 +		goto free_mpeg4;
 +	}
 +
++	/* Canvas regs: AV_SCRATCH_0-AV_SCRATCH_4;AV_SCRATCH_G-AV_SCRATCH_J */
 +	amvdec_set_canvases(sess, (u32[]){ AV_SCRATCH_0, AV_SCRATCH_G, 0 },
 +				  (u32[]){ 4, 4, 0 });
 +
@@ -108,6 +106,9 @@ index 0000000..c6db264
 +	amvdec_write_dos(core, MREG_BUFFEROUT, 0);
 +	amvdec_write_dos(core, MREG_FATAL_ERROR, 0);
 +	amvdec_write_dos(core, MDEC_PIC_DC_THRESH, 0x404038aa);
++
++	sess->keyframe_found = 1;
++	sess->priv = mpeg4;
 +
 +	return 0;
 +
@@ -133,26 +134,33 @@ index 0000000..c6db264
 +
 +static irqreturn_t codec_mpeg4_isr(struct amvdec_session *sess)
 +{
++	struct amvdec_core *core = sess->core;
 +	u32 reg;
 +	u32 buffer_index;
-+	struct amvdec_core *core = sess->core;
++	u32 field = V4L2_FIELD_NONE;
 +
 +	reg = amvdec_read_dos(core, MREG_FATAL_ERROR);
-+	if (reg == 1)
++	if (reg == 1) {
 +		dev_err(core->dev, "mpeg4 fatal error\n");
-+
-+	reg = amvdec_read_dos(core, MREG_BUFFEROUT);
-+	if (reg) {
-+		sess->keyframe_found = 1;
-+		amvdec_read_dos(core, MP4_NOT_CODED_CNT);
-+		amvdec_read_dos(core, MP4_VOP_TIME_INC);
-+		buffer_index = reg & 0x7;
-+		amvdec_dst_buf_done_idx(sess, buffer_index, V4L2_FIELD_NONE);
-+		amvdec_write_dos(core, MREG_BUFFEROUT, 0);
++		amvdec_abort(sess);
++		return IRQ_HANDLED;
 +	}
 +
-+	amvdec_write_dos(core, ASSIST_MBOX1_CLR_REG, 1);
++	reg = amvdec_read_dos(core, MREG_BUFFEROUT);
++	if (!reg)
++		goto end;
 +
++	buffer_index = reg & BUF_IDX_MASK;
++	if (reg & INTERLACE_FLAG)
++		field = (reg & TOP_FIELD_FIRST_FLAG) ?
++			V4L2_FIELD_INTERLACED_TB :
++			V4L2_FIELD_INTERLACED_BT;
++
++	amvdec_dst_buf_done_idx(sess, buffer_index, -1, field);
++	amvdec_write_dos(core, MREG_BUFFEROUT, 0);
++
++end:
++	amvdec_write_dos(core, ASSIST_MBOX1_CLR_REG, 1);
 +	return IRQ_HANDLED;
 +}
 +
@@ -184,7 +192,7 @@ index 0000000..b91b26413
 +#endif
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/vdec_platform.c b/drivers/media/platform/meson/vdec/vdec_platform.c
-index 9f7872f..135d756 100644
+index e9b7df6..f6fe5a9 100644
 --- a/drivers/media/platform/meson/vdec/vdec_platform.c
 +++ b/drivers/media/platform/meson/vdec/vdec_platform.c
 @@ -10,9 +10,40 @@
@@ -226,7 +234,7 @@ index 9f7872f..135d756 100644
 +		.pixfmts_cap = { V4L2_PIX_FMT_NV12M, V4L2_PIX_FMT_YUV420M, 0 },
 +	}, {
  		.pixfmt = V4L2_PIX_FMT_H264,
- 		.min_buffers = 21,
+ 		.min_buffers = 20,
  		.max_buffers = 24,
 @@ -47,6 +78,36 @@ static const struct amvdec_format vdec_formats_gxbb[] = {
  
@@ -263,7 +271,7 @@ index 9f7872f..135d756 100644
 +		.pixfmts_cap = { V4L2_PIX_FMT_NV12M, V4L2_PIX_FMT_YUV420M, 0 },
 +	}, {
  		.pixfmt = V4L2_PIX_FMT_H264,
- 		.min_buffers = 21,
+ 		.min_buffers = 20,
  		.max_buffers = 24,
 @@ -81,6 +142,36 @@ static const struct amvdec_format vdec_formats_gxl[] = {
  
@@ -300,7 +308,7 @@ index 9f7872f..135d756 100644
 +		.pixfmts_cap = { V4L2_PIX_FMT_NV12M, V4L2_PIX_FMT_YUV420M, 0 },
 +	}, {
  		.pixfmt = V4L2_PIX_FMT_H264,
- 		.min_buffers = 21,
+ 		.min_buffers = 20,
  		.max_buffers = 24,
 -- 
 2.7.4

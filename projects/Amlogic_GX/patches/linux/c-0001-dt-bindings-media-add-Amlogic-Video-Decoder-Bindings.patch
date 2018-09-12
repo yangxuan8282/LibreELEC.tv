@@ -1,34 +1,38 @@
-From 0ceff9fb866173338b3ca79657ce6bf9aa3b2a9a Mon Sep 17 00:00:00 2001
+From 88085629c3e8518fcaf043785b7d1b28e6840915 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 15:05:05 +0200
-Subject: [PATCH 01/12] dt-bindings: media: add Amlogic Video Decoder Bindings
+Subject: [PATCH 01/11] dt-bindings: media: add Amlogic Video Decoder Bindings
 
 Add documentation for the meson vdec dts node.
 
 Signed-off-by: Maxime Jourdan <mjourdan@baylibre.com>
 ---
- .../devicetree/bindings/media/amlogic,vdec.txt     | 63 ++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ .../devicetree/bindings/media/amlogic,vdec.txt     | 71 ++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/media/amlogic,vdec.txt
 
 diff --git a/Documentation/devicetree/bindings/media/amlogic,vdec.txt b/Documentation/devicetree/bindings/media/amlogic,vdec.txt
 new file mode 100644
-index 0000000..c6450f2
+index 0000000..aabdd01
 --- /dev/null
 +++ b/Documentation/devicetree/bindings/media/amlogic,vdec.txt
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,71 @@
 +Amlogic Video Decoder
 +================================
 +
-+The VDEC IP is composed of the following blocks :
++The video decoding IP lies within the DOS memory region,
++except for the hardware bitstream parser that makes use of an undocumented
++region.
++
++It makes use of the following blocks:
 +
 +- ESPARSER is a bitstream parser that outputs to a VIFIFO. Further VDEC blocks
 +then feed from this VIFIFO.
-+- VDEC_1 can decode MPEG-1, MPEG-2, MPEG-4 part 2, H.263, H.264.
-+- VDEC_2 is used as a helper for corner cases like H.264 4K on older SoCs.
-+It is not handled by this driver.
-+- VDEC_HCODEC is the H.264 encoding block. It is not handled by this driver.
++- VDEC_1 can decode MPEG-1, MPEG-2, MPEG-4 part 2, MJPEG, H.263, H.264, VC-1.
 +- VDEC_HEVC can decode HEVC and VP9.
++
++Both VDEC_1 and VDEC_HEVC share the "vdec" IRQ and as such cannot run
++concurrently.
 +
 +Device Tree Bindings:
 +---------------------
@@ -45,7 +49,10 @@ index 0000000..c6450f2
 +	- dos
 +	- esparser
 +- reg-names: should contain the names of the previous memory regions
-+- interrupts: should contain the vdec and esparser IRQs.
++- interrupts: should contain the following IRQs:
++	- vdec
++	- esparser
++- interrupt-names: should contain the names of the previous interrupts
 +- amlogic,ao-sysctrl: should point to the AOBUS sysctrl node
 +- amlogic,canvas: should point to a canvas provider node
 +- clocks: should contain the following clocks :
@@ -54,8 +61,8 @@ index 0000000..c6450f2
 +	- vdec_1
 +	- vdec_hevc
 +- clock-names: should contain the names of the previous clocks
-+- resets: should contain the parser reset.
-+- reset-names: should be "esparser".
++- resets: should contain the parser reset
++- reset-names: should be "esparser"
 +
 +Example:
 +
@@ -67,6 +74,7 @@ index 0000000..c6450f2
 +
 +	interrupts = <GIC_SPI 44 IRQ_TYPE_EDGE_RISING>,
 +		     <GIC_SPI 32 IRQ_TYPE_EDGE_RISING>;
++	interrupt-names = "vdec", "esparser";
 +
 +	amlogic,ao-sysctrl = <&sysctrl_AO>;
 +	amlogic,canvas = <&canvas>;

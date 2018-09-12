@@ -1,15 +1,15 @@
-From 9d2683700060a36200da3b296671485b7fec747f Mon Sep 17 00:00:00 2001
+From 8288a18e58231cb6602b41bf0269a0ae5ded8d18 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 15:42:56 +0200
-Subject: [PATCH 05/12] media: meson: vdec: add H.264 decoding support
+Subject: [PATCH 06/11] media: meson: vdec: add H.264 decoding support
 
 Add support for V4L2_PIX_FMT_H264
 ---
  drivers/media/platform/meson/vdec/Makefile        |   2 +-
- drivers/media/platform/meson/vdec/codec_h264.c    | 354 ++++++++++++++++++++++
+ drivers/media/platform/meson/vdec/codec_h264.c    | 362 ++++++++++++++++++++++
  drivers/media/platform/meson/vdec/codec_h264.h    |  13 +
  drivers/media/platform/meson/vdec/vdec_platform.c |  31 ++
- 4 files changed, 399 insertions(+), 1 deletion(-)
+ 4 files changed, 407 insertions(+), 1 deletion(-)
  create mode 100644 drivers/media/platform/meson/vdec/codec_h264.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_h264.h
 
@@ -27,10 +27,10 @@ index 6bea129..711d990 100644
  obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_h264.c b/drivers/media/platform/meson/vdec/codec_h264.c
 new file mode 100644
-index 0000000..7c47ec3
+index 0000000..f57c37c
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_h264.c
-@@ -0,0 +1,354 @@
+@@ -0,0 +1,362 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -51,27 +51,37 @@ index 0000000..7c47ec3
 + */
 +#define WORKSPACE_BUF_OFFSET	0x1000000
 +
-+#define SEI_DATA_READY BIT(15)
-+
 +/* ISR status */
++#define CMD_MASK		GENMASK(7, 0)
 +#define CMD_SET_PARAM		1
 +#define CMD_FRAMES_READY	2
 +#define CMD_FATAL_ERROR		6
 +#define CMD_BAD_WIDTH		7
 +#define CMD_BAD_HEIGHT		8
 +
++#define SEI_DATA_READY	BIT(15)
++
 +/* Picture type */
-+#define PIC_SINGLE_FRAME	0
-+#define PIC_TOP_BOT_TOP		1
-+#define PIC_BOT_TOP_BOT		2
-+#define PIC_DOUBLE_FRAME	3
-+#define PIC_TRIPLE_FRAME	4
-+#define PIC_TOP_BOT		5
-+#define PIC_BOT_TOP		6
-+#define PIC_INVALID		7
++#define PIC_TOP_BOT	5
++#define PIC_BOT_TOP	6
 +
 +/* Size of Motion Vector per macroblock */
-+#define MB_MV_SIZE 96
++#define MB_MV_SIZE	96
++
++/* Frame status data */
++#define PIC_STRUCT_BIT	5
++#define PIC_STRUCT_MASK	GENMASK(2, 0)
++#define BUF_IDX_MASK	GENMASK(4, 0)
++#define ERROR_MASK	BIT(9)
++#define OFFSET_BIT	16
++#define OFFSET_MASK	GENMASK(15, 0)
++
++/* Bitstream parsed data */
++#define MB_TOTAL_BIT	8
++#define MB_TOTAL_MASK	GENMASK(15, 0)
++#define MB_WIDTH_MASK	GENMASK(7, 0)
++#define MAX_REF_BIT	24
++#define MAX_REF_MASK	GENMASK(6, 0)
 +
 +struct codec_h264 {
 +	/* H.264 decoder requires an extended firmware */
@@ -90,8 +100,6 @@ index 0000000..7c47ec3
 +	/* Buffer for parsed SEI data */
 +	void      *sei_vaddr;
 +	dma_addr_t sei_paddr;
-+
-+	int received_0;
 +};
 +
 +static int codec_h264_can_recycle(struct amvdec_core *core)
@@ -117,16 +125,16 @@ index 0000000..7c47ec3
 +	struct codec_h264 *h264 = sess->priv;
 +
 +	/* Allocate some memory for the H.264 decoder's state */
-+	h264->workspace_vaddr =
-+		dma_alloc_coherent(core->dev, SIZE_WORKSPACE, &h264->workspace_paddr, GFP_KERNEL);
++	h264->workspace_vaddr = dma_alloc_coherent(core->dev, SIZE_WORKSPACE,
++					   &h264->workspace_paddr, GFP_KERNEL);
 +	if (!h264->workspace_vaddr) {
 +		dev_err(core->dev, "Failed to alloc H.264 Workspace\n");
 +		return -ENOMEM;
 +	}
 +
 +	/* Allocate some memory for the H.264 SEI dump */
-+	h264->sei_vaddr =
-+		dma_alloc_coherent(core->dev, SIZE_SEI, &h264->sei_paddr, GFP_KERNEL);
++	h264->sei_vaddr = dma_alloc_coherent(core->dev, SIZE_SEI,
++					     &h264->sei_paddr, GFP_KERNEL);
 +	if (!h264->sei_vaddr) {
 +		dev_err(core->dev, "Failed to alloc H.264 SEI\n");
 +		return -ENOMEM;
@@ -134,20 +142,15 @@ index 0000000..7c47ec3
 +
 +	amvdec_write_dos_bits(core, POWER_CTL_VLD, BIT(9) | BIT(6));
 +
-+	amvdec_write_dos(core, PSCALE_CTRL, 0);
-+	amvdec_write_dos(core, AV_SCRATCH_0, 0);
-+
 +	workspace_offset = h264->workspace_paddr - WORKSPACE_BUF_OFFSET;
 +	amvdec_write_dos(core, AV_SCRATCH_1, workspace_offset);
 +	amvdec_write_dos(core, AV_SCRATCH_G, h264->ext_fw_paddr);
 +	amvdec_write_dos(core, AV_SCRATCH_I, h264->sei_paddr - workspace_offset);
 +
-+	amvdec_write_dos(core, AV_SCRATCH_7, 0);
-+	amvdec_write_dos(core, AV_SCRATCH_8, 0);
-+	amvdec_write_dos(core, AV_SCRATCH_9, 0);
-+
 +	/* Enable "error correction" */
-+	amvdec_write_dos(core, AV_SCRATCH_F, (amvdec_read_dos(core, AV_SCRATCH_F) & 0xffffffc3) | BIT(4) | BIT(7));
++	amvdec_write_dos(core, AV_SCRATCH_F,
++			 (amvdec_read_dos(core, AV_SCRATCH_F) & 0xffffffc3) |
++			 BIT(4) | BIT(7));
 +
 +	amvdec_write_dos(core, MDEC_PIC_DC_THRESH, 0x404038aa);
 +
@@ -178,28 +181,29 @@ index 0000000..7c47ec3
 +	return 0;
 +}
 +
-+static int codec_h264_load_extended_firmware(struct amvdec_session *sess, const u8 *data, u32 len)
++static int codec_h264_load_extended_firmware(struct amvdec_session *sess,
++					     const u8 *data, u32 len)
 +{
 +	struct codec_h264 *h264;
 +	struct amvdec_core *core = sess->core;
++
++	if (len < SIZE_EXT_FW)
++		return -EINVAL;
 +
 +	h264 = kzalloc(sizeof(*h264), GFP_KERNEL);
 +	if (!h264)
 +		return -ENOMEM;
 +
-+	sess->priv = h264;
-+
-+	if (len < SIZE_EXT_FW)
-+		return -EINVAL;
-+
 +	h264->ext_fw_vaddr = dma_alloc_coherent(core->dev, SIZE_EXT_FW,
-+						&h264->ext_fw_paddr, GFP_KERNEL);
++					      &h264->ext_fw_paddr, GFP_KERNEL);
 +	if (!h264->ext_fw_vaddr) {
 +		dev_err(core->dev, "Failed to alloc H.264 extended fw\n");
++		kfree(h264);
 +		return -ENOMEM;
 +	}
 +
 +	memcpy(h264->ext_fw_vaddr, data, SIZE_EXT_FW);
++	sess->priv = h264;
 +
 +	return 0;
 +}
@@ -217,22 +221,18 @@ index 0000000..7c47ec3
 +
 +	sess->keyframe_found = 1;
 +
-+	amvdec_write_dos(core, AV_SCRATCH_7, 0);
-+	amvdec_write_dos(core, AV_SCRATCH_8, 0);
-+	amvdec_write_dos(core, AV_SCRATCH_9, 0);
-+
 +	parsed_info = amvdec_read_dos(core, AV_SCRATCH_1);
 +
 +	/* Total number of 16x16 macroblocks */
-+	mb_total = (parsed_info >> 8) & 0xffff;
++	mb_total = (parsed_info >> MB_TOTAL_BIT) & MB_TOTAL_MASK;
 +
 +	/* Number of macroblocks per line */
-+	mb_width = parsed_info & 0xff;
++	mb_width = parsed_info & MB_WIDTH_MASK;
 +
 +	/* Number of macroblock lines */
 +	mb_height = mb_total / mb_width;
 +
-+	max_reference_size = (parsed_info >> 24) & 0x7f;
++	max_reference_size = (parsed_info >> MAX_REF_BIT) & MAX_REF_MASK;
 +
 +	/* Align to a multiple of 4 macroblocks */
 +	mb_width = ALIGN(mb_width, 4);
@@ -270,10 +270,24 @@ index 0000000..7c47ec3
 +					     (max_dpb_size << 8));
 +}
 +
++/**
++ * The offset is split in half in 2 different registers
++ */
++static s32 get_offset_msb(struct amvdec_core *core, int frame_num)
++{
++	int take_msb = frame_num % 2;
++	int reg_offset = (frame_num / 2) * 4;
++	s32 offset_msb = amvdec_read_dos(core, AV_SCRATCH_A + reg_offset);
++
++	if (take_msb)
++		return offset_msb & 0xffff0000;
++
++	return (offset_msb & 0x0000ffff) << 16;
++}
++
 +static void codec_h264_frames_ready(struct amvdec_session *sess, u32 status)
 +{
 +	struct amvdec_core *core = sess->core;
-+	struct codec_h264 *h264 = sess->priv;
 +	int error_count;
 +	int num_frames;
 +	int i;
@@ -288,43 +302,39 @@ index 0000000..7c47ec3
 +
 +	for (i = 0; i < num_frames; i++) {
 +		u32 frame_status = amvdec_read_dos(core, AV_SCRATCH_1 + i * 4);
-+		u32 buffer_index = frame_status & 0x1f;
-+		u32 error = frame_status & 0x200;
-+		u32 pic_struct = (frame_status >> 5) & 0x7;
++		u32 buffer_index = frame_status & BUF_IDX_MASK;
++		u32 pic_struct = (frame_status >> PIC_STRUCT_BIT) &
++				 PIC_STRUCT_MASK;
++		s32 offset = (frame_status >> OFFSET_BIT) & OFFSET_MASK;
 +		u32 field = V4L2_FIELD_NONE;
 +
 +		/* A buffer decode error means it was decoded,
 +		 * but part of the picture will have artifacts.
 +		 * Typical reason is a temporarily corrupted bitstream
 +		 */
-+		if (error)
-+			dev_info(core->dev, "Buffer %d decode error\n",
-+				 buffer_index);
++		if (frame_status & ERROR_MASK)
++			dev_dbg(core->dev, "Buffer %d decode error\n",
++				buffer_index);
 +
 +		if (pic_struct == PIC_TOP_BOT)
 +			field = V4L2_FIELD_INTERLACED_TB;
 +		else if (pic_struct == PIC_BOT_TOP)
 +			field = V4L2_FIELD_INTERLACED_BT;
 +
-+		amvdec_dst_buf_done_idx(sess, buffer_index, field);
-+
-+		if (field != V4L2_FIELD_NONE && !h264->received_0)
-+			amvdec_rm_first_ts(sess);
-+
-+		h264->received_0 = 0;
++		offset |= get_offset_msb(core, i);
++		amvdec_dst_buf_done_idx(sess, buffer_index, offset, field);
 +	}
 +}
 +
 +static irqreturn_t codec_h264_threaded_isr(struct amvdec_session *sess)
 +{
 +	struct amvdec_core *core = sess->core;
-+	struct codec_h264 *h264 = sess->priv;
 +	u32 status;
 +	u32 size;
 +	u8 cmd;
 +
 +	status = amvdec_read_dos(core, AV_SCRATCH_0);
-+	cmd = status & 0xff;
++	cmd = status & CMD_MASK;
 +
 +	switch (cmd) {
 +	case CMD_SET_PARAM:
@@ -344,10 +354,8 @@ index 0000000..7c47ec3
 +		size = (amvdec_read_dos(core, AV_SCRATCH_1) + 1) * 16;
 +		dev_err(core->dev, "Unsupported video height: %u\n", size);
 +		goto abort;
-+	case 0:
-+		h264->received_0 = 1;
-+		break;
-+	case 9: /* Unused but not worth printing for */
++	case 0: /* Unused but not worth printing for */
++	case 9:
 +		break;
 +	default:
 +		dev_info(core->dev, "Unexpected H264 ISR: %08X\n", cmd);
@@ -406,7 +414,7 @@ index 0000000..7a15976
 +#endif
 \ No newline at end of file
 diff --git a/drivers/media/platform/meson/vdec/vdec_platform.c b/drivers/media/platform/meson/vdec/vdec_platform.c
-index 46eeb74..9f7872f 100644
+index 46eeb74..e9b7df6 100644
 --- a/drivers/media/platform/meson/vdec/vdec_platform.c
 +++ b/drivers/media/platform/meson/vdec/vdec_platform.c
 @@ -9,9 +9,20 @@
@@ -418,7 +426,7 @@ index 46eeb74..9f7872f 100644
  static const struct amvdec_format vdec_formats_gxbb[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_H264,
-+		.min_buffers = 21,
++		.min_buffers = 20,
 +		.max_buffers = 24,
 +		.max_width = 1920,
 +		.max_height = 1080,
@@ -435,10 +443,10 @@ index 46eeb74..9f7872f 100644
  static const struct amvdec_format vdec_formats_gxl[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_H264,
-+		.min_buffers = 21,
++		.min_buffers = 20,
 +		.max_buffers = 24,
-+		.max_width = 1920,
-+		.max_height = 1080,
++		.max_width = 3840,
++		.max_height = 2160,
 +		.vdec_ops = &vdec_1_ops,
 +		.codec_ops = &codec_h264_ops,
 +		.firmware_path = "meson/gxl/vh264_mc",
@@ -452,10 +460,10 @@ index 46eeb74..9f7872f 100644
  static const struct amvdec_format vdec_formats_gxm[] = {
  	{
 +		.pixfmt = V4L2_PIX_FMT_H264,
-+		.min_buffers = 21,
++		.min_buffers = 20,
 +		.max_buffers = 24,
-+		.max_width = 1920,
-+		.max_height = 1080,
++		.max_width = 3840,
++		.max_height = 2160,
 +		.vdec_ops = &vdec_1_ops,
 +		.codec_ops = &codec_h264_ops,
 +		.firmware_path = "meson/gxm/vh264_mc",
