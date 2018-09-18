@@ -26,9 +26,9 @@ parted -s "${DEV_EMMC}" mklabel msdos
 parted -s "${DEV_EMMC}" mkpart primary fat32 16M 532M
 parted -s "${DEV_EMMC}" mkpart primary ext4 533M 565M
 
-if [ -f /flash/uboot.img ] ; then
+if [ -f /flash/u-boot/uboot.img ] ; then
     echo "Start update u-boot"
-    dd if=/flash/uboot.img of="${DEV_EMMC}" conv=fsync seek=16384
+    dd if=/flash/u-boot/uboot.img of="${DEV_EMMC}" conv=fsync seek=16384
 fi
 
 sync

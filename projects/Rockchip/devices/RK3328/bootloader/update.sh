@@ -17,30 +17,29 @@ if [ -z "$BOOT_DISK" ]; then
 fi
 
 # mount $BOOT_ROOT r/w
-  mount -o remount,rw $BOOT_ROOT
+mount -o remount,rw $BOOT_ROOT
 
 # update device tree
 mv $BOOT_ROOT/dtb $BOOT_ROOT/dtb_old
-cp -R $UPDATE_DIR/.tmp/*/3rdparty/bootloader/dtb $BOOT_ROOT
+cp -R $UPDATE_DIR/.tmp/*/3rdparty/instboot/dtb $BOOT_ROOT
 
 # update bootloader
-  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/bootloader/idbloader.img ]; then
+  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/idbloader.img ]; then
     echo -n "Updating idbloader.img... "
-    dd if=$UPDATE_DIR/.tmp/*/3rdparty/bootloader/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
+    dd if=$UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/idbloader.img of=$BOOT_DISK bs=32k seek=1 conv=fsync &>/dev/null
     echo "done"
   fi
-  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/bootloader/uboot.img ]; then
+  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/uboot.img ]; then
     echo -n "Updating uboot.img... "
-    dd if=$UPDATE_DIR/.tmp/*/3rdparty/bootloader/uboot.img of=$BOOT_DISK bs=64k seek=128 conv=fsync &>/dev/null
+    dd if=$UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/uboot.img of=$BOOT_DISK bs=64k seek=128 conv=fsync &>/dev/null
     echo "done"
   fi
-  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/bootloader/trust.img ]; then
+  if [ -f $UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/trust.img ]; then
     echo -n "Updating trust.img... "
-    dd if=$UPDATE_DIR/.tmp/*/3rdparty/bootloader/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
+    dd if=$UPDATE_DIR/.tmp/*/3rdparty/instboot/u-boot/trust.img of=$BOOT_DISK bs=64k seek=192 conv=fsync &>/dev/null
     echo "done"
   fi
 
 # mount $BOOT_ROOT r/o
   sync
   mount -o remount,ro $BOOT_ROOT
-
