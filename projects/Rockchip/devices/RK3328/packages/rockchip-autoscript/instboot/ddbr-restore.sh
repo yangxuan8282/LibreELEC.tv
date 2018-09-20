@@ -29,5 +29,5 @@ fi
 gunzip -c $OUTDIR/$image.gz | dd of=/dev/$emmc
 
 echo "Done! restore backup completed."
-
+poweroff
 exit 0

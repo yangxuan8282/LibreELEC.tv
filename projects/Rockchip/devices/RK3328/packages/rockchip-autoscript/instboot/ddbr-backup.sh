@@ -37,5 +37,5 @@ fi
 dd if=$emmc | gzip > $OUTDIR/$image.gz
 
 echo "Done! Full backup completed."
-
+poweroff
 exit 0
