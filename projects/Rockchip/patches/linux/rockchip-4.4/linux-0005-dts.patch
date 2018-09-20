@@ -1,4 +1,4 @@
-From cf1a1299ed4c29012b0cf0476d93f45d49629b18 Mon Sep 17 00:00:00 2001
+From 20f6c0db1041cf9636896a4c769aceec134cb5e4 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 1 Jul 2018 23:22:32 +0200
 Subject: [PATCH] arm: dts: rockchip: rk3288: update dtsi
@@ -8,7 +8,7 @@ Subject: [PATCH] arm: dts: rockchip: rk3288: update dtsi
  1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
-index 8e51132ef7e4..54b785278956 100644
+index 1b7602f25f34..9cca69f9f5ba 100644
 --- a/arch/arm/boot/dts/rk3288.dtsi
 +++ b/arch/arm/boot/dts/rk3288.dtsi
 @@ -352,49 +352,57 @@
@@ -99,7 +99,7 @@ index 8e51132ef7e4..54b785278956 100644
  
  		upthreshold = <75>;
 
-From 25d521533a524ec201dd8b0e38a32989f8c00bfc Mon Sep 17 00:00:00 2001
+From dd0d99ffe4c71b2996e0a728d4aaacd83c85ece1 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 13 Aug 2017 10:24:19 +0200
 Subject: [PATCH] arm: dts: rk3288-miniarm: update dts
@@ -275,20 +275,20 @@ index a5c5300797ab..7fc92c037dfd 100644
  
  &vopb {
 
-From 6cf3332dd491b1898930ff53e3cdd3b9f2a4a190 Mon Sep 17 00:00:00 2001
+From 9124e9cb1fa4a10c90113e5086c7233c2f27d38f Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Thu, 2 Nov 2017 23:17:46 +0100
 Subject: [PATCH] arm: dts: rk3288-miqi: update dts
 
 ---
- arch/arm/boot/dts/rk3288-miqi.dts | 69 ++++++++++++++++++++++++---------------
- 1 file changed, 43 insertions(+), 26 deletions(-)
+ arch/arm/boot/dts/rk3288-miqi.dts | 67 ++++++++++++++++++++++++---------------
+ 1 file changed, 42 insertions(+), 25 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rk3288-miqi.dts b/arch/arm/boot/dts/rk3288-miqi.dts
-index a2862c6a17f1..18f2a9f96d71 100644
+index a2862c6a17f1..fe011a2a228c 100644
 --- a/arch/arm/boot/dts/rk3288-miqi.dts
 +++ b/arch/arm/boot/dts/rk3288-miqi.dts
-@@ -43,10 +43,21 @@
+@@ -43,11 +43,22 @@
  /dts-v1/;
  #include <dt-bindings/pwm/pwm.h>
  #include "rk3288.dtsi"
@@ -296,10 +296,9 @@ index a2862c6a17f1..18f2a9f96d71 100644
 +#include "rk3288cg-opp.dtsi"
  
  / {
--	compatible = "rockchip,rk3288-miqi", "rockchip,rk3288";
 +	model = "mqmaker MiQi";
-+	compatible = "rockchip,rk3288-miqi", "rockchip,rk3288w", "rockchip,rk3288";
-+
+ 	compatible = "rockchip,rk3288-miqi", "rockchip,rk3288";
+ 
 +	chosen {
 +		bootargs = "earlyprintk=uart8250-32bit,0xff690000";
 +	};
@@ -309,9 +308,10 @@ index a2862c6a17f1..18f2a9f96d71 100644
 +		nvmem-cells = <&efuse_id>;
 +		nvmem-cell-names = "id";
 +	};
- 
++
  	memory {
  		device_type = "memory";
+ 		reg = <0x0 0x0 0x0 0x80000000>;
 @@ -56,29 +67,14 @@
  	sound {
  		compatible = "simple-audio-card";
@@ -421,7 +421,7 @@ index a2862c6a17f1..18f2a9f96d71 100644
  };
 -
 
-From ca712805039a7324e9451784ebec7099cb36e5d3 Mon Sep 17 00:00:00 2001
+From 57839f69ed524eb7539ab832af25e6197bca0295 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 17 Jan 2018 22:17:45 +0100
 Subject: [PATCH] arm64: dts: rockchip: rk3328: update dtsi
@@ -615,7 +615,7 @@ index 0d2251c903b1..4e2418be4bda 100644
  		interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
  		status = "disabled";
 
-From 0cf4e80b916ca39a676d998252b99ebceeaa8ba7 Mon Sep 17 00:00:00 2001
+From b5feb1859a8deb87e5860560d32989df519c138e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 17 Jan 2018 22:17:45 +0100
 Subject: [PATCH] arm64: dts: rockchip: rk3328-rock64: update dts
@@ -625,15 +625,15 @@ Subject: [PATCH] arm64: dts: rockchip: rk3328-rock64: update dts
  1 file changed, 158 insertions(+), 92 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts b/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
-index ea8cd77333a8..68795d255309 100644
+index 4b2eef609601..761d428e1b9e 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
 @@ -48,20 +48,15 @@
  	compatible = "pine64,rock64", "rockchip,rk3328";
  
  	chosen {
--		bootargs = "rockchip_jtag earlyprintk=uart8250-32bit,0xff130000";
-+		bootargs = "earlyprintk=uart8250-32bit,0xff130000";
+-		bootargs = "rockchip_jtag earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
++		bootargs = "earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
  		stdout-path = "serial2:1500000n8";
  	};
  
@@ -1142,7 +1142,7 @@ index ea8cd77333a8..68795d255309 100644
  };
  
 
-From f8574a0c71e49e998490c77d4666c23cee4c7aa7 Mon Sep 17 00:00:00 2001
+From eaa9e2d6d9e6bce6f1b6b9fb25ac9760ef2c4762 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 17 Jan 2018 22:17:45 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3328-box board
@@ -1154,7 +1154,7 @@ Subject: [PATCH] arm64: dts: rockchip: add rk3328-box board
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-box.dts b/arch/arm64/boot/dts/rockchip/rk3328-box.dts
 new file mode 100644
-index 000000000000..3587126087e5
+index 000000000000..52e6601d1511
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-box.dts
 @@ -0,0 +1,642 @@
@@ -1208,7 +1208,7 @@ index 000000000000..3587126087e5
 +	compatible = "rockchip,rk3328-box", "rockchip,rk3328";
 +
 +	chosen {
-+		bootargs = "earlyprintk=uart8250-32bit,0xff130000";
++		bootargs = "earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
 +		stdout-path = "serial2:1500000n8";
 +	};
 +
@@ -1801,7 +1801,7 @@ index 000000000000..3587126087e5
 +	status = "okay";
 +};
 
-From 22fd62816f459b28ee5a5edfa5218f671138f9dc Mon Sep 17 00:00:00 2001
+From a5329bc30dbe3f87674da0589f7651d3fca39c3d Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 17 Jan 2018 22:17:45 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3328-rockbox board
@@ -1813,7 +1813,7 @@ Subject: [PATCH] arm64: dts: rockchip: add rk3328-rockbox board
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 new file mode 100644
-index 000000000000..75f890e548e5
+index 000000000000..96f5e7fef10c
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-rockbox.dts
 @@ -0,0 +1,582 @@
@@ -1867,7 +1867,7 @@ index 000000000000..75f890e548e5
 +	compatible = "pine64,rockbox", "rockchip,rk3328";
 +
 +	chosen {
-+		bootargs = "earlyprintk=uart8250-32bit,0xff130000";
++		bootargs = "earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
 +		stdout-path = "serial2:1500000n8";
 +	};
 +
@@ -2400,7 +2400,7 @@ index 000000000000..75f890e548e5
 +	status = "okay";
 +};
 
-From cb2feb6b91c5716b3d0d50f4cb36cc544d8a238c Mon Sep 17 00:00:00 2001
+From 0d5ca24605ee4ef19d22e19b0a6754ae960ce3df Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Wed, 17 Jan 2018 22:17:45 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3328-roc-cc board
@@ -2412,7 +2412,7 @@ Subject: [PATCH] arm64: dts: rockchip: add rk3328-roc-cc board
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 new file mode 100644
-index 000000000000..cd0b377977ab
+index 000000000000..4127e81a8ddd
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 @@ -0,0 +1,571 @@
@@ -2466,7 +2466,7 @@ index 000000000000..cd0b377977ab
 +	compatible = "firefly,roc-rk3328-cc", "rockchip,rk3328";
 +
 +	chosen {
-+		bootargs = "earlyprintk=uart8250-32bit,0xff130000";
++		bootargs = "earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
 +		stdout-path = "serial2:1500000n8";
 +	};
 +
@@ -2988,7 +2988,7 @@ index 000000000000..cd0b377977ab
 +	status = "okay";
 +};
 
-From 464ffff441b6bb08cc72885c76de00d0b864341c Mon Sep 17 00:00:00 2001
+From 0612cd1265545e2612f7ca623c2c1fd8c589d842 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 3 Sep 2017 11:19:19 +0200
 Subject: [PATCH] arm64: dts: rockchip: rk3328-rock64: use two dai-link for i2s
@@ -3000,7 +3000,7 @@ Subject: [PATCH] arm64: dts: rockchip: rk3328-rock64: use two dai-link for i2s
  2 files changed, 31 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts b/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
-index 68795d255309..ea68f0a892bc 100644
+index 761d428e1b9e..f2684833bb90 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-rock64.dts
 @@ -127,6 +127,11 @@
@@ -3078,7 +3078,7 @@ index 53dd085d3ee2..bf7ce34084a9 100644
  	.probe = snd_soc_dummy_probe,
  	.remove = snd_soc_dummy_remove,
 
-From 47f55b038b49b9009832bbac865c8d74f3ff5c50 Mon Sep 17 00:00:00 2001
+From 495a90d08c35896d9ce370a7ca92dca27db36355 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Fri, 26 Jan 2018 00:03:46 +0100
 Subject: [PATCH] arm64: dts: rockchip: rk3328-roc-cc: disable sd-card voltage
@@ -3092,7 +3092,7 @@ RK kernel uses GRF_SOC_CON10 bit 1 to mute avcodec.
  1 file changed, 1 insertion(+), 11 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
-index cd0b377977ab..fadb35d978a9 100644
+index 4127e81a8ddd..dddf27257eee 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 @@ -98,8 +98,6 @@
@@ -3133,7 +3133,7 @@ index cd0b377977ab..fadb35d978a9 100644
  };
  
 
-From 5ff8fc9b1cd50bc59f01aad0d0dd161a149d4012 Mon Sep 17 00:00:00 2001
+From 303b48ac15cacfedf2247fb480711cec29b62506 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 28 Jan 2018 15:17:34 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3399-sapphire board
@@ -3312,7 +3312,7 @@ index 000000000000..03d009578814
 +	};
 +};
 
-From 7fb5fa6744e8e57dd985479dafffff7a08c57b3d Mon Sep 17 00:00:00 2001
+From 3a23a3bc995a2c966d007fb90c11992afa024581 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 28 Jan 2018 15:17:53 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3399-rock960 board
@@ -4324,7 +4324,7 @@ index 000000000000..828fff747135
 +	status = "okay";
 +};
 
-From 703631a6fd61c6d4cb2b972a71d4b4406bd1925a Mon Sep 17 00:00:00 2001
+From d4bccd909d81bab1fd97d68f7d8105bbc4f79328 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 28 Jan 2018 15:38:32 +0100
 Subject: [PATCH] arm: dts: rk3288: add cec clock and pinctrl
@@ -4334,7 +4334,7 @@ Subject: [PATCH] arm: dts: rk3288: add cec clock and pinctrl
  1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
-index 54b785278956..e3e3a58bb91e 100644
+index 9cca69f9f5ba..2141eb23faa7 100644
 --- a/arch/arm/boot/dts/rk3288.dtsi
 +++ b/arch/arm/boot/dts/rk3288.dtsi
 @@ -981,6 +981,8 @@
@@ -4376,7 +4376,7 @@ index 54b785278956..e3e3a58bb91e 100644
  				rockchip,pins = <7 19 RK_FUNC_2 &pcfg_pull_none>,
  						<7 20 RK_FUNC_2 &pcfg_pull_none>;
 
-From 6d9ee1951a667f61e29262045f287d9c2cbe78a7 Mon Sep 17 00:00:00 2001
+From 8ebfd23d3e0ca9029f8015aa8f713cb18cd27246 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 4 Mar 2018 09:08:35 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3328-box-trn9 board
@@ -4388,7 +4388,7 @@ Subject: [PATCH] arm64: dts: rockchip: add rk3328-box-trn9 board
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts b/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts
 new file mode 100644
-index 000000000000..55c4cbf6baff
+index 000000000000..88839fc5a899
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts
 @@ -0,0 +1,667 @@
@@ -4442,7 +4442,7 @@ index 000000000000..55c4cbf6baff
 +	compatible = "rockchip,rk3328-box-trn9", "rockchip,rk3328";
 +
 +	chosen {
-+		bootargs = "";
++		bootargs = "swiotlb=1 kpti=0";
 +	};
 +
 +	xin32k: xin32k {
@@ -5060,7 +5060,7 @@ index 000000000000..55c4cbf6baff
 +	status = "okay";
 +};
 
-From 141b61c301ed86e187a746ccd378213aca8c3372 Mon Sep 17 00:00:00 2001
+From 31a4cba962d50218ae00b2bfb856596d965ab5b3 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 4 Mar 2018 09:08:35 +0100
 Subject: [PATCH] arm64: dts: rockchip: add rk3328-box-z28 board
@@ -5072,7 +5072,7 @@ Subject: [PATCH] arm64: dts: rockchip: add rk3328-box-z28 board
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-box-z28.dts b/arch/arm64/boot/dts/rockchip/rk3328-box-z28.dts
 new file mode 100644
-index 000000000000..f94526f6f190
+index 000000000000..c121fd681437
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-box-z28.dts
 @@ -0,0 +1,597 @@
@@ -5126,7 +5126,7 @@ index 000000000000..f94526f6f190
 +	compatible = "rockchip,rk3328-box-z28", "rockchip,rk3328";
 +
 +	chosen {
-+		bootargs = "earlyprintk=uart8250-32bit,0xff130000";
++		bootargs = "earlyprintk=uart8250-32bit,0xff130000 swiotlb=1 kpti=0";
 +		stdout-path = "serial2:1500000n8";
 +	};
 +
@@ -5674,7 +5674,7 @@ index 000000000000..f94526f6f190
 +	status = "okay";
 +};
 
-From b71af0f2ea1244e216b400a3a806472fc83e8bd2 Mon Sep 17 00:00:00 2001
+From c6cdae8537d49c3b19344476033d38f45a01d5a7 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 10 Apr 2018 22:07:37 +0200
 Subject: [PATCH] arm64: dts: rockchip: rk3328-roc-cc: use 1066MHz ddr
@@ -5956,7 +5956,7 @@ index 000000000000..ac34cc7ab1ce
 +	cs1_dqs3n_tx_de-skew = <10>;
 +};
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
-index fadb35d978a9..d0db35366b68 100644
+index dddf27257eee..6e55f7a1151a 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-roc-cc.dts
 @@ -42,6 +42,7 @@
@@ -6007,7 +6007,7 @@ index fadb35d978a9..d0db35366b68 100644
  
  &display_subsystem {
 
-From 730acd01d665d0cfa1154ba4578b26e0e5479c5b Mon Sep 17 00:00:00 2001
+From 049035ff2a0c4e818596f4562319f789f10d3f86 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 21 Apr 2018 13:21:24 +0200
 Subject: [PATCH] arm64: dts: rockchip: rk3328-box-trn9: use 1066MHz ddr
@@ -6018,7 +6018,7 @@ Subject: [PATCH] arm64: dts: rockchip: rk3328-box-trn9: use 1066MHz ddr
  1 file changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts b/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts
-index 55c4cbf6baff..da823ee47b6a 100644
+index 88839fc5a899..2b8cf0d4ebc4 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts
 +++ b/arch/arm64/boot/dts/rockchip/rk3328-box-trn9.dts
 @@ -42,6 +42,7 @@
@@ -6065,7 +6065,7 @@ index 55c4cbf6baff..da823ee47b6a 100644
  
  &display_subsystem {
 
-From 04f76286ef4c33805646a10515a65a6689aee386 Mon Sep 17 00:00:00 2001
+From 5d48879863b9b07d34cf47664ff9802f981877f8 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 18 Aug 2018 20:53:04 +0200
 Subject: [PATCH] arm64: dts: rockchip: rk3399: update dtsi
@@ -6073,8 +6073,8 @@ Subject: [PATCH] arm64: dts: rockchip: rk3399: update dtsi
 ---
  arch/arm64/boot/dts/rockchip/rk3399-linux.dtsi    | 14 +-------------
  arch/arm64/boot/dts/rockchip/rk3399-sapphire.dtsi | 17 ++++++++++++++---
- arch/arm64/boot/dts/rockchip/rk3399.dtsi          |  1 +
- 3 files changed, 16 insertions(+), 16 deletions(-)
+ arch/arm64/boot/dts/rockchip/rk3399.dtsi          |  3 ++-
+ 3 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/rockchip/rk3399-linux.dtsi b/arch/arm64/boot/dts/rockchip/rk3399-linux.dtsi
 index 2851cd529e04..7be2af6b0ba8 100644
@@ -6157,7 +6157,7 @@ index 3d76b9733665..62ba4281197e 100644
  	vqmmc-supply = <&vccio_sd>;
  	pinctrl-names = "default";
 diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-index 36fbafe89e19..30646785fa70 100644
+index 0e3d7c9da3ee..30646785fa70 100644
 --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
 +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
 @@ -1858,6 +1858,7 @@
@@ -6168,8 +6168,17 @@ index 36fbafe89e19..30646785fa70 100644
  		power-domains = <&power RK3399_PD_VOPB>;
  		iommus = <&vopb_mmu>;
  		status = "disabled";
+@@ -1980,7 +1981,7 @@
+ 		compatible = "rockchip,rk3399-dw-hdmi";
+ 		reg = <0x0 0xff940000 0x0 0x20000>;
+ 		pinctrl-names = "default";
+-		pinctrl-0 = <&hdmi_i2c_xfer>;
++		pinctrl-0 = <&hdmi_i2c_xfer>, <&hdmi_cec>;
+ 		interrupts = <GIC_SPI 23 IRQ_TYPE_LEVEL_HIGH 0>;
+ 		clocks = <&cru PCLK_HDMI_CTRL>,
+ 			 <&cru SCLK_HDMI_SFR>,
 
-From 20e2d297c0a1f3dde0d149927581e2998b374bb8 Mon Sep 17 00:00:00 2001
+From c989644a32574ab0bf3450c0cfbbdd0a18cfb536 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 19 Aug 2018 23:10:05 +0200
 Subject: [PATCH] arm64: dts: rk3399-rockpro64: update dts

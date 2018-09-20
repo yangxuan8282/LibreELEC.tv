@@ -1,7 +1,7 @@
-From e44f2ddac6099a0947c4182a0f4296d8df2be4a8 Mon Sep 17 00:00:00 2001
+From 3195a9b9cae60613359d7ee0339253825d3cb220 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 18 Aug 2018 17:26:35 +0200
-Subject: [PATCH] rockchip: rk3328: add efuse support
+Subject: [PATCH] rockchip: rk3328: get serial and ethaddr from efuse
 
 ---
  arch/arm/dts/rk3328.dtsi     | 14 ++++++++++++++

@@ -8,15 +8,18 @@ OUTDIR=$1
 
 emmc=$2
 
-echo "Start FULL backup eMMC to /storage/backup"
 
 if [ "$emmc" = "" ]
 then
-    emmc="/dev/mmcblk1"
+    if grep /dev/mmcblk0 /proc/mounts | grep flash ; then
+	emmc="/dev/mmcblk1"
+    else
+	emmc="/dev/mmcblk0"
+    fi
 else
     if [ ! -e "$emmc" ] ; then
 	echo "Not found EMMC !!!!"
-	    exit 1
+	exit 1
 	fi
 fi
 
@@ -31,8 +34,12 @@ else
     fi
 fi
 
+echo "Start FULL backup eMMC to /storage/backup/ddbr"
+systemctl stop kodi
+
 dd if=$emmc | gzip > $OUTDIR/$image.gz
 
-echo "Done"
+echo "Done! Full backup completed."
+systemctl start kodi
 
 exit 0

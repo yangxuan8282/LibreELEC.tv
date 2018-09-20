@@ -6,15 +6,18 @@ OUTDIR=$1
 
 emmc=$2
 
-echo "Start FULL restore eMMC to eMMC"
 
 if [ "$emmc" = "" ]
 then
-    emmc="/dev/mmcblk1"
+    if grep /dev/mmcblk0 /proc/mounts | grep flash ; then
+	emmc="/dev/mmcblk1"
+    else
+	emmc="/dev/mmcblk0"
+    fi
 else
     if [ ! -e "$emmc" ] ; then
 	echo "Not found EMMC !!!!"
-	    exit 1
+	exit 1
 	fi
 fi
 
@@ -23,8 +26,12 @@ if [ ! -f "$OUTDIR/$image" ] ; then
     exit 1
 fi
 
+echo "Start FULL restore eMMC to eMMC"
+systemctl stop kodi
+
 gunzip -c $OUTDIR/$image.gz | dd of=/dev/$emmc
 
-echo "Done"
+echo "Done! restore backup completed."
+systemctl start kodi
 
 exit 0

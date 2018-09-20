@@ -1,4 +1,4 @@
-From e2a70002f9a0a37f5c6297f1cc5e6604e9f9d964 Mon Sep 17 00:00:00 2001
+From dbbf39910f8192c3bb1f19dc6a57d3cbf489f404 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 24 Jun 2018 11:07:44 +0200
 Subject: [PATCH] disable unit tests by default

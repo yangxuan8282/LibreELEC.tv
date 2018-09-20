@@ -1,4 +1,4 @@
-From 6ed983631422dcce52d8b029818617b4cd067a93 Mon Sep 17 00:00:00 2001
+From a664a3f29ba297fb9cf19ae676558f9dfcdbe40d Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 21 Apr 2018 12:52:58 +0200
 Subject: [PATCH] drm/rockchip: skip 4K 50/60Hz clocks for RK3328
@@ -23,7 +23,7 @@ index e2aad6e2149b..6399bb2f3a32 100644
  	 * ensure all drm display mode can work, if someone want support more
  	 * resolutions, please limit the possible_crtc, only connect to
 
-From 3953395d6056914e32f4d3459cdb0d5bd8c362a0 Mon Sep 17 00:00:00 2001
+From e6bdc26883db7c7608cedc24a1324665404b70d9 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sat, 21 Apr 2018 12:53:04 +0200
 Subject: [PATCH] drm/rockchip: skip 4K 50/60Hz clocks for RK3399
