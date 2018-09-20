@@ -26,12 +26,8 @@ if [ ! -f "$OUTDIR/$image" ] ; then
     exit 1
 fi
 
-echo "Start FULL restore eMMC to eMMC"
-systemctl stop kodi
-
 gunzip -c $OUTDIR/$image.gz | dd of=/dev/$emmc
 
 echo "Done! restore backup completed."
-systemctl start kodi
 
 exit 0

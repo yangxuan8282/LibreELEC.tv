@@ -34,12 +34,8 @@ else
     fi
 fi
 
-echo "Start FULL backup eMMC to /storage/backup/ddbr"
-systemctl stop kodi
-
 dd if=$emmc | gzip > $OUTDIR/$image.gz
 
 echo "Done! Full backup completed."
-systemctl start kodi
 
 exit 0
