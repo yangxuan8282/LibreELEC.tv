@@ -1,0 +1,124 @@
+--- a/src/resources/lib/modules/services.py
++++ b/src/resources/lib/modules/services.py
+@@ -27,7 +27,8 @@
+ 
+ import os
+ import glob
+-
++import xbmc
++import xbmcgui
+ 
+ class services:
+ 
+@@ -47,6 +48,9 @@
+     OPT_SSH_NOPASSWD = None
+     AVAHI_DAEMON = None
+     CRON_DAEMON = None
++    EMMC_INSTALL = "/flash/install2emmc.sh"
++    EMMC_DDBR_BACKUP = "/flash/ddbr-backup.sh"
++    EMMC_DDBR_RESTORE = "/flash/ddbr-restore.sh"
+     menu = {'4': {
+         'name': 32001,
+         'menuLoader': 'load_menu',
+@@ -259,6 +263,37 @@
+                             },
+                         },
+                     },
++                'emmc': {
++                    'order': 7,
++                    'name': 32820,
++                    'not_supported': [],
++                    'settings': {
++                        'emmc_install': {
++                            'order': 1,
++                            'name': 32821,
++                            'value': '0',
++                            'action': 'install_emmc',
++                            'type': 'button',
++                            'InfoText': 2821,
++                            },
++                        'emmc_backup': {
++                            'order': 2,
++                            'name': 32822,
++                            'value': '0',
++                            'action': 'backup_emmc',
++                            'type': 'button',
++                            'InfoText': 2822,
++                            },
++                        'emmc_restore': {
++                            'order': 3,
++                            'name': 32823,
++                            'value': '0',
++                            'action': 'restore_emmc',
++                            'type': 'button',
++                            'InfoText': 2823,
++                            },
++                        },
++                    },
+                 }
+ 
+             self.oe = oeMain
+@@ -484,6 +519,63 @@
+             self.oe.set_busy(0)
+             self.oe.dbg_log('services::initialize_cron', 'ERROR: (%s)' % repr(e), 4)
+ 
++    def install_emmc(self, listItem=None):
++        try:
++            self.oe.dbg_log('services::install_emmc', 'enter_function', 0)
++            if os.path.exists(self.EMMC_INSTALL):
++                dialog = xbmcgui.Dialog()
++                ret = dialog.yesno('Attention!', 'Install Libreelec to eMMC ?')
++                if ret:
++                    self.oe.notify(self.oe._(32363), 'Start Installation to eMMC...')
++                    self.oe.set_busy(1)
++                    message = self.oe.execute(self.EMMC_INSTALL, 1).strip()
++                    self.oe.set_busy(0)
++#                    if message == 'Done! Install Libreelec to eMMC completed.':
++                    dialog = xbmcgui.Dialog()
++                    dialog.notification('Install',
++                                        '%s' % message,
++                                        xbmcgui.NOTIFICATION_INFO, 3000)
++        except Exception, e:
++            self.oe.dbg_log('services::install_emmc', 'ERROR: (' + repr(e) + ')')
++
++    def backup_emmc(self, listItem=None):
++        try:
++            self.oe.dbg_log('services::backup_emmc', 'enter_function', 0)
++            if os.path.exists(self.EMMC_DDBR_BACKUP):
++                dialog = xbmcgui.Dialog()
++                ret = dialog.yesno('Attention!', 'Create full backup eMMC ?')
++                if ret:
++                    self.oe.notify(self.oe._(32363), 'Backup...')
++                    self.oe.set_busy(1)
++                    message = self.oe.execute(self.EMMC_DDBR_BACKUP, 1).strip()
++                    self.oe.set_busy(0)
++                    if message == 'Done! Full backup completed.':
++                        dialog = xbmcgui.Dialog()
++                        dialog.notification('Backup',
++                                        '%s' % message,
++                                        xbmcgui.NOTIFICATION_INFO, 3000)
++        except Exception, e:
++            self.oe.dbg_log('services::backup_emmc', 'ERROR: (' + repr(e) + ')')
++
++    def restore_emmc(self, listItem=None):
++        try:
++            self.oe.dbg_log('services::restore_emmc', 'enter_function', 0)
++            if os.path.exists(self.EMMC_DDBR_RESTORE):
++                dialog = xbmcgui.Dialog()
++                ret = dialog.yesno('Attention!', 'Start restore full backup eMMC ?')
++                if ret:
++                    self.oe.notify(self.oe._(32363), 'Backup...')
++                    self.oe.set_busy(1)
++                    message = self.oe.execute(self.EMMC_DDBR_RESTORE, 1).strip()
++                    self.oe.set_busy(0)
++                    if message == 'Done! restore backup completed.':
++                	dialog = xbmcgui.Dialog()
++                	dialog.notification('Restore',
++                                        '%s' % message,
++                                        xbmcgui.NOTIFICATION_INFO, 3000)
++        except Exception, e:
++            self.oe.dbg_log('services::restore_emmc', 'ERROR: (' + repr(e) + ')')
++
+     def init_bluetooth(self, **kwargs):
+         try:
+             self.oe.dbg_log('services::init_bluetooth', 'enter_function', 0)
