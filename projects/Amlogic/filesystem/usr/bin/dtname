@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+COMPATIBLE=$(cat /proc/device-tree/compatible | tr -d '\000' | sed -n -e 's/.*\(amlogic\|rockchip\).*/\1/p')
+
+if [ -f /usr/sbin/fdtgrep ]; then
+  case $COMPATIBLE in
+    amlogic)
+      DTNAME=$(fdtgrep /flash/dtb.img | grep -m 1 compatible | awk -F '"' '{gsub("[,/-]","_"); print $2}')
+      echo "$DTNAME"
+      ;;
+    *)
+      echo "unknown"
+      ;;
+  esac
+else
+  echo "unknown"
+fi
