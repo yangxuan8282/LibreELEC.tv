@@ -13,6 +13,15 @@
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=" dtbs"
 
+  # Amlogic Meson SOC family (gx,gxbb,gxl,gxm)
+    MESON_FAMILY="rockchip"
+
+  # additional drivers to install:
+  # for a list of additinoal drivers see packages/linux-drivers
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
+    ADDITIONAL_DRIVERS="meson_gx_mali_t820"
+
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
@@ -27,4 +36,4 @@
     OPENGLES="opengl-meson-gbm"
 
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
-    KODIPLAYER_DRIVER="opengl-meson-gbm"
+#    KODIPLAYER_DRIVER="opengl-meson-gbm"

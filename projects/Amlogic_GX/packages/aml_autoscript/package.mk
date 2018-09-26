@@ -15,7 +15,12 @@ make_target() {
   $TOOLCHAIN/bin/mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$PKG_DIR/scripts/boot.txt" "boot.scr" > /dev/null
 }
 
+#makeinstall_target() {
+#  mkdir -p $INSTALL/usr/share/bootloader
+#  cp -a $PKG_DIR/config/* $PKG_BUILD/
+#}
+
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-  cp -a $PKG_DIR/config/* $PKG_BUILD/
+  mkdir -p $INSTALL/instboot
+  cp -a $PKG_DIR/instboot/* $INSTALL/instboot
 }

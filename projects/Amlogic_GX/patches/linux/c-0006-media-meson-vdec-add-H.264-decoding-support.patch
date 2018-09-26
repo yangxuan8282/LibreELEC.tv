@@ -1,15 +1,15 @@
-From 8288a18e58231cb6602b41bf0269a0ae5ded8d18 Mon Sep 17 00:00:00 2001
+From 0cf5cf7f40ab9623b8ccf7672703460a95d8b5ce Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 15:42:56 +0200
-Subject: [PATCH 06/11] media: meson: vdec: add H.264 decoding support
+Subject: [PATCH 06/22] media: meson: vdec: add H.264 decoding support
 
 Add support for V4L2_PIX_FMT_H264
 ---
  drivers/media/platform/meson/vdec/Makefile        |   2 +-
- drivers/media/platform/meson/vdec/codec_h264.c    | 362 ++++++++++++++++++++++
+ drivers/media/platform/meson/vdec/codec_h264.c    | 399 ++++++++++++++++++++++
  drivers/media/platform/meson/vdec/codec_h264.h    |  13 +
  drivers/media/platform/meson/vdec/vdec_platform.c |  31 ++
- 4 files changed, 407 insertions(+), 1 deletion(-)
+ 4 files changed, 444 insertions(+), 1 deletion(-)
  create mode 100644 drivers/media/platform/meson/vdec/codec_h264.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_h264.h
 
@@ -27,10 +27,10 @@ index 6bea129..711d990 100644
  obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_h264.c b/drivers/media/platform/meson/vdec/codec_h264.c
 new file mode 100644
-index 0000000..f57c37c
+index 0000000..65cb024
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_h264.c
-@@ -0,0 +1,362 @@
+@@ -0,0 +1,399 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 Maxime Jourdan <maxi.jourdan@wanadoo.fr>
@@ -72,7 +72,7 @@ index 0000000..f57c37c
 +#define PIC_STRUCT_BIT	5
 +#define PIC_STRUCT_MASK	GENMASK(2, 0)
 +#define BUF_IDX_MASK	GENMASK(4, 0)
-+#define ERROR_MASK	BIT(9)
++#define ERROR_FLAG	BIT(9)
 +#define OFFSET_BIT	16
 +#define OFFSET_MASK	GENMASK(15, 0)
 +
@@ -82,6 +82,10 @@ index 0000000..f57c37c
 +#define MB_WIDTH_MASK	GENMASK(7, 0)
 +#define MAX_REF_BIT	24
 +#define MAX_REF_MASK	GENMASK(6, 0)
++#define AR_IDC_BIT	16
++#define AR_IDC_MASK	GENMASK(7, 0)
++#define AR_PRESENT_FLAG	BIT(0)
++#define AR_EXTEND	0xff
 +
 +struct codec_h264 {
 +	/* H.264 decoder requires an extended firmware */
@@ -208,10 +212,41 @@ index 0000000..f57c37c
 +	return 0;
 +}
 +
++const struct v4l2_fract par_table[] = {
++	{ 1, 1 },   { 1, 1 },    { 12, 11 }, { 10, 11 },
++	{ 16, 11 }, { 40, 33 },  { 24, 11 }, { 20, 11 },
++	{ 32, 11 }, { 80, 33 },  { 18, 11 }, { 15, 11 },
++	{ 64, 33 }, { 160, 99 }, { 4, 3 },   { 3, 2 },
++	{ 2, 1 }
++};
++
++static void codec_h264_set_par(struct amvdec_session *sess)
++{
++	struct amvdec_core *core = sess->core;
++	u32 seq_info = amvdec_read_dos(core, AV_SCRATCH_2);
++	u32 ar_idc = (seq_info >> AR_IDC_BIT) & AR_IDC_MASK;
++
++	if (!(seq_info & AR_PRESENT_FLAG))
++		return;
++
++	if (ar_idc == AR_EXTEND) {
++		u32 ar_info = amvdec_read_dos(core, AV_SCRATCH_3);
++		sess->pixelaspect.numerator = ar_info & 0xffff;
++		sess->pixelaspect.denominator = (ar_info >> 16) & 0xffff;
++		return;
++	}
++
++	if (!ar_idc || ar_idc >= ARRAY_SIZE(par_table))
++		return;
++
++	sess->pixelaspect = par_table[ar_idc];
++}
++
 +/* Configure the H.264 decoder when the esparser finished parsing
 + * the first keyframe
 + */
-+static void codec_h264_set_param(struct amvdec_session *sess) {
++static void codec_h264_set_param(struct amvdec_session *sess)
++{
 +	struct amvdec_core *core = sess->core;
 +	struct codec_h264 *h264 = sess->priv;
 +	u32 max_reference_size;
@@ -259,6 +294,8 @@ index 0000000..f57c37c
 +		amvdec_abort(sess);
 +		return;
 +	}
++
++	codec_h264_set_par(sess);
 +
 +	/* Address to store the references' MVs */
 +	amvdec_write_dos(core, AV_SCRATCH_1, h264->ref_paddr);
@@ -312,7 +349,7 @@ index 0000000..f57c37c
 +		 * but part of the picture will have artifacts.
 +		 * Typical reason is a temporarily corrupted bitstream
 +		 */
-+		if (frame_status & ERROR_MASK)
++		if (frame_status & ERROR_FLAG)
 +			dev_dbg(core->dev, "Buffer %d decode error\n",
 +				buffer_index);
 +

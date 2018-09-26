@@ -1,7 +1,7 @@
-From 5e62b0e0e2593f7e17962a5f9774a5af3252807d Mon Sep 17 00:00:00 2001
+From a85606c02e5e39d76860cdc8dc32290033beeee2 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Tue, 4 Sep 2018 10:07:08 +0200
-Subject: [PATCH 03/11] MAINTAINERS: Add meson video decoder
+Subject: [PATCH 03/22] MAINTAINERS: Add meson video decoder
 
 Add an entry for the meson video decoder for amlogic SoCs.
 

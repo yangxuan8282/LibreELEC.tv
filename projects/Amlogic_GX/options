@@ -78,7 +78,7 @@
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
     OPENGLES="amlogic-meson-mali"
 
-  # Amlogic Meson SOC family (8 / 6 / gxbb)
+  # Amlogic Meson SOC family (gx,gxbb,gxl,gxm)
     MESON_FAMILY="gx"
 
   # include uvesafb support (yes / no)
@@ -146,7 +146,3 @@
   # set the addon dirs
     ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
-
-  # remote control keymaps to use in multimap_custom
-  # Space separated list is supported,
-    MULTIMAP_CUSTOM="default"

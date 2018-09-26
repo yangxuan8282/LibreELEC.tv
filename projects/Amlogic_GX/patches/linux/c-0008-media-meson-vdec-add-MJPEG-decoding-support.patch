@@ -1,7 +1,7 @@
-From 0d3bdd851331565f6c3f6a33392547de056986b6 Mon Sep 17 00:00:00 2001
+From 9ac3ad12f37f8c63f09faba45fe3157333f69353 Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 16:05:28 +0200
-Subject: [PATCH 08/11] media: meson: vdec: add MJPEG decoding support
+Subject: [PATCH 08/22] media: meson: vdec: add MJPEG decoding support
 
 Add support for V4L2_PIX_FMT_MJPEG
 ---

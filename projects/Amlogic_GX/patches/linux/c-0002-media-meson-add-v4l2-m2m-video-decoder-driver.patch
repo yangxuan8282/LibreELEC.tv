@@ -1,7 +1,7 @@
-From 6caeac579a45cb37680d6f14ecce9153a5b6cd09 Mon Sep 17 00:00:00 2001
+From a8d2089a739745296df4f4b63c1b2a6e52dbfcfc Mon Sep 17 00:00:00 2001
 From: Maxime Jourdan <mjourdan@baylibre.com>
 Date: Wed, 29 Aug 2018 15:17:22 +0200
-Subject: [PATCH 02/11] media: meson: add v4l2 m2m video decoder driver
+Subject: [PATCH 02/22] media: meson: add v4l2 m2m video decoder driver
 
 Amlogic SoCs feature a powerful video decoder unit able to
 decode many formats, with a performance of usually up to 4k60.
@@ -18,23 +18,23 @@ There is also a hardware bitstream parser (ESPARSER) that is handled here.
 
 Signed-off-by: Maxime Jourdan <mjourdan@baylibre.com>
 ---
- drivers/media/platform/Kconfig                    |  10 +
- drivers/media/platform/meson/Makefile             |   1 +
- drivers/media/platform/meson/vdec/Makefile        |   8 +
- drivers/media/platform/meson/vdec/codec_mpeg12.c  | 172 ++++
- drivers/media/platform/meson/vdec/codec_mpeg12.h  |  14 +
- drivers/media/platform/meson/vdec/dos_regs.h      |  98 +++
- drivers/media/platform/meson/vdec/esparser.c      | 366 ++++++++
- drivers/media/platform/meson/vdec/esparser.h      |  32 +
- drivers/media/platform/meson/vdec/vdec.c          | 973 ++++++++++++++++++++++
- drivers/media/platform/meson/vdec/vdec.h          | 244 ++++++
- drivers/media/platform/meson/vdec/vdec_1.c        | 235 ++++++
- drivers/media/platform/meson/vdec/vdec_1.h        |  14 +
- drivers/media/platform/meson/vdec/vdec_helpers.c  | 427 ++++++++++
- drivers/media/platform/meson/vdec/vdec_helpers.h  |  45 +
- drivers/media/platform/meson/vdec/vdec_platform.c | 101 +++
- drivers/media/platform/meson/vdec/vdec_platform.h |  30 +
- 16 files changed, 2770 insertions(+)
+ drivers/media/platform/Kconfig                    |   10 +
+ drivers/media/platform/meson/Makefile             |    1 +
+ drivers/media/platform/meson/vdec/Makefile        |    8 +
+ drivers/media/platform/meson/vdec/codec_mpeg12.c  |  200 ++++
+ drivers/media/platform/meson/vdec/codec_mpeg12.h  |   14 +
+ drivers/media/platform/meson/vdec/dos_regs.h      |   98 ++
+ drivers/media/platform/meson/vdec/esparser.c      |  366 ++++++++
+ drivers/media/platform/meson/vdec/esparser.h      |   32 +
+ drivers/media/platform/meson/vdec/vdec.c          | 1013 +++++++++++++++++++++
+ drivers/media/platform/meson/vdec/vdec.h          |  247 +++++
+ drivers/media/platform/meson/vdec/vdec_1.c        |  235 +++++
+ drivers/media/platform/meson/vdec/vdec_1.h        |   14 +
+ drivers/media/platform/meson/vdec/vdec_helpers.c  |  437 +++++++++
+ drivers/media/platform/meson/vdec/vdec_helpers.h  |   48 +
+ drivers/media/platform/meson/vdec/vdec_platform.c |  101 ++
+ drivers/media/platform/meson/vdec/vdec_platform.h |   30 +
+ 16 files changed, 2854 insertions(+)
  create mode 100644 drivers/media/platform/meson/vdec/Makefile
  create mode 100644 drivers/media/platform/meson/vdec/codec_mpeg12.c
  create mode 100644 drivers/media/platform/meson/vdec/codec_mpeg12.h
@@ -94,10 +94,10 @@ index 0000000..6bea129
 +obj-$(CONFIG_VIDEO_MESON_VDEC) += meson-vdec.o
 diff --git a/drivers/media/platform/meson/vdec/codec_mpeg12.c b/drivers/media/platform/meson/vdec/codec_mpeg12.c
 new file mode 100644
-index 0000000..9240f0c
+index 0000000..85e2e80
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/codec_mpeg12.c
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,200 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
@@ -116,6 +116,10 @@ index 0000000..9240f0c
 +
 +/* map firmware registers to known MPEG1/2 functions */
 +#define MREG_SEQ_INFO		AV_SCRATCH_4
++	#define MPEG2_SEQ_DAR_MASK	GENMASK(3, 0)
++	#define MPEG2_DAR_4_3		2
++	#define MPEG2_DAR_16_9		3
++	#define MPEG2_DAR_221_100	4
 +#define MREG_PIC_INFO		AV_SCRATCH_5
 +#define MREG_PIC_WIDTH		AV_SCRATCH_6
 +#define MREG_PIC_HEIGHT		AV_SCRATCH_7
@@ -214,6 +218,29 @@ index 0000000..9240f0c
 +	return 0;
 +}
 +
++static void codec_mpeg12_update_dar(struct amvdec_session *sess)
++{
++	struct amvdec_core *core = sess->core;
++	u32 seq = amvdec_read_dos(core, MREG_SEQ_INFO);
++	u32 ar = seq & MPEG2_SEQ_DAR_MASK;
++
++	switch (ar) {
++	case MPEG2_DAR_4_3:
++		amvdec_set_par_from_dar(sess, 4, 3);
++		break;
++	case MPEG2_DAR_16_9:
++		amvdec_set_par_from_dar(sess, 16, 9);
++		break;
++	case MPEG2_DAR_221_100:
++		amvdec_set_par_from_dar(sess, 221, 100);
++		break;
++	default:
++		sess->pixelaspect.numerator = 1;
++		sess->pixelaspect.denominator = 1;
++		break;
++	};
++}
++
 +static irqreturn_t codec_mpeg12_threaded_isr(struct amvdec_session *sess)
 +{
 +	struct amvdec_core *core = sess->core;
@@ -248,6 +275,7 @@ index 0000000..9240f0c
 +			V4L2_FIELD_INTERLACED_TB :
 +			V4L2_FIELD_INTERLACED_BT;
 +
++	codec_mpeg12_update_dar(sess);
 +	buffer_index = ((reg & 0xf) - 1) & 7;
 +	offset = amvdec_read_dos(core, MREG_FRAME_OFFSET);
 +	amvdec_dst_buf_done_idx(sess, buffer_index, offset, field);
@@ -806,10 +834,10 @@ index 0000000..582ee56
 +#endif
 diff --git a/drivers/media/platform/meson/vdec/vdec.c b/drivers/media/platform/meson/vdec/vdec.c
 new file mode 100644
-index 0000000..2c0b7db
+index 0000000..5229119
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec.c
-@@ -0,0 +1,973 @@
+@@ -0,0 +1,1013 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
@@ -974,7 +1002,37 @@ index 0000000..2c0b7db
 +{
 +	struct amvdec_session *sess = vb2_get_drv_priv(q);
 +	const struct amvdec_format *fmt_out = sess->fmt_out;
-+	u32 pixfmt_cap = sess->pixfmt_cap;
++	u32 output_size = amvdec_get_output_size(sess);
++
++	if (*num_planes) {
++		switch (q->type) {
++		case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
++			if (*num_planes != 1 || sizes[0] < output_size)
++				return -EINVAL;
++			break;
++		case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
++			switch (sess->pixfmt_cap) {
++			case V4L2_PIX_FMT_NV12M:
++				if (*num_planes != 2 ||
++				    sizes[0] < output_size ||
++				    sizes[1] < output_size / 2)
++					return -EINVAL;
++				break;
++			case V4L2_PIX_FMT_YUV420M:
++				if (*num_planes != 3 ||
++				    sizes[0] < output_size ||
++				    sizes[1] < output_size / 4 ||
++				    sizes[2] < output_size / 4)
++					return -EINVAL;
++				break;
++			default:
++				return -EINVAL;
++			}
++			break;
++		}
++
++		return 0;
++	}
 +
 +	switch (q->type) {
 +	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
@@ -982,15 +1040,20 @@ index 0000000..2c0b7db
 +		*num_planes = 1;
 +		break;
 +	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
-+		if (pixfmt_cap == V4L2_PIX_FMT_NV12M) {
-+			sizes[0] = amvdec_get_output_size(sess);
-+			sizes[1] = amvdec_get_output_size(sess) / 2;
++		switch (sess->pixfmt_cap) {
++		case V4L2_PIX_FMT_NV12M:
++			sizes[0] = output_size;
++			sizes[1] = output_size / 2;
 +			*num_planes = 2;
-+		} else if (pixfmt_cap == V4L2_PIX_FMT_YUV420M) {
-+			sizes[0] = amvdec_get_output_size(sess);
-+			sizes[1] = amvdec_get_output_size(sess) / 4;
-+			sizes[2] = amvdec_get_output_size(sess) / 4;
++			break;
++		case V4L2_PIX_FMT_YUV420M:
++			sizes[0] = output_size;
++			sizes[1] = output_size / 4;
++			sizes[2] = output_size / 4;
 +			*num_planes = 3;
++			break;
++		default:
++			return -EINVAL;
 +		}
 +		*num_buffers = min(max(*num_buffers, fmt_out->min_buffers),
 +				   fmt_out->max_buffers);
@@ -1008,19 +1071,16 @@ index 0000000..2c0b7db
 +	struct amvdec_session *sess = vb2_get_drv_priv(vb->vb2_queue);
 +	struct v4l2_m2m_ctx *m2m_ctx = sess->m2m_ctx;
 +
-+	mutex_lock(&sess->lock);
 +	v4l2_m2m_buf_queue(m2m_ctx, vbuf);
 +
 +	if (!sess->streamon_out || !sess->streamon_cap)
-+		goto unlock;
++		return;
 +
 +	if (vb->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE &&
 +	    vdec_codec_needs_recycle(sess))
 +		vdec_queue_recycle(sess, vb);
 +
 +	schedule_work(&sess->esparser_queue_work);
-+unlock:
-+	mutex_unlock(&sess->lock);
 +}
 +
 +static int vdec_start_streaming(struct vb2_queue *q, unsigned int count)
@@ -1033,16 +1093,13 @@ index 0000000..2c0b7db
 +	if (core->cur_sess)
 +		return -EBUSY;
 +
-+	mutex_lock(&sess->lock);
 +	if (q->type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE)
 +		sess->streamon_out = 1;
 +	else
 +		sess->streamon_cap = 1;
 +
-+	if (!sess->streamon_out || !sess->streamon_cap) {
-+		mutex_unlock(&sess->lock);
++	if (!sess->streamon_out || !sess->streamon_cap)
 +		return 0;
-+	}
 +
 +	sess->vififo_size = SIZE_VIFIFO;
 +	sess->vififo_vaddr =
@@ -1056,7 +1113,10 @@ index 0000000..2c0b7db
 +
 +	sess->should_stop = 0;
 +	sess->keyframe_found = 0;
++	sess->pixelaspect.numerator = 1;
++	sess->pixelaspect.denominator = 1;
 +	atomic_set(&sess->esparser_queued_bufs, 0);
++
 +	ret = vdec_poweron(sess);
 +	if (ret)
 +		goto vififo_free;
@@ -1067,7 +1127,6 @@ index 0000000..2c0b7db
 +						   "vdec_recycle");
 +
 +	core->cur_sess = sess;
-+	mutex_unlock(&sess->lock);
 +
 +	return 0;
 +
@@ -1084,7 +1143,7 @@ index 0000000..2c0b7db
 +		sess->streamon_out = 0;
 +	else
 +		sess->streamon_cap = 0;
-+	mutex_unlock(&sess->lock);
++
 +	return ret;
 +}
 +
@@ -1124,8 +1183,6 @@ index 0000000..2c0b7db
 +	struct amvdec_core *core = sess->core;
 +	struct vb2_v4l2_buffer *buf;
 +
-+	mutex_lock(&sess->lock);
-+
 +	if (sess->streamon_out && sess->streamon_cap) {
 +		if (vdec_codec_needs_recycle(sess))
 +			kthread_stop(sess->recycle_thread);
@@ -1152,8 +1209,6 @@ index 0000000..2c0b7db
 +
 +		sess->streamon_cap = 0;
 +	}
-+
-+	mutex_unlock(&sess->lock);
 +}
 +
 +static const struct vb2_ops vdec_vb2_ops = {
@@ -1443,21 +1498,18 @@ index 0000000..2c0b7db
 +		return ret;
 +
 +	if (!(sess->streamon_out & sess->streamon_cap))
-+		goto unlock;
++		return 0;
 +
 +	dev_dbg(sess->core->dev, "Received V4L2_DEC_CMD_STOP\n");
 +	sess->should_stop = 1;
 +
 +	vdec_wait_inactive(sess);
 +
-+	mutex_lock(&sess->lock);
 +	if (codec_ops->drain)
 +		codec_ops->drain(sess);
 +	else
 +		esparser_queue_eos(sess->core);
 +
-+unlock:
-+	mutex_unlock(&sess->lock);
 +	return ret;
 +}
 +
@@ -1470,6 +1522,19 @@ index 0000000..2c0b7db
 +	default:
 +		return -EINVAL;
 +	}
++}
++
++static int vdec_cropcap(struct file *file, void *fh,
++			struct v4l2_cropcap *crop)
++{
++	struct amvdec_session *sess =
++		container_of(file->private_data, struct amvdec_session, fh);
++
++	if (crop->type != V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
++		return -EINVAL;
++
++	crop->pixelaspect = sess->pixelaspect;
++	return 0;
 +}
 +
 +static const struct v4l2_ioctl_ops vdec_ioctl_ops = {
@@ -1496,6 +1561,7 @@ index 0000000..2c0b7db
 +	.vidioc_unsubscribe_event = v4l2_event_unsubscribe,
 +	.vidioc_try_decoder_cmd = vdec_try_decoder_cmd,
 +	.vidioc_decoder_cmd = vdec_decoder_cmd,
++	.vidioc_cropcap = vdec_cropcap,
 +};
 +
 +static int m2m_queue_init(void *priv, struct vb2_queue *src_vq,
@@ -1569,6 +1635,8 @@ index 0000000..2c0b7db
 +	sess->fmt_out = &formats[0];
 +	sess->width = 1280;
 +	sess->height = 720;
++	sess->pixelaspect.numerator = 1;
++	sess->pixelaspect.denominator = 1;
 +
 +	INIT_LIST_HEAD(&sess->timestamps);
 +	INIT_LIST_HEAD(&sess->bufs_recycle);
@@ -1785,10 +1853,10 @@ index 0000000..2c0b7db
 +MODULE_LICENSE("GPL");
 diff --git a/drivers/media/platform/meson/vdec/vdec.h b/drivers/media/platform/meson/vdec/vdec.h
 new file mode 100644
-index 0000000..6de0a11
+index 0000000..92c757d
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec.h
-@@ -0,0 +1,244 @@
+@@ -0,0 +1,247 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
@@ -1964,6 +2032,7 @@ index 0000000..6de0a11
 + * @ycbcr_enc: current ycbcr_enc
 + * @quantization: current quantization
 + * @xfer_func: current transfer function
++ * @pixelaspect: Pixel Aspect Ratio reported by the decoder
 + * @esparser_queued_bufs: number of buffers currently queued into ESPARSER
 + * @esparser_queue_work: work struct for the ESPARSER to process src buffers
 + * @streamon_cap: stream on flag for capture queue
@@ -2002,6 +2071,8 @@ index 0000000..6de0a11
 +	u8 ycbcr_enc;
 +	u8 quantization;
 +	u8 xfer_func;
++
++	struct v4l2_fract pixelaspect;
 +
 +	atomic_t esparser_queued_bufs;
 +	struct work_struct esparser_queue_work;
@@ -2296,16 +2367,17 @@ index 0000000..042d930
 +#endif
 diff --git a/drivers/media/platform/meson/vdec/vdec_helpers.c b/drivers/media/platform/meson/vdec/vdec_helpers.c
 new file mode 100644
-index 0000000..01e544e
+index 0000000..3ad0ef8
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec_helpers.c
-@@ -0,0 +1,427 @@
+@@ -0,0 +1,437 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
 + * Author: Maxime Jourdan <mjourdan@baylibre.com>
 + */
 +
++#include <linux/gcd.h>
 +#include <media/v4l2-mem2mem.h>
 +#include <media/v4l2-event.h>
 +#include <media/videobuf2-dma-contig.h>
@@ -2648,7 +2720,7 @@ index 0000000..01e544e
 +	struct device *dev = sess->core->dev_dec;
 +	struct amvdec_timestamp *match = NULL;
 +	struct amvdec_timestamp *tmp, *n;
-+	u64 timestamp;
++	u64 timestamp = 0;
 +	unsigned long flags;
 +
 +	/* codec offsets do not wrap around the vififo size */
@@ -2682,17 +2754,13 @@ index 0000000..01e544e
 +	}
 +
 +	if (!match) {
-+		dev_err(dev, "Buffer %u done but can't match offset (%08X)\n",
++		dev_dbg(dev, "Buffer %u done but can't match offset (%08X)\n",
 +			vbuf->vb2_buf.index, offset);
-+
-+		v4l2_m2m_buf_done(vbuf, VB2_BUF_STATE_ERROR);
-+		spin_unlock_irqrestore(&sess->ts_spinlock, flags);
-+		return;
++	} else {
++		timestamp = match->ts;
++		list_del(&match->list);
++		kfree(match);
 +	}
-+
-+	timestamp = match->ts;
-+	list_del(&match->list);
-+	kfree(match);
 +	spin_unlock_irqrestore(&sess->ts_spinlock, flags);
 +
 +	dst_buf_done(sess, vbuf, field, timestamp);
@@ -2720,6 +2788,19 @@ index 0000000..01e544e
 +}
 +EXPORT_SYMBOL_GPL(amvdec_dst_buf_done_idx);
 +
++void amvdec_set_par_from_dar(struct amvdec_session *sess,
++			     u32 dar_num, u32 dar_den)
++{
++	u32 div;
++
++	sess->pixelaspect.numerator = sess->height * dar_num;
++	sess->pixelaspect.denominator = sess->width * dar_den;
++	div = gcd(sess->pixelaspect.numerator, sess->pixelaspect.denominator);
++	sess->pixelaspect.numerator /= div;
++	sess->pixelaspect.denominator /= div;
++}
++EXPORT_SYMBOL_GPL(amvdec_set_par_from_dar);
++
 +void amvdec_abort(struct amvdec_session *sess)
 +{
 +	dev_info(sess->core->dev, "Aborting decoding session!\n");
@@ -2729,10 +2810,10 @@ index 0000000..01e544e
 +EXPORT_SYMBOL_GPL(amvdec_abort);
 diff --git a/drivers/media/platform/meson/vdec/vdec_helpers.h b/drivers/media/platform/meson/vdec/vdec_helpers.h
 new file mode 100644
-index 0000000..73af210
+index 0000000..14593e3
 --- /dev/null
 +++ b/drivers/media/platform/meson/vdec/vdec_helpers.h
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,48 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2018 BayLibre, SAS
@@ -2775,6 +2856,9 @@ index 0000000..73af210
 + */
 +void amvdec_add_ts_reorder(struct amvdec_session *sess, u64 ts, s32 offset);
 +void amvdec_remove_ts(struct amvdec_session *sess, u64 ts);
++
++void amvdec_set_par_from_dar(struct amvdec_session *sess,
++			     u32 dar_num, u32 dar_den);
 +
 +void amvdec_abort(struct amvdec_session *sess);
 +#endif

@@ -1,0 +1,27 @@
+From ea0c3c1985a8fc139d0582aab9ec624a63e752f4 Mon Sep 17 00:00:00 2001
+From: Rainer Hochecker <fernetmenta@online.de>
+Date: Sun, 9 Sep 2018 15:59:21 +0200
+Subject: [PATCH] VideoPlayer: rt streams - flush demux queue if sync error is
+ too big
+
+---
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index a16eb99f4060..1bd837468257 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -1931,7 +1931,11 @@ void CVideoPlayer::HandlePlaySpeed()
+           {
+             CLog::Log(LOGDEBUG, "Stream stalled, start buffering. Audio: %d - Video: %d",
+                                  m_VideoPlayerAudio->GetLevel(), m_processInfo->GetLevelVQ());
+-            SetCaching(CACHESTATE_FULL);
++
++            if (m_VideoPlayerAudio->AcceptsData() && m_VideoPlayerVideo->AcceptsData())
++              SetCaching(CACHESTATE_FULL);
++            else
++              FlushBuffers(DVD_NOPTS_VALUE, false, true);
+           }
+         }
+         else

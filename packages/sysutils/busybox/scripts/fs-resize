@@ -49,7 +49,7 @@ if [ -e /storage/.please_resize_me ] ; then
       echo ""
 
       # identify the partition scheme, and if gpt fix minor issues such as gpt header not at end of disk
-      SCHEME=$(parted -s -m $DISK unit b print 2>/dev/null | grep /dev | sed 's/^.*\(msdos\|gpt\).*$/\1/')
+      SCHEME=$(blkid -s PTTYPE -o value $DISK)
       if [ "$SCHEME" = "gpt" ]; then
         StartProgress spinner "Checking layout...   " "sgdisk -e $DISK &>/dev/null"
       fi
