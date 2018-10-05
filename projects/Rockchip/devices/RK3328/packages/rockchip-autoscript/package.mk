@@ -9,7 +9,5 @@ PKG_TOOLCHAIN="manual"
 
 makeinstall_target() {
   mkdir -p $INSTALL/instboot
-
   cp -a $PKG_DIR/instboot/* $INSTALL/instboot
-
 }

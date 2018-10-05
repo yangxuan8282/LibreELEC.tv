@@ -1,80 +1,46 @@
 #!/bin/sh
 
-################################################################################
-#      This file is part of LibreELEC - https://libreelec.tv
-#
-#  LibreELEC is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  LibreELEC is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 IMAGE_KERNEL="/flash/kernel.img"
 IMAGE_SYSTEM="/flash/SYSTEM"
-IMAGE_DTB="/flash/dtb.img"
 SCRIPT_EMMC="/flash/emmc_autoscript"
-SCRIPT_ENV="/flash/emmc_uEnv.ini"
+SCRIPT_ENV="/flash/uEnv.ini"
+IMAGE_DTB="/flash/dtb"
 
-install_to_emmc() {
-  if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM -a -f $SCRIPT_EMMC ] ; then
+if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM -a -f $SCRIPT_EMMC -a -f $SCRIPT_ENV ] ; then
 
-	echo "Unmounting SYSTEM partiton."
-	umount -f /dev/system
-        mkdir -p /tmp/system
-        mount -o rw /dev/system /tmp/system
+    if grep -q /dev/system /proc/mounts ; then
+      echo "Unmounting SYSTEM partiton."
+      umount -f /dev/system
+    fi
+    e2label /dev/system "LE_EMMC"
+    e2label /dev/data "DATA_EMMC"
+    mkdir -p /tmp/system
+    mount -o rw /dev/system /tmp/system
 
     if grep -q /dev/system /proc/mounts ; then
 
-        echo -n "Cppying kernel image..."
         cp $IMAGE_KERNEL /tmp/system && sync
-        echo "done."
-
-        echo -n "Copying SYSTEM files..."
         cp $IMAGE_SYSTEM /tmp/system && sync
-        echo "done."
-
-        echo -n "Writing script eMMC..."
         cp $SCRIPT_EMMC /tmp/system && sync
-        echo "done."
+        cp $SCRIPT_ENV /tmp/system && sync
+        sed -e "s/LIBREELEC/LE_EMMC/g" \
+          -e "s/STORAGE/DATA_EMMC/g" \
+          -i "/tmp/system/uEnv.ini"
 
-        if [ -f $IMAGE_DTB ] ; then
-          echo -n "Writing device tree image..."
-          cp $IMAGE_DTB /tmp/system && sync
-          echo "done."
-        fi
-
-        if [ -f $SCRIPT_ENV ] ; then
-          echo -n "Writing init ENV..."
-          cp $SCRIPT_ENV /tmp/system && sync
-          echo "done."
-        fi
+        cp -r $IMAGE_DTB /tmp/system && sync
 
         umount /tmp/system
-
+        sync
+        poweroff
+        exit 0
     else
       echo "No /dev/system  partiton."
-      sleep 10
+      exit 1
     fi
-
-  else
+else
     echo "No LE image found on /flash! Exiting..."
-    sleep 10
-  fi
-}
-
-echo "This script install LE that you booted from SD card/USB drive."
-echo ""
-echo "The script does not have any safeguards!"
-echo ""
-
-install_to_emmc
-
-sleep 10
+    exit 1
+fi

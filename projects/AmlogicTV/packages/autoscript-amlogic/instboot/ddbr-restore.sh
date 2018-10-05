@@ -29,7 +29,7 @@ else
     if [ ! -e "$emmc" ] ; then
 	echo "Not found EMMC !!!!"
 	exit 1
-	fi
+    fi
 fi
 
 if [ ! -f "$OUTDIR/$image" ] ; then

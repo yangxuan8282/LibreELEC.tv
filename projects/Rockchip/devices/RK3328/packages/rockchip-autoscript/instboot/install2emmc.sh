@@ -30,8 +30,7 @@ IMAGE_SYSTEM="/flash/SYSTEM"
 IMAGE_DTB="/flash/dtb"
 SCRIPT_EMMC="/flash/extlinux"
 
-install_to_emmc() {
-  if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM ] ; then
+if [ -f $IMAGE_KERNEL -a -f $IMAGE_SYSTEM -a -f $SCRIPT_EMMC ] ; then
 
     umount -f "${DEV_EMMC}p1"
     mkfs.vfat -n "LE_EMMC" "${DEV_EMMC}p1"
@@ -59,17 +58,13 @@ install_to_emmc() {
         umount /tmp/data
 	sync
 
-        echo "Done! Install Libreelec to eMMC completed."
-	exit 0
+        poweroff
+        exit 0
     else
 	echo "No $DEV_EMMC partiton."
 	exit 1
     fi
-
-  else
+else
     echo "No LE image found on /flash! Exiting..."
     exit 1
-  fi
-}
-
-install_to_emmc
+fi

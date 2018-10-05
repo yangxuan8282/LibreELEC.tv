@@ -4,12 +4,12 @@
 # Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
 
 # compile and copy amlogic autoscript files to part1
-mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
+#mcopy $RELEASE_DIR/3rdparty/bootloader/*autoscript :: 2>&1 > /dev/null || true
 
 # copy device trees to part1
-for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
-  [ -e "$dtb" ] && mcopy -s "$dtb" ::
-done
+#for dtb in $RELEASE_DIR/3rdparty/bootloader/device_trees $RELEASE_DIR/3rdparty/bootloader/*.dtb $RELEASE_DIR/3rdparty/bootloader/dtb.img ; do
+#  [ -e "$dtb" ] && mcopy -s "$dtb" ::
+#done
 
 if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
   echo "Writing u-boot to $(basename $DISK)"
@@ -18,6 +18,10 @@ if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
 fi
 
 # copy files to part1
-for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip $RELEASE_DIR/3rdparty/bootloader/u-boot ; do
+#for file_ini in $RELEASE_DIR/3rdparty/bootloader/*.ini $RELEASE_DIR/3rdparty/bootloader/*.sh $RELEASE_DIR/3rdparty/bootloader/*.zip $RELEASE_DIR/3rdparty/bootloader/u-boot ; do
+#  [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
+#done
+
+for file_ini in $RELEASE_DIR/3rdparty/instboot/* ; do
   [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
 done

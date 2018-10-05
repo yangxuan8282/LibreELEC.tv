@@ -1,4 +1,4 @@
-From 679b0365e6f83653d6c6b9d012dfb06fd1454584 Mon Sep 17 00:00:00 2001
+From 75bb99dc815464846a4add357494acf04212271d Mon Sep 17 00:00:00 2001
 From: Julia Lawall <Julia.Lawall@lip6.fr>
 Date: Sat, 14 Nov 2015 18:05:20 +0100
 Subject: [PATCH] UPSTREAM: mmc: pwrseq: constify mmc_pwrseq_ops structures
@@ -56,7 +56,7 @@ index d10538bb5e07..2b16263458af 100644
  	.post_power_on = mmc_pwrseq_simple_post_power_on,
  	.power_off = mmc_pwrseq_simple_power_off,
 
-From 2e11c6d2eeab3d060a921d84712ab2ad2493f029 Mon Sep 17 00:00:00 2001
+From 1977551c6ef29f55b398a02112e3075c9a38649d Mon Sep 17 00:00:00 2001
 From: Martin Fuzzey <mfuzzey@parkeon.com>
 Date: Wed, 20 Jan 2016 16:08:03 +0100
 Subject: [PATCH] UPSTREAM: mmc: pwrseq_simple: Make reset-gpios optional to
@@ -128,7 +128,7 @@ index 2b16263458af..aba786daebca 100644
  		goto clk_put;
  	}
 
-From aa2b864cb311057a2f9aaf7c628a6cad55488032 Mon Sep 17 00:00:00 2001
+From e79ed0004dc68dc2f2189256bf00a1f579c78f1a Mon Sep 17 00:00:00 2001
 From: Peter Chen <peter.chen@freescale.com>
 Date: Wed, 6 Jan 2016 11:34:10 +0800
 Subject: [PATCH] UPSTREAM: mmc: core: pwrseq_simple: remove unused header file
@@ -153,7 +153,7 @@ index aba786daebca..bc173e18b71c 100644
  
  #include <linux/mmc/host.h>
 
-From 62c7a84f0ff0d38f17c49673c211ffb39c7e8a14 Mon Sep 17 00:00:00 2001
+From 545d059f7a0a4c470acfdb0fff30397899597f09 Mon Sep 17 00:00:00 2001
 From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Date: Thu, 14 Apr 2016 14:02:14 +0100
 Subject: [PATCH] UPSTREAM: mmc: pwrseq_simple: add to_pwrseq_simple() macro
@@ -220,7 +220,7 @@ index bc173e18b71c..f94271bb1f6b 100644
  	if (!IS_ERR(pwrseq->reset_gpios))
  		gpiod_put_array(pwrseq->reset_gpios);
 
-From 1863f1b04c1fc4fdeb29651e5d8c7e1515de3404 Mon Sep 17 00:00:00 2001
+From e8c5f0b9383e6a528c8fc00d61755f8187e4c0b8 Mon Sep 17 00:00:00 2001
 From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Date: Thu, 14 Apr 2016 14:02:15 +0100
 Subject: [PATCH] UPSTREAM: mmc: pwrseq_emmc: add to_pwrseq_emmc() macro
@@ -267,7 +267,7 @@ index 4a82bc77fe49..c2d732aa464c 100644
  	unregister_restart_handler(&pwrseq->reset_nb);
  	gpiod_put(pwrseq->reset_gpio);
 
-From a67b9f53eb6c6fa579bc4b274e098eb2b261c0e0 Mon Sep 17 00:00:00 2001
+From ef2f3c5b7375b930697a64c85f30f9109e631cb0 Mon Sep 17 00:00:00 2001
 From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Date: Thu, 14 Apr 2016 14:02:16 +0100
 Subject: [PATCH] UPSTREAM: mmc: pwrseq: convert to proper platform device
@@ -785,7 +785,7 @@ index f94271bb1f6b..450d907c6e6c 100644
 +module_platform_driver(mmc_pwrseq_simple_driver);
 +MODULE_LICENSE("GPL v2");
 
-From 74450a05dce9db2f40f09542fa00b458cf7f537a Mon Sep 17 00:00:00 2001
+From 42eb02ddb70002e4f72fa627037b6acbdd4cb7a1 Mon Sep 17 00:00:00 2001
 From: Hans de Goede <hdegoede@redhat.com>
 Date: Sun, 7 Aug 2016 21:02:38 +0200
 Subject: [PATCH] UPSTREAM: mmc: pwrseq-simple: Add an optional
@@ -861,7 +861,7 @@ index 450d907c6e6c..1304160de168 100644
  	pwrseq->pwrseq.ops = &mmc_pwrseq_simple_ops;
  	pwrseq->pwrseq.owner = THIS_MODULE;
 
-From c8157f7f92d706e4bcb97cd2ac61672ccae46734 Mon Sep 17 00:00:00 2001
+From bf90ebd56d6f327f77bd7add55b3593679cd5c67 Mon Sep 17 00:00:00 2001
 From: Ulf Hansson <ulf.hansson@linaro.org>
 Date: Sat, 6 May 2017 11:41:30 +0200
 Subject: [PATCH] UPSTREAM: mmc: dt: pwrseq-simple: Invent power-off-delay-us
@@ -897,7 +897,7 @@ index e25436861867..9029b45b8a22 100644
  Example:
  
 
-From e16b1cbb99e49a0d6a9d9c96afba3802d297ce4a Mon Sep 17 00:00:00 2001
+From bc79b1f8ca4d16d45b93c2888474bb3f11b10226 Mon Sep 17 00:00:00 2001
 From: Ulf Hansson <ulf.hansson@linaro.org>
 Date: Sat, 6 May 2017 11:43:05 +0200
 Subject: [PATCH] UPSTREAM: mmc: pwrseq_simple: Parse DTS for the

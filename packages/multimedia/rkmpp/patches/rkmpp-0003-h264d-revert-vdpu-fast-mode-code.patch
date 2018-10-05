@@ -1,4 +1,4 @@
-From 81545d7f688c255354ee9314cfcbd285823b3f4f Mon Sep 17 00:00:00 2001
+From ccd837fab6ab41ee3cb63b0e9ae1db824f96d4dc Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Tue, 7 Aug 2018 18:14:57 +0200
 Subject: [PATCH] [h264d]: revert vdpu fast mode code
