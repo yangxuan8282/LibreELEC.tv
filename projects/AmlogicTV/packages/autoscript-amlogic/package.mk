@@ -25,9 +25,4 @@ makeinstall_target() {
       sed -e "s/@DTB_NAME@/$KERNEL_UBOOT_EXTRA_TARGET/g" \
           -i "$src"
   done
-
-#  mkdir -p $INSTALL/usr/share/bootloader
-#  cp -a $PKG_DIR/instboot/*.zip $INSTALL/usr/share/bootloader/
-#  cp -a $PKG_DIR/instboot/*.sh $INSTALL/usr/share/bootloader/
-#  cp -a $PKG_DIR/instboot/*.ini $INSTALL/usr/share/bootloader/
 }
