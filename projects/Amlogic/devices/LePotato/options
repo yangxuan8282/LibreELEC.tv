@@ -1,19 +1,9 @@
-  # u-boot version to use (default)
-    UBOOT_VERSION="vendor"
-
   # Configuration for u-boot
-    UBOOT_CONFIG="libretech_cc_defconfig"
-
-  # Target Configfile for u-boot
-    UBOOT_CONFIGFILE="boot.ini"
+    UBOOT_SYSTEM="LePotato"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxl_p212_1g_lepotato.dtb gxl_p212_2g_lepotato.dtb"
-
-  # Additional kernel dependencies
-    KERNEL_EXTRA_DEPENDS_TARGET="device-trees-amlogic"
+    KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxl-s905x-libretech-cc.dtb"
 
   # additional packages to install:
-  # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES+=" autoscript-amlogic"
+    ADDITIONAL_PACKAGES+=" amlogic-boot-fip"

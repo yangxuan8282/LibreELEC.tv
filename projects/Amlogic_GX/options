@@ -33,7 +33,7 @@
         ;;
     esac
 
-  # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
+  # Bootloader to use (syslinux / u-boot / bcm2835-bootloader)
     BOOTLOADER="u-boot"
 
   # u-boot version to use (default)
@@ -72,14 +72,11 @@
   # build and install ALSA Audio support (yes / no)
     ALSA_SUPPORT="yes"
 
-  # OpenGL(X) implementation to use (no / Mesa)
+  # OpenGL(X) implementation to use (no / mesa)
     OPENGL="no"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
     OPENGLES="amlogic-meson-mali"
-
-  # Amlogic Meson SOC family (gx,gxbb,gxl,gxm)
-    MESON_FAMILY="gx"
 
   # include uvesafb support (yes / no)
     UVESAFB_SUPPORT="no"

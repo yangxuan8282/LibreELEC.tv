@@ -20,7 +20,7 @@
         #
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc+fp+simd"
-        TARGET_FEATURES="64bit"
+        TARGET_FEATURES="64bit neon"
         ;;
       arm)
         TARGET_KERNEL_ARCH="arm64"
@@ -29,40 +29,31 @@
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
         TARGET_FPU="neon-fp-armv8"
-        TARGET_FEATURES="32bit"
+        TARGET_FEATURES="32bit neon"
         ;;
     esac
 
-  # Bootloader to use (syslinux / u-boot / atv-bootloader / bcm2835-bootloader)
+  # Bootloader to use (syslinux / u-boot / bcm2835-bootloader)
     BOOTLOADER="u-boot"
 
   # u-boot version to use (default)
-    UBOOT_VERSION="vendor"
+    UBOOT_VERSION="default"
 
   # Kernel target
-    KERNEL_TARGET="Image.lzo"
+    KERNEL_TARGET="Image"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="gxbb_p200.dtb gxbb_p200_2G.dtb gxl_p212_1g.dtb gxl_p212_2g.dtb gxl_p230_2g.dtb"
-
-  # Build Android kernel image using mkbootimg
-    BUILD_ANDROID_BOOTIMG="yes"
-
-  # Additional options to be passed to Android mkbootimg
-    ANDROID_BOOTIMG_OPTIONS="--base 0x0 --kernel_offset 0x1080000"
+    KERNEL_UBOOT_EXTRA_TARGET=""
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=""
 
-  # Additional kernel dependencies
-    KERNEL_EXTRA_DEPENDS_TARGET=""
-
   # Kernel to use. values can be:
   # default:  default mainline kernel
-    LINUX="amlogic-3.14"
+    LINUX="amlogic-mainline"
 
   # kernel image name
-    KERNEL_NAME="kernel.img"
+    KERNEL_NAME="Image"
 
 ################################################################################
 # setup build defaults
@@ -81,14 +72,11 @@
   # build and install ALSA Audio support (yes / no)
     ALSA_SUPPORT="yes"
 
-  # OpenGL(X) implementation to use (no / Mesa)
+  # OpenGL(X) implementation to use (no / mesa)
     OPENGL="no"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q / opengl-meson)
-    OPENGLES="opengl-meson"
-
-  # Amlogic Meson SOC family (8 / 6 / gxbb)
-    MESON_FAMILY="gxbb"
+    OPENGLES="amlogic-meson-mali"
 
   # include uvesafb support (yes / no)
     UVESAFB_SUPPORT="no"
@@ -99,27 +87,27 @@
   # Windowmanager to use (ratpoison / fluxbox / none)
     WINDOWMANAGER="none"
 
-  # Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
+  # Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
   # Space separated list is supported,
   # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia nouveau"
-    GRAPHIC_DRIVERS=""
+    GRAPHIC_DRIVERS="meson"
 
   # KODI Player implementation to use (default / bcm2835-driver / libfslvpuwrap / libamcodec)
-    KODIPLAYER_DRIVER="libamcodec"
+    KODIPLAYER_DRIVER="amlogic-meson-mali"
 
   # Modules to install in initramfs for early boot
-    INITRAMFS_MODULES="font softcursor bitblit fbcon dwc_otg"
+    INITRAMFS_MODULES=""
 
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-    ADDITIONAL_DRIVERS="gpu-aml RTL8192CU RTL8192DU RTL8192EU RTL8812AU RTL8188EU-aml"
+    ADDITIONAL_DRIVERS="meson_gx_mali_450"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
   # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
-    FIRMWARE="misc-firmware wlan-firmware dvb-firmware"
+    FIRMWARE="misc-firmware wlan-firmware meson-firmware"
 
   # build and install ATV IR remote support (yes / no)
     ATVCLIENT_SUPPORT="no"
@@ -144,12 +132,14 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES="u-boot-tools-aml dtc"
+    ADDITIONAL_PACKAGES="dtc"
 
-  # build and install driver addons (yes / no)
-    DRIVER_ADDONS_SUPPORT="no"
+  # use the kernel CEC framework for libcec (yes / no)
+    CEC_FRAMEWORK_SUPPORT="yes"
 
-  # driver addons to install:
-  # for a list of additinoal drivers see packages/linux-driver-addons
-  # Space separated list is supported,
-    DRIVER_ADDONS="crazycat"
+  # Addon Server Url
+#    ADDON_SERVER_URL="https://amlgx.libreelec.tv"
+
+  # set the addon dirs
+    ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"

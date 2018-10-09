@@ -17,22 +17,22 @@ PKG_NEED_UNPACK="$PROJECT_DIR/$PROJECT/bootloader"
 [ -n "$DEVICE" ] && PKG_NEED_UNPACK+=" $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader"
 
 case "$PROJECT" in
+  Amlogic)
+    PKG_VERSION="2018.07-rc2"
+    PKG_SHA256="03bd17bd0cf1d74d2f49454ef90bf17764ae5340053007cbc6eb630cf7c54863"
+    PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
+    ;;
   Rockchip)
-    PKG_VERSION="ac5a8f08e811581376e731c898c21e4f79177ec2"
-    PKG_SHA256="e3ca0d99fef24649c75c4fe7cb0c6de069f98424a7dbf9d397f65b79b8749866"
+    PKG_VERSION="8659d08d2b589693d121c1298484e861b7dafc4f"
+    PKG_SHA256="3f9f2bbd0c28be6d7d6eb909823fee5728da023aca0ce37aef3c8f67d1179ec1"
     PKG_URL="https://github.com/rockchip-linux/u-boot/archive/$PKG_VERSION.tar.gz"
     PKG_PATCH_DIRS="rockchip"
     PKG_DEPENDS_TARGET+=" rkbin"
     PKG_NEED_UNPACK+=" $(get_pkg_directory rkbin)"
     ;;
-  Amlogic_GX)
-    PKG_VERSION="2018.07-rc2"
-    PKG_SHA256="03bd17bd0cf1d74d2f49454ef90bf17764ae5340053007cbc6eb630cf7c54863"
-    PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
-    ;;
   *)
-    PKG_VERSION="2018.01"
-    PKG_SHA256="938f597394b33e82e5af8c98bd5ea1a238f61892aabef36384adbf7ca5b52dda"
+    PKG_VERSION="2017.09"
+    PKG_SHA256="b2d15f2cf5f72e706025cde73d67247c6da8cd35f7e10891eefe7d9095089744"
     PKG_URL="http://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
     ;;
 esac

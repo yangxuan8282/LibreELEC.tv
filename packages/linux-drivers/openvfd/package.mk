@@ -23,17 +23,22 @@ make_target() {
   make ARCH=$TARGET_KERNEL_ARCH \
        CROSS_COMPILE=$TARGET_KERNEL_PREFIX \
        -C "$(kernel_path)" M="$PKG_BUILD/driver"
-    make OpenVFDService
+  make OpenVFDService
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/$(get_full_module_dir)/$PKG_NAME
     find $PKG_BUILD/ -name \*.ko -not -path '*/\.*' -exec cp {} $INSTALL/$(get_full_module_dir)/$PKG_NAME \;
 
+  mkdir -p $INSTALL/usr/bin
+    cp -P $PKG_DIR/scripts/openvfd-config $INSTALL/usr/bin
+    cp -P $PKG_DIR/scripts/openvfd $INSTALL/usr/bin
+
   mkdir -p $INSTALL/usr/sbin
     cp -P OpenVFDService $INSTALL/usr/sbin
 }
 
 post_install() {
+  enable_service openvfd-config.service
   enable_service openvfd.service
 }
