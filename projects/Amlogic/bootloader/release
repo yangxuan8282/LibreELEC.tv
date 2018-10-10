@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-. config/options $1
-
-mkdir -p $RELEASE_DIR/3rdparty/bootloader
-cp -a $INSTALL/usr/share/bootloader/* $RELEASE_DIR/3rdparty/bootloader
+INSTBOOT_DIR=$RELEASE_DIR/3rdparty/instboot
+mkdir -p $INSTBOOT_DIR
+cp -a $INSTALL/instboot/* $INSTBOOT_DIR
+mv $INSTALL/usr/share/bootloader/dtb $INSTBOOT_DIR/dtb

@@ -2,7 +2,7 @@
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
 PKG_NAME="autoscript-amlogic"
-PKG_VERSION=""
+PKG_VERSION="0.2"
 PKG_LICENSE="GPL"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_TOOLCHAIN="manual"
@@ -14,6 +14,15 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-  cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
+  mkdir -p $INSTALL/instboot
+  cp -a $PKG_BUILD/*autoscript $INSTALL/instboot
+  cp -a $PKG_DIR/instboot/* $INSTALL/instboot
+  for src in $INSTALL/instboot/*.ini ; do
+      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+          -i "$src"
+
+      sed -e "s/@DTB_NAME@/$KERNEL_UBOOT_EXTRA_TARGET/g" \
+          -i "$src"
+  done
 }
