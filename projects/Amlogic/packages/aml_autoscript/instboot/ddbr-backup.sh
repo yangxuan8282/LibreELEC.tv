@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
 #BACKUP_DATE=$(date +%Y%m%d%H%M%S)
 #image="$(date +%Y%m%d%H%M%S)-EMMC-backup.img"
 image="EMMC-backup.img"
@@ -8,7 +11,6 @@ OUTDIR=$1
 
 emmc=$2
 
-echo "Start FULL backup eMMC to /storage/backup"
 
 if [ "$emmc" = "" ]
 then
@@ -16,8 +18,8 @@ then
 else
     if [ ! -e "$emmc" ] ; then
 	echo "Not found EMMC !!!!"
-	    exit 1
-	fi
+	exit 1
+    fi
 fi
 
 if [ "$OUTDIR" = "" ]
@@ -33,6 +35,6 @@ fi
 
 dd if=$emmc | gzip > $OUTDIR/$image.gz
 
-echo "Done"
-
+echo "Done! Full backup completed."
+poweroff
 exit 0

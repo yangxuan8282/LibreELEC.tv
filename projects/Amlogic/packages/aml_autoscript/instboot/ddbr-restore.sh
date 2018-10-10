@@ -1,12 +1,23 @@
 #!/bin/sh
 
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
 image="EMMC-backup.img.gz"
 
 OUTDIR=$1
 
-emmc=$2
+if [ "$OUTDIR" = "" ]
+then
+    OUTDIR="/storage/backup/ddbr"
+else
+    if [ ! -d "$OUTDIR" ] ; then
+        echo " PROGRAM EXITED DUE TO ERROR: NO DIR $OUTDIR !!!"
+        exit 1
+    fi
+fi
 
-echo "Start FULL restore eMMC to eMMC"
+emmc=$2
 
 if [ "$emmc" = "" ]
 then
@@ -14,8 +25,8 @@ then
 else
     if [ ! -e "$emmc" ] ; then
 	echo "Not found EMMC !!!!"
-	    exit 1
-	fi
+	exit 1
+    fi
 fi
 
 if [ ! -f "$OUTDIR/$image" ] ; then
@@ -23,8 +34,8 @@ if [ ! -f "$OUTDIR/$image" ] ; then
     exit 1
 fi
 
-gunzip -c $OUTDIR/$image.gz | dd of=/dev/$emmc
+gunzip -c $OUTDIR/$image | dd of=$emmc
 
-echo "Done"
-
+echo "Done! restore backup completed."
+poweroff
 exit 0
