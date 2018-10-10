@@ -64,8 +64,8 @@ make_target() {
 makeinstall_target() {
   case "$DEVICE" in
     S905|S912)
-      mkdir -p $INSTALL/usr/share/bootloader/device_trees
-      cp -a $PKG_BUILD/*.dtb $INSTALL/usr/share/bootloader/device_trees
+      mkdir -p $INSTALL/usr/share/bootloader/dtb
+      cp -a $PKG_BUILD/*.dtb $INSTALL/usr/share/bootloader/dtb
     ;;
   esac
 }
