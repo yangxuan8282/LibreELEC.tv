@@ -11,11 +11,18 @@ make_target() {
   for src in $PKG_DIR/scripts/*autoscript.src ; do
     $TOOLCHAIN/bin/mkimage -A $TARGET_KERNEL_ARCH -O linux -T script -C none -d "$src" "$(basename $src .src)" > /dev/null
   done
-
-  cp -a $PKG_DIR/config/* $PKG_BUILD/
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/usr/share/bootloader
-    cp -a $PKG_BUILD/*autoscript $INSTALL/usr/share/bootloader/
+  mkdir -p $INSTALL/instboot
+  cp -a $PKG_BUILD/*autoscript $INSTALL/instboot
+  cp -a $PKG_DIR/instboot/* $INSTALL/instboot
+  for src in $INSTALL/instboot/*.ini ; do
+      sed -e "s/@BOOT_LABEL@/$DISTRO_BOOTLABEL/g" \
+          -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
+          -i "$src"
+
+      sed -e "s/@DTB_NAME@/$KERNEL_UBOOT_EXTRA_TARGET/g" \
+          -i "$src"
+  done
 }
