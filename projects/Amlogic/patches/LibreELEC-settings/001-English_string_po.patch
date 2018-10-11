@@ -8,7 +8,7 @@
 +########## eMMC #########
 +
 +msgctxt "#32820"
-+msgid "Install Libreelec to eMMC"
++msgid "eMMC"
 +msgstr ""
 +
 +msgctxt "#32821"
@@ -16,21 +16,21 @@
 +msgstr ""
 +
 +msgctxt "#2821"
-+msgid "Transfer all settings to a new system."
++msgid "Install Libreelec to eMMC."
 +msgstr ""
 +
 +msgctxt "#32822"
-+msgid "Install ..."
++msgid "Full backup eMMC."
 +msgstr ""
 +
 +msgctxt "#2822"
-+msgid "This will erase BOOT, SYSTEM, DATA and DTB on your device."
++msgid "Create full backup eMMC to /storage/backup/ddbr ."
 +msgstr ""
 +
 +msgctxt "#32823"
-+msgid "Full backup eMMC"
++msgid "Restore  eMMC"
 +msgstr ""
 +
 +msgctxt "#2823"
-+msgid "Create full backup eMMC."
++msgid "Restore full backup to eMMC."
 +msgstr ""

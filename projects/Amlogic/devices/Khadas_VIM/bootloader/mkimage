@@ -3,24 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-echo "Run mkimage"
-
-. config/options $1
-
-# compile and copy amlogic autoscript files to part1
-mcopy $RELEASE_DIR/3rdparty/bootloader/* :: 2>&1 > /dev/null || true
-
-#for dtb in $RELEASE_DIR/3rdparty/bootloader/dtb ; do
-#  [ -e "$dtb" ] && mcopy -s "$dtb" ::
-#done
+if [ -f "$RELEASE_DIR/3rdparty/bootloader/u-boot" ]; then
+  echo "Writing u-boot to $(basename $DISK)"
+  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=1 count=112 >"$SAVE_ERROR" 2>&1 || show_error
+  dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 skip=1 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
+fi
 
 for file_ini in $RELEASE_DIR/3rdparty/instboot/* ; do
   [ -e "$file_ini" ] && mcopy -s "$file_ini" ::
 done
-
-echo "Installing dtb"
-LINUX="$(get_build_dir linux)"
-DTB="$($ROOT/$SCRIPTS/uboot_helper $PROJECT $DEVICE $UBOOT_SYSTEM dtb)"
-cp -a $LINUX/arch/$TARGET_KERNEL_ARCH/boot/dts/amlogic/$DTB "$LE_TMP/dtb.img"
-
-mcopy -s "$LE_TMP/dtb.img" ::

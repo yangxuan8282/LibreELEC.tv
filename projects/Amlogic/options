@@ -138,7 +138,7 @@
     CEC_FRAMEWORK_SUPPORT="yes"
 
   # Addon Server Url
-#    ADDON_SERVER_URL="https://amlgx.libreelec.tv"
+    ADDON_SERVER_URL="https://amlgx.libreelec.tv"
 
   # set the addon dirs
     ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
