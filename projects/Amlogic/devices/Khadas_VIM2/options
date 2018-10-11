@@ -8,7 +8,7 @@
     UBOOT_SYSTEM="Khadas_VIM2"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="amlogic/meson-gxm-khadas-vim2.dtb"
+    KERNEL_UBOOT_EXTRA_TARGET="meson-gxm-khadas-vim2.dtb"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=" dtbs"
@@ -25,7 +25,7 @@
   # additional packages to install:
   # Space separated list is supported,
   # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
-    ADDITIONAL_PACKAGES+=" aml_autoscript cpumac mc"
+    ADDITIONAL_PACKAGES+=" aml_autoscript cpumac"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,

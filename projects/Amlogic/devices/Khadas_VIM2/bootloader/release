@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
 
-mkdir -p $RELEASE_DIR/3rdparty/bootloader
-cp -a $(get_build_dir aml_autoscript)/* $RELEASE_DIR/3rdparty/bootloader
+INSTBOOT_DIR=$RELEASE_DIR/3rdparty/instboot
+mkdir -p $INSTBOOT_DIR
+cp -a $INSTALL/instboot/* $INSTBOOT_DIR
+
+mkdir -p $INSTBOOT_DIR/dtb
+mv $INSTALL/usr/share/bootloader/*.dtb $INSTBOOT_DIR/dtb
