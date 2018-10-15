@@ -22,7 +22,7 @@ makeinstall_target() {
           -e "s/@DISK_LABEL@/$DISTRO_DISKLABEL/g" \
           -i "$src"
 
-      sed -e "s/@DTB_NAME@/$KERNEL_UBOOT_EXTRA_TARGET/g" \
+      sed -e "s/@DTB_NAME@/$DEFAULT_DTB_NAME/g" \
           -i "$src"
   done
 }

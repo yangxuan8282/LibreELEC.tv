@@ -8,7 +8,8 @@
     UBOOT_SYSTEM="Khadas_VIM"
 
   # Kernel extra targets to build
-    KERNEL_UBOOT_EXTRA_TARGET="meson-gxl-s905x-khadas-vim.dtb"
+#    KERNEL_UBOOT_EXTRA_TARGET="meson-gxl-s905x-khadas-vim.dtb"
+    DEFAULT_DTB_NAME=meson-gxl-s905x-khadas-vim.dtb
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD=" dtbs"
