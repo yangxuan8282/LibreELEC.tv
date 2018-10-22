@@ -138,8 +138,17 @@
     CEC_FRAMEWORK_SUPPORT="yes"
 
   # Addon Server Url
-    ADDON_SERVER_URL="https://amlgx.libreelec.tv"
+    case $TARGET_ARCH in
+      aarch64)
+        ADDON_SERVER_URL="https://balbes150.libreelec.tv/addons"
+        ;;
+      arm)
+        ADDON_SERVER_URL="https://amlgx.libreelec.tv"
+        ;;
+    esac
 
   # set the addon dirs
     ADDON_PATH="$ADDON_VERSION/${DEVICE:-$PROJECT}/$TARGET_ARCH"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+
+   ADDON_OVERWRITE="yes"
