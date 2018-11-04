@@ -1,0 +1,22 @@
+  # build and install driver addons (yes / no)
+    DRIVER_ADDONS_SUPPORT="no"
+
+  # Configuration for u-boot
+    UBOOT_VERSION="vendor"
+
+  # Kernel extra targets to build
+#    KERNEL_UBOOT_EXTRA_TARGET="meson-gxl-s905x-khadas-vim.dtb"
+    DEFAULT_DTB_NAME=meson-gxl-s905d-phicomm-n1.dtb
+
+  # Additional kernel make parameters (for example to specify the u-boot loadaddress)
+    KERNEL_MAKE_EXTRACMD=" dtbs"
+
+  # additional packages to install:
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
+    ADDITIONAL_PACKAGES+=" aml_autoscript cpumac"
+
+  # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
+  # Space separated list is supported,
+  # e.g. FIRMWARE="dvb-firmware misc-firmware wlan-firmware"
+    FIRMWARE="brcmfmac_sdio-firmware-aml meson-firmware"
